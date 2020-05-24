@@ -5,6 +5,7 @@ all rights reserved
  */
 package tick;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -16,6 +17,7 @@ public class UI_Tick_Interface {
     
     Scanner sc;                 // main object for scanning 
     ArrayList<String> log;      // main log of the input,output
+    Console console;
     
     final String PROMPT = ">";
     
@@ -40,6 +42,22 @@ public class UI_Tick_Interface {
         log.add(input);
         last_und = understand(input);
         return input;
+    }
+    /**
+     * UI_Tick_Interface.get_password()
+     * @return String
+     * Returns password typed by user
+     */
+    String get_password(){
+        Console console = System.console();
+        if ( console == null){
+            return interface_get();
+        }
+        else{
+            char[] password = console.readPassword("Password: ");
+            return String.copyValueOf(password);
+        }
+        
     }
     /**
      * UI_Tick_Interface.interface_print(String text)

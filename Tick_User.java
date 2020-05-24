@@ -34,6 +34,7 @@ public class Tick_User extends Tick_Element{
     String owner_login;                     // owner login from database
     String owner_name;                      // owner name
     private String owner_surname;           // --/--
+    private String owner_password;
     String owner_email_address;
     int owner_age;
     int owner_status;
@@ -48,14 +49,35 @@ public class Tick_User extends Tick_Element{
         owner_email_address = "";
         owner_age = 0;
         owner_status = 0;
+        owner_password = "";
+        super.put_elements(wall_updater());
+    }
+    // constructor for database
+    Tick_User(ArrayList<Tick_Brick> to_add){
+        super("Tick_User");
+        owner_id = to_add.get(0).i_get();     
+        owner_login = to_add.get(1).s_get();
+        address_id = to_add.get(2).i_get(); 
+        owner_password = to_add.get(3).s_get();
+        owner_name = to_add.get(4).s_get();                 
+        owner_surname = to_add.get(5).s_get();           
+        owner_email_address = to_add.get(6).s_get();
+        owner_age = to_add.get(7).i_get();
+        owner_status = to_add.get(8).i_get();
         super.put_elements(wall_updater());
     }
     
+    /**
+     * Tick_User.wall_updater()
+     * @return ArrayList<Tick_Brick>
+     * Returns collection of objects
+     */
     ArrayList<Tick_Brick> wall_updater(){
           ArrayList<Tick_Brick> to_ret = new ArrayList<>();
           to_ret.add(new Tick_Brick(owner_id));
-          to_ret.add(new Tick_Brick(address_id));
           to_ret.add(new Tick_Brick(owner_login));
+          to_ret.add(new Tick_Brick(address_id));
+          to_ret.add(new Tick_Brick(owner_password));
           to_ret.add(new Tick_Brick(owner_name));
           to_ret.add(new Tick_Brick(owner_surname));
           to_ret.add(new Tick_Brick(owner_email_address));
@@ -70,11 +92,20 @@ public class Tick_User extends Tick_Element{
      */
     void init_CUI(){
         
-        System.out.println("Welcome in the Tick User interface!");
-        owner_id = -1;
-        
-        
-        
+        super.inter.interface_print("Welcome in the Tick User!");
+        super.inter.interface_print("Name:");
+        owner_name = super.inter.interface_get();
+        super.inter.interface_print("Surname::");
+        owner_surname = super.inter.interface_get();
+        super.inter.interface_print("Email:");
+        owner_email_address = super.inter.interface_get();
+        super.inter.interface_print("Age:");
+        owner_age = Integer.parseInt(super.inter.interface_get());
+        super.inter.interface_print("Login:");
+        owner_login = super.inter.interface_get();
+        super.inter.interface_print("Password:");
+        owner_password = super.inter.get_password();
+        super.put_elements(wall_updater()); // updates Tick_Brick collection
     }
     
     void show(){

@@ -28,17 +28,21 @@ public class Tick_Brick {
         data_string = null;
         category = 0;
         data_array = null;
+        get_category();
     }
     
+       
     Tick_Brick(int data){
         data_int = data;
         data_string = null;
+        data_array = null;
         get_category();
     }
     
     Tick_Brick(String data){
         data_int = MAX;
-        data_string = null;
+        data_string = data;
+        data_array = null;
         get_category();
     }
     
@@ -49,6 +53,18 @@ public class Tick_Brick {
         get_category();
     }
     
+    String s_get(){
+        return data_string;
+    }
+    
+    int i_get(){
+        return data_int;
+    }
+    
+    ArrayList<String> a_get(){
+        return data_array;
+    }
+
     /**
      * Tick_Brick.get_category()
      * Function for categorise data input
@@ -68,6 +84,20 @@ public class Tick_Brick {
         }
     }
     /**
+     * Tick_Brick.categorize(String obj)
+     * @param obj
+     * @return boolean
+     * Function for cateogrization string.
+     */
+    boolean categorise(String obj){
+        try{
+            Integer i = Integer.parseInt(obj);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
+    /**
      * Tick_Brick.set_index_collection(int index)
      * @param index 
      * Function for passing index from collection where Tick_Brick is
@@ -79,8 +109,19 @@ public class Tick_Brick {
     void show(){
         System.out.println("Tick_Brick version ("+version+"):");
         System.out.println("Category : "+Integer.toString(category));
-        System.out.println("data_int : "+Integer.toString(data_int));
-        System.out.println("data_string : "+data_string);
-        System.out.println("data_array:"+data_array.toString());
+        if ( category == 2){
+            System.out.println("data_string : "+data_string);
+        }
+        else if ( category == 1){
+            System.out.println("data_int : "+Integer.toString(data_int));
+        }
+        else if ( category == 3){
+            if (data_array!= null){
+                System.out.println("data_array:"+data_array.toString());
+            }
+            else{
+                System.out.println("data_array: null");
+            }
+        }
     }
 }

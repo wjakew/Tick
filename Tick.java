@@ -6,6 +6,8 @@ all rights reserved
 package tick;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *Main program
@@ -21,7 +23,7 @@ public class Tick {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         
 // initialization of the modules
         // -- Tick_Log
@@ -29,6 +31,7 @@ public class Tick {
         // -- Database
         database = new Database(session_log);
         
+        database.user_login("wjakew", "test").show();
         session_log.save();
     }
     

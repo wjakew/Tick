@@ -30,4 +30,11 @@ public class Tick_Element {
         tick_Element_Elements = object_elements;
         tick_Element_size = object_elements.size();
     }
+    
+    void show_tick_wall(){
+        System.out.println("Tick_Brick for object: "+ tick_Element_Name);
+        for (Tick_Brick t : tick_Element_Elements){
+            t.show();
+        }
+    }
 }
