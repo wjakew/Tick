@@ -16,7 +16,7 @@ import java.util.Scanner;
 public class UI_Tick_Interface {
     
     Scanner sc;                 // main object for scanning 
-    ArrayList<String> log;      // main log of the input,output
+    ArrayList<String> history;      // main log of the input,output
     Console console;
     
     final String PROMPT = ">";
@@ -28,7 +28,7 @@ public class UI_Tick_Interface {
      */
     UI_Tick_Interface(){
         sc = new Scanner(System.in);
-        log = new ArrayList<>();
+        history = new ArrayList<>();
         last_und = -1;
     }
     
@@ -39,7 +39,7 @@ public class UI_Tick_Interface {
     String interface_get(){
         System.out.print(PROMPT);
         String input = sc.nextLine();
-        log.add(input);
+        history.add("UI - > USER INPUT : "+input+"\n");
         last_und = understand(input);
         return input;
     }
@@ -65,6 +65,7 @@ public class UI_Tick_Interface {
      * Function for printing
      */
     void interface_print(String text){
+        history.add("UI - > USER OUTPUT: "+text+"\n");
         System.out.println(text);
     }
     /**

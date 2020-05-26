@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class Database {
     
-    final String version = "v0.0.1";
+    final String version = "v0.0.1B";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -54,6 +54,38 @@ public class Database {
     }
     //----------------------------maintanance and optional methods
     /**
+     * Database.update_user_logins(Tick_User user)
+     * @param user
+     * @throws SQLException 
+     */
+    void update_user_logins(Tick_User user) throws SQLException{
+        String query = "update CONFIGURATION SET sum_entries = sum_entries + 1 WHERE owner_id = ?;";
+        
+        this.log.add("Updating sum_entries value on database...", HEADER);
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1, user.owner_id);
+        ppst.execute();
+    }
+    /**
+     * Database.get_debug_info(int owner_id)
+     * @param user
+     * @return int
+     * @throws SQLException
+     * Returns debug info number from database
+     */
+    int get_debug_info(Tick_User user) throws SQLException{
+        String query = "SELECT debug FROM CONFIGURATION where owner_id = ?";
+        this.log.add("Getting debug info from database", HEADER);
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1, user.owner_id);
+        ResultSet rs = ppst.executeQuery();
+        
+        if ( rs.next() ){
+            return rs.getInt("debug");
+        }
+        return -1;
+    }
+    /**
      * Database.array_has_it(int array[],int a)
      * @param array
      * @param a
@@ -67,6 +99,12 @@ public class Database {
             }
         }
         return false;
+    }
+    
+    void close() throws SQLException{
+        con.close();
+        connected = false;
+        this.log.add("Database connection ended", HEADER);
     }
     //----------------------------USER LOGIN TO THE DATABASE
     /**
@@ -104,6 +142,7 @@ public class Database {
             }
             this.log.add("Logged user correctly", HEADER);
             logged = new Tick_User(us_part);
+            update_user_logins(logged);
         }
         return logged;
     }

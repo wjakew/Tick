@@ -17,7 +17,7 @@ import java.util.Date;
  */
 public class Tick_Log {
     
-    final String version = "v1.0.0";
+    final String version = "v1.0.1";
     
     ArrayList<String> log_lines;
     String LOG_SRC = "LOG_TICKPROGRAM_";
@@ -55,6 +55,14 @@ public class Tick_Log {
     void add(String text,String header){
         String to_add = header + " ----> " + text+"\n";
         log_lines.add(to_add);
+    }
+    /**
+     * Tic_Log.add(String text)
+     * @param lines 
+     * Function for adding data to the log
+     */
+    void add(ArrayList<String> lines){
+        log_lines.addAll(lines);
     }
     
     /**

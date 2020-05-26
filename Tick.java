@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class Tick {
 
-    final String version = "v0.0.1";
+    static final String version = "v0.0.1";
     
     static Tick_Log session_log;
     static Database database;
@@ -24,6 +24,7 @@ public class Tick {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException, SQLException {
+        System.out.println("TICK "+version);
         
 // initialization of the modules
         // -- Tick_Log
@@ -31,7 +32,8 @@ public class Tick {
         // -- Database
         database = new Database(session_log);
         
-        database.user_login("wjakew", "test").show();
+        new CUI_Tick_Inteface(database).run();
+   
         session_log.save();
     }
     

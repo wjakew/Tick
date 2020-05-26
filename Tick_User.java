@@ -6,7 +6,6 @@ all rights reserved
 package tick;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  *Object for storing user info
