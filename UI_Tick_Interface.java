@@ -23,6 +23,8 @@ public class UI_Tick_Interface {
     
     int last_und;
     
+    int last_input;
+    
     /**
      * Main constructor of the object.
      */
@@ -78,6 +80,7 @@ public class UI_Tick_Interface {
     int understand(String input){
         try{
             int a = Integer.parseInt(input);
+            last_input = a;
             return 1;
         }catch( NumberFormatException e){
             // it's not an int
