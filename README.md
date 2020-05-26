@@ -9,4 +9,4 @@
   <li> Console interface </li>
   <li> Android App </li>
 </ul>
-<br> Date of planned beta release: 27.05.2020 <br>
+<br> Date of planned beta release: 31.05.2020 <br>
