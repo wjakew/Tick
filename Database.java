@@ -106,6 +106,43 @@ public class Database {
         connected = false;
         this.log.add("Database connection ended", HEADER);
     }
+    /**
+     * Database.make_first_configuration(Tick_User user)
+     * @param user
+     * @throws SQLException 
+     * Setting the first configuration
+     */
+    void make_first_configuration(Tick_User user) throws SQLException{
+        log.add("Making first configuration for user: "+user.owner_login,HEADER);
+        String query = "INSERT INTO CONFIGURATION\n" +
+                       "(owner_id,sum_entries,debug,conf2,conf3,conf4,conf5,conf6,conf7)\n" +
+                       "VALUES\n" +
+                       "(?,1,1,'','','','','','');";
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1, user.owner_id);
+        ppst.execute();
+    }
+    /**
+     * Database.ret_owner_id(String owner_login)
+     * @param owner_login
+     * @return int
+     * @throws SQLException
+     * Returns id of user with that login
+     */
+    int ret_owner_id (String owner_login) throws SQLException{
+        log.add("Returning id for user : " + owner_login, HEADER);
+        String query = " SELECT owner_id from OWN WHERE owner_login = ?;";
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setString(1, owner_login);
+        ResultSet rs = ppst.executeQuery();
+        
+        if ( rs.next() ){
+            return rs.getInt("owner_id");
+        }
+        
+        return -1;
+        
+    }
     //----------------------------USER LOGIN TO THE DATABASE
     /**
      * Database.user_login(String user_login, String user_password)
@@ -146,7 +183,67 @@ public class Database {
         }
         return logged;
     }
+    //----------------------------FUNCTIONS FOR USER
+    /**
+     * Database.register_user(Tick_User to_add)
+     * @param to_add
+     * @throws SQLException 
+     * Function adds user records to database
+     */
+    void register_user(Tick_User to_add) throws SQLException{
+        log.add("Registering new user...",HEADER);
+        String query = "INSERT INTO OWN\n" +
+                       "(owner_login,address_id,owner_password,owner_name,owner_surname,owner_email_address,\n" +
+                       "owner_age,owner_status)\n" +
+                       "VALUES\n" +
+                       "(?,?,?,?,?,?,?,?);";
+        log.add("QUERY: "+query, HEADER);
+        PreparedStatement ppst = con.prepareStatement(query);
+        
+        for ( int i = 1,j=1 ; i < to_add.tick_Element_size ; i++,j++){
+            Tick_Brick act = to_add.tick_Element_Elements.get(j);
+            
+            if ( act.category == 1){
+                ppst.setInt(i, act.data_int);
+            }
+            else if (act.category == 2){
+                ppst.setString(i, act.data_string);
+            }
+        }
+        log.add("QUERY: "+ppst.toString(), HEADER);
+        ppst.execute();
+        
+        to_add.owner_id = ret_owner_id(to_add.owner_login);
+        make_first_configuration(to_add);
+    }
+    //----------------------------FUNCTIONS FOR ADDRESS
+    /**
+     * Database add_address(Tick_Address to_add)
+     * @param to_add
+     * @throws SQLException 
+     * Adding address to the database
+     */
+    void add_address(Tick_Address to_add) throws SQLException{
+        String query = "INSERT INTO ADDRESS\n" +
+                       "(address_city,address_street,address_house_number,address_flat_number,address_postal,\n" +
+                       "address_country)\n" +
+                       "VALUES\n" +
+                       "(?,?,?,?,?,?);";
+        PreparedStatement ppst = con.prepareStatement(query);
+
+        for ( int i = 1,j=1 ; i < to_add.tick_Element_size ; i++,j++){
+            Tick_Brick act = to_add.tick_Element_Elements.get(j);
+            
+            if (act.category == 1){
+                ppst.setInt(i,act.i_get());
+            }
+            else if (act.category == 2){
+                ppst.setString(i, act.s_get());
+            }
+        }
+        ppst.execute();
+        log.add("QUERY: "+ppst.toString(),HEADER);
+    }
     
-    //----------------------------ADDING TO THE DATABASE
     
 }

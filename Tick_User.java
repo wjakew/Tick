@@ -41,7 +41,7 @@ public class Tick_User extends Tick_Element{
     Tick_User(){
         super("Tick_User");
         owner_id = 0;                           // id from the database
-        address_id = 0;                         // id of the address
+        address_id = 1;                         // id of the address
         owner_login = "";                     // owner login from database
         owner_name = "";                      // owner name
         owner_surname = "";           // --/--

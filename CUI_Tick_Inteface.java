@@ -42,7 +42,7 @@ public class CUI_Tick_Inteface {
         welcome_screen();
         
         // welcome prompt
-        while ( welcome_menu());
+        while ( welcome_menu());    // setting the login or register option
 
         // login loop
         while ( !login_prompt() );  // in login_prompt method is closing the procedure
@@ -50,6 +50,7 @@ public class CUI_Tick_Inteface {
         // if we are here login was succesful
     
         while ( run ){  // main loop of the program
+            // showing main menu
             String user_input = ui.interface_get();
             CUI_logic(user_input);   
         }
@@ -153,7 +154,10 @@ public class CUI_Tick_Inteface {
                 }
                 else if (ui.last_input == 2){   // go to register
                     ui.interface_print("Welcome in Tick registration!");
-                    return true;
+                    Tick_User to_register = new Tick_User();
+                    to_register.init_CUI();
+                    database.register_user(to_register);
+                    return false;
                 }
                 else if ( ui.last_input == 3){
                     close();
@@ -182,5 +186,7 @@ public class CUI_Tick_Inteface {
         ui.interface_print("Program for getting shit done");
         ui.interface_print("kubawawak@gmail.com");
     }
+    
+    
     
 }
