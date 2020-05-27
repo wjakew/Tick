@@ -32,8 +32,13 @@ public class Tick {
         // -- Database
         database = new Database(session_log);
         
-        new CUI_Tick_Inteface(database).run();
-   
+        if (database.connected){
+            new CUI_Tick_Inteface(database).run();
+        }
+        else{
+            System.out.println("Failed to connect to the database. Check log file.");
+            session_log.add("Failed to connect to the database",  "TICK "+version);
+        }
         session_log.save();
     }
     

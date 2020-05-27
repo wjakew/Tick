@@ -8,7 +8,7 @@ package tick;
 import java.util.ArrayList;
 
 /**
- *
+ *Object for storing addresses
  * @author jakub
  */
 public class Tick_Address extends Tick_Element{

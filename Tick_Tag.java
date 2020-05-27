@@ -1,0 +1,86 @@
+/*
+by Jakub Wawak
+kubawawak@gmail.com
+all rights reserved
+ */
+package tick;
+
+import java.util.ArrayList;
+
+/**
+ *Object for storing tags from database
+ * @author jakub
+ */
+public class Tick_Tag extends Tick_Element{
+    
+    /**
+     * CREATE TABLE TAG
+        (
+        tag_id INT AUTO_INCREMENT PRIMARY KEY,
+        owner_id INT,
+        hashtag_table_id INT,
+        tag_name VARCHAR(45),
+        tag_note VARCHAR(100),
+        CONSTRAINT fk_tag FOREIGN KEY (owner_id) REFERENCES OWN(owner_id),
+        CONSTRAINT fk_tag2 FOREIGN KEY (hashtag_table_id) REFERENCES HASHTAG_TABLE(hashtag_table_id)
+        );
+     */
+    
+    int tag_id;
+    int owner_id;
+    int hashtag_table_id;
+    String tag_name;
+    String tag_note;
+    
+    // main constructor
+    Tick_Tag(){
+        super("Tick_Tag");
+        tag_id = -1;
+        owner_id = -1;
+        hashtag_table_id = 1;
+        tag_name = "";
+        tag_note = "";
+        super.put_elements(wall_updater());
+        
+    }
+    
+    // one argument constructor
+    Tick_Tag(ArrayList<Tick_Brick> to_add){
+        super("Tick_Tag");
+        tag_id = to_add.get(0).i_get();
+        owner_id = to_add.get(1).i_get();
+        hashtag_table_id = to_add.get(2).i_get();
+        tag_name = to_add.get(3).s_get();
+        tag_note = to_add.get(4).s_get();
+        super.put_elements(wall_updater());
+    }
+    
+    /**
+     * Tick_Tag.wall_updater()
+     * @return ArrayList
+     * Function for 'making wall'
+     */
+    ArrayList<Tick_Brick> wall_updater(){
+        ArrayList<Tick_Brick> to_ret = new ArrayList<>();
+        
+        to_ret.add(new Tick_Brick(tag_id));
+        to_ret.add(new Tick_Brick(owner_id));
+        to_ret.add(new Tick_Brick(hashtag_table_id));
+        to_ret.add(new Tick_Brick(tag_name));
+        to_ret.add(new Tick_Brick(tag_note));
+         
+        return to_ret;
+    }
+    
+    /**
+     * Tick_Tag.init_CUI()
+     * Interface CUI input
+     */
+    void init_CUI(){
+        super.inter.interface_print("Tag name:");
+        tag_name = super.inter.interface_get();
+        super.inter.interface_print("Tag note:");
+        tag_note = super.inter.interface_get();
+        super.put_elements(wall_updater());
+    }
+}

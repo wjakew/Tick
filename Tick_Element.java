@@ -24,6 +24,7 @@ public class Tick_Element {
         tick_Element_Name = object_name;
         tick_Element_Elements = new ArrayList<>();
         tick_Element_size = 0;
+        inter.tab ="    ";
     }
     
     void put_elements(ArrayList<Tick_Brick> object_elements){

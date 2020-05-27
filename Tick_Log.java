@@ -17,7 +17,7 @@ import java.util.Date;
  */
 public class Tick_Log {
     
-    final String version = "v1.0.1";
+    final String version = "v1.0.2";
     
     ArrayList<String> log_lines;
     String LOG_SRC = "LOG_TICKPROGRAM_";
@@ -41,7 +41,7 @@ public class Tick_Log {
      */
     void init(){
         log_lines.add("Log file from program TICK\n");
-        log_lines.add("Log made by Tick_Log version "+version);
+        log_lines.add("Log made by Tick_Log version "+version+"\n");
         log_lines.add("TIME OF START: "+ actual_date.toString()+"\n");
         log_lines.add("---------------------------------------\n");
     }

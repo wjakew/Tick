@@ -15,12 +15,14 @@ import java.util.Scanner;
  */
 public class UI_Tick_Interface {
     
-    Scanner sc;                 // main object for scanning 
+    Scanner sc;                     // main object for scanning 
     ArrayList<String> history;      // main log of the input,output
     Console console;
     
+    
     final String PROMPT = ">";
     
+    String tab = "";                // variable used to 'move' print
     int last_und;
     
     int last_input;
@@ -39,7 +41,7 @@ public class UI_Tick_Interface {
      * @return String 
      */
     String interface_get(){
-        System.out.print(PROMPT);
+        System.out.print(tab+PROMPT);
         String input = sc.nextLine();
         history.add("UI - > USER INPUT : "+input+"\n");
         last_und = understand(input);
@@ -68,7 +70,7 @@ public class UI_Tick_Interface {
      */
     void interface_print(String text){
         history.add("UI - > USER OUTPUT: "+text+"\n");
-        System.out.println(text);
+        System.out.println(tab+text);
     }
     /**
      * UI_Tick_Interface.understand(String input)

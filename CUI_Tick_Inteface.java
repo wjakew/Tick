@@ -65,16 +65,31 @@ public class CUI_Tick_Inteface {
         List<String> words = Arrays.asList(user_input.split(" ")); 
         
         for (String word : words){
-            
+            // exit
             if (word.equals("exit")){
                 close();
             }
+            // help
+            else if ( word.equals("help")){
+                CUI_FUN_help(words);
+                break;
+            }
+            // add
+            else if ( word.equals("add")){
+                CUI_FUN_add(words);
+                break;
+            }
+            // me
+            else if ( word.equals("me")){
+                CUI_FUN_me(words);
+                break;
+            }
+            // not supported command
             else{
+                ui.interface_print("Wrong command");
                 echo_CUI_interface(words.toString());
             }
-            
         }
-        
     }
     
     /**
@@ -187,6 +202,124 @@ public class CUI_Tick_Inteface {
         ui.interface_print("kubawawak@gmail.com");
     }
     
+    //----------------------------------------FUNCTIONS OF THE INTERFACE
+    /**
+     * CUI_Tick_Inteface.help_screen(List<String> addons)
+     * @param addons 
+     * Shows help for the user
+     */
+    void CUI_FUN_help(List<String> addons){
+        // help
+        if ( addons.size() == 1){
+            ui.interface_print("Help for the program: ");
+            ui.interface_print("add ");
+            ui.interface_print("    - place | address | scene | hashtable | tag | category | note ");
+            ui.interface_print("me ");
+            ui.interface_print(" ( without parameters shows account )"); 
+            ui.interface_print("    - update ");
+            ui.interface_print("        address | password ");
+        }
+        // help add
+        else if (addons.size() == 2 && addons.contains("add")){
+            ui.interface_print("Help for add ");
+            ui.interface_print("    - place | address | scene | hashtable | tag | category | note ");
+        }
+        // help me
+        else if (addons.size() == 2 && addons.contains("me")){
+            ui.interface_print("Help for me ");
+            ui.interface_print(" ( without parameters shows account )"); 
+            ui.interface_print("    - password ( changes password ) ");
+        }
+    }
+    void CUI_FUN_add(List<String> addons) throws SQLException{
+        //   +         +                 +         +       +
+        //  place | address | scene | hashtable | tag | category | note 
+        // add
+        if ( addons.size() == 1 ){
+            ui.interface_print("No additional arguments. See help ( help add ) ");
+        }
+        // add address
+        else if ( addons.size() == 2 && addons.contains("address")){
+            Tick_Address to_add = new Tick_Address();
+            to_add.init_CUI();
+            if ( database.add_address(to_add) ) {
+                ui.interface_print("Address added");
+            }
+            else{
+                ui.interface_print("Something goes wrong");
+            }
+        }
+        // add place
+        else if ( addons.size() == 2 && addons.contains("place")){
+            Tick_Place to_add = new Tick_Place();
+            to_add.init_CUI();
+            to_add.owner_id = logged_user.owner_id;
+            if ( database.add_place(to_add)){
+                ui.interface_print("Place added");
+            }
+            else{
+                ui.interface_print("Something goes wrong");
+            }
+        }
+        // add hashtable
+        else if ( addons.size() == 2 && addons.contains("hashtable")){
+            Tick_HashtagT  to_add = new Tick_HashtagT();
+            to_add.init_CUI();
+            to_add.owner_id = logged_user.owner_id;
+            to_add.put_elements(to_add.wall_updater());
+            if (database.add_hashtagT(to_add)){
+                ui.interface_print("Hashtag Table added");
+            }
+            else{
+                ui.interface_print("Something goes wrong");
+            }
+        }
+        // add tag
+        else if ( addons.size() == 2 && addons.contains("tag")){
+            Tick_Tag to_add = new Tick_Tag();
+            to_add.init_CUI();
+            to_add.owner_id = logged_user.owner_id;
+            to_add.put_elements(to_add.wall_updater());
+            if (database.add_tag(to_add)){
+                ui.interface_print("Tag added");
+            }
+            else{
+                ui.interface_print("Something goes wrong");
+            }
+        }
+        // add category
+        else if ( addons.size() == 2 && addons.contains("category")){
+            Tick_Category to_add = new Tick_Category();
+            to_add.init_CUI();
+            to_add.owner_id = logged_user.owner_id;
+            to_add.put_elements(to_add.wall_updater());
+            if (database.add_category(to_add)){
+                ui.interface_print("Category added");
+            }
+            else{
+                ui.interface_print("Something goes wrong");
+            }
+        }
+    }
+    /**
+     * CUI_Tick_Inteface.CUI_FUN_me(List<String> addons)
+     * @param addons
+     * @throws SQLException 
+     * Function of showing and changing user stuff
+     */
+    void CUI_FUN_me(List<String> addons) throws SQLException{
+        // me
+        if ( addons.size() == 1){
+            ui.interface_print("Info about your account:");
+            logged_user.show();
+        }
+        // me password 'content'
+        else if ( addons.size() == 3 && addons.contains("password")){
+            run = !database.change_password(logged_user, addons.get(2));
+            ui.interface_print("Password change, please log again.");
+        }
+        
+    }
     
     
 }
