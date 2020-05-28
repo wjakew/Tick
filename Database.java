@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class Database {
     
-    final String version = "v0.0.2B";
+    final String version = "v0.0.3B";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -432,6 +432,41 @@ public class Database {
             log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
             return false;
         }
+    }
+    //------------------------------FUNCTIONS FOR NOTE
+    /**
+     * Database.add_note(Tick_Note to_add)
+     * @param to_add
+     * @return
+     * @throws SQLException 
+     * Functions for adding data to database
+     */
+    boolean add_note(Tick_Note to_add) throws SQLException{
+        log.add("Adding new note",HEADER);
+        String query = "INSERT INTO NOTE\n" +
+                       "(owner_id,note_content,setting1,setting2,setting3)\n" +
+                       "VALUES\n" +
+                       "(?,?,?,?,?);";
+        PreparedStatement ppst = con.prepareStatement(query);
         
+        for ( int i = 1,j=1 ; i < to_add.tick_Element_size ; i++,j++){
+            Tick_Brick act = to_add.tick_Element_Elements.get(j);
+            
+            if (act.category == 1){
+                ppst.setInt(i,act.i_get());
+            }
+            else if (act.category == 2){
+                ppst.setString(i, act.s_get());
+            }
+        }
+        try{
+            log.add("QUERY: "+ppst.toString(),HEADER);
+            ppst.execute();
+            return true;
+        }catch (Exception e){
+            log.add("Failed to add note",HEADER);
+            log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
+            return false;
+        }
     }
 }

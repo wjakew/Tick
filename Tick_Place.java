@@ -71,6 +71,21 @@ public class Tick_Place extends Tick_Element{
         super.inter.interface_print("Enter the place name: ");
         place_name = super.inter.interface_get();
     }
+    /**
+     * Tick_Place.get_lines_to_show()
+     * @return ArrayList
+     * Returns lines of object content
+     */
+    ArrayList<String> get_lines_to_show(){
+        /**
+         * id: /place_id/
+         * Place name: /place_name/
+         */
+        ArrayList<String> to_ret = new ArrayList<>();
+        to_ret.add("id: "+Integer.toString(place_id));
+        to_ret.add("Place name: "+place_name);
+        return to_ret;
+    }
 
     
 }

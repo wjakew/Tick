@@ -73,7 +73,10 @@ public class Tick_Address extends Tick_Element{
         to_ret.add(new Tick_Brick(address_country));
         return to_ret;
     }
-    
+    /**
+     * Tick_Address.init_CUI()
+     * User input interface for CUI
+     */
     void init_CUI(){
         super.inter.interface_print("Adding new address:");
         super.inter.interface_print("City name:");
@@ -89,5 +92,25 @@ public class Tick_Address extends Tick_Element{
         super.inter.interface_print("Country:");
         address_country = super.inter.interface_get();
         super.put_elements(wall_updater());
+    }
+    /**
+     * Tick_Address.get_lines_to_show()
+     * @return ArrayList
+     * Returns lines of object content
+     */
+    ArrayList<String> get_lines_to_show(){
+        /**
+         * id: /id number/
+         * /address_street/ /address_house_number///address_flat_number/
+         * /address_postal/ /address_city/
+         * /address_country/
+         */
+        ArrayList<String> to_ret = new ArrayList<>();
+        to_ret.add("id: "+Integer.toString(address_id));
+        to_ret.add(address_street+" "+
+                Integer.toString(address_house_number)+"/"+Integer.toString(address_flat_number));
+        to_ret.add(address_postal+" "+address_city);
+        to_ret.add(address_country);
+        return to_ret;
     }
 }

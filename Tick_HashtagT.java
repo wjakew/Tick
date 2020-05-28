@@ -72,5 +72,24 @@ public class Tick_HashtagT extends Tick_Element{
         hashtag_table_note = super.inter.interface_get();
         super.put_elements(wall_updater());
     }
+    /**
+     * Tick_Address.get_lines_to_show()
+     * @return ArrayList
+     * Returns lines of object content
+     */
+    ArrayList<String> get_lines_to_show(){
+        /**
+         * id: /hashtag_table_id/
+         * Hashtag Table Name: /hashtag_table_name/
+         * Hashtag Table Note:
+         * /hashtag_table_note/
+         */
+        ArrayList<String> to_ret = new ArrayList<>();
+        to_ret.add("id: "+Integer.toString(hashtag_table_id));
+        to_ret.add("Hashtag Table Name: "+hashtag_table_name);
+        to_ret.add("Hashtag Table Note:");
+        to_ret.add(hashtag_table_note);
+        return to_ret;
+    }
     
 }

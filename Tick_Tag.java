@@ -83,4 +83,23 @@ public class Tick_Tag extends Tick_Element{
         tag_note = super.inter.interface_get();
         super.put_elements(wall_updater());
     }
+    /**
+     * Tick_Tag.get_lines_to_show()
+     * @return ArrayList
+     * Returns lines of object content
+     */
+    ArrayList<String> get_lines_to_show(){
+        /**
+         * id: /tag_id/
+         * Tag name: /tag_name/
+         * Note:
+         * /tag_note/
+         */
+        ArrayList<String> to_ret = new ArrayList<>();
+        to_ret.add("id: "+Integer.toString(tag_id));
+        to_ret.add("Tag name: " + tag_name);
+        to_ret.add("Note:");
+        to_ret.add(tag_note);
+        return to_ret;
+    }
 }

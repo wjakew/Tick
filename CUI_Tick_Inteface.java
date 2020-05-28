@@ -212,17 +212,20 @@ public class CUI_Tick_Inteface {
         // help
         if ( addons.size() == 1){
             ui.interface_print("Help for the program: ");
+            ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("add ");
-            ui.interface_print("    - place | address | scene | hashtable | tag | category | note ");
+            ui.interface_print("    - place | address | hashtable | tag | category | note ");
+            ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
             ui.interface_print("    - update ");
             ui.interface_print("        address | password ");
+            ui.interface_print("-----------------------------------------------------------");
         }
         // help add
         else if (addons.size() == 2 && addons.contains("add")){
             ui.interface_print("Help for add ");
-            ui.interface_print("    - place | address | scene | hashtable | tag | category | note ");
+            ui.interface_print("    - place | address | hashtable | tag | category | note ");
         }
         // help me
         else if (addons.size() == 2 && addons.contains("me")){
@@ -231,9 +234,15 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - password ( changes password ) ");
         }
     }
+    /**
+     * CUI_Tick_Interface.CUI_FUN_add(List<String> addons)
+     * @param addons
+     * @throws SQLException 
+     * Function for adding data to the database
+     */
     void CUI_FUN_add(List<String> addons) throws SQLException{
-        //   +         +                 +         +       +
-        //  place | address | scene | hashtable | tag | category | note 
+        //   +         +         +         +       +        +
+        //  place | address | hashtable | tag | category | note 
         // add
         if ( addons.size() == 1 ){
             ui.interface_print("No additional arguments. See help ( help add ) ");
@@ -295,6 +304,19 @@ public class CUI_Tick_Inteface {
             to_add.put_elements(to_add.wall_updater());
             if (database.add_category(to_add)){
                 ui.interface_print("Category added");
+            }
+            else{
+                ui.interface_print("Something goes wrong");
+            }
+        }
+        // add note
+        else if ( addons.size() == 2 && addons.contains("note")){
+            Tick_Note to_add = new Tick_Note();
+            to_add.init_CUI();
+            to_add.owner_id = logged_user.owner_id;
+            to_add.put_elements(to_add.wall_updater());
+            if (database.add_note(to_add)){
+                ui.interface_print("Note added");
             }
             else{
                 ui.interface_print("Something goes wrong");

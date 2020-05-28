@@ -72,5 +72,25 @@ public class Tick_Category extends Tick_Element{
         category_note = super.inter.interface_get();
         super.put_elements(wall_updater());
     }
+    /**
+     * Tick_Category.get_lines_to_show()
+     * @return ArrayList
+     * Returns lines of object content
+     */
+    ArrayList<String> get_lines_to_show(){
+        /**
+         * id: /category_id/
+         * Category name: /category_name/
+         * Note:
+         * /category_note/
+         */
+        ArrayList<String> to_ret = new ArrayList<>();
+        to_ret.add("id: "+Integer.toString(category_id));
+        to_ret.add("Category name: "+category_name);
+        to_ret.add("Note:");
+        to_ret.add(category_note);
+        
+        return to_ret;
+    }
     
 }
