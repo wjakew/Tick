@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class Database {
     
-    final String version = "v0.0.6B";
+    final String version = "v0.0.7B";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -135,7 +135,6 @@ public class Database {
         }
         return false;
     }
-    
     void close() throws SQLException{
         con.close();
         connected = false;
@@ -400,14 +399,6 @@ public class Database {
             update_user_logins(logged);
         }
         return logged;
-    }
-    //----------------------------LINK FUNCTIONS
-    void link_own_address(int owner_id,int address_id) throws SQLException{
-        String query = "UPDATE OWN SET address_id = ? WHERE owner_id = ?";
-        PreparedStatement ppst = con.prepareStatement(query);
-        ppst.setInt(1,address_id);
-        ppst.setInt(2,owner_id);
-        ppst.execute();
     }
     //----------------------------FUNCTIONS FOR USER
     /**

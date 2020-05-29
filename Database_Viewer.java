@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class Database_Viewer {
     
-    final String version = "v1.0.0";
+    final String version = "v1.0.1";
     final String HEADER = "DATABASE_VIEWER ("+version+")"; 
     /**
      * modes:
@@ -65,7 +65,11 @@ public class Database_Viewer {
      */
     ArrayList<String> get_lines(ArrayList<Tick_Brick> to_get) throws SQLException{
         Container obj = new Container (to_get, mode,database,logged);
-        return obj.make_lines();
+        ArrayList<String> to_ret = obj.make_lines();
+        if ( to_ret.isEmpty() ){
+            to_ret.add("Empty");
+        }
+        return to_ret;
     }
     /**
      * Database_Viewer.prepare_query(String mode)
@@ -92,6 +96,9 @@ public class Database_Viewer {
         }
         else if (mode.equals("tag")){
             query = "SELECT * FROM TAG where owner_id = ?;";
+        }
+        else if (mode.equals("scene")){
+            query = "SELECT * FROM SCENE where owner_id = ?;";
         }
         PreparedStatement ppst = database.con.prepareStatement(query);
         if ( !mode.equals("address") ){
@@ -181,6 +188,18 @@ public class Database_Viewer {
                 tag_note VARCHAR(100),
              */
             index = new int[] {1,2,3};
+        }
+        else if (mode.equals("scene")){
+            /**
+             *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
+                hashtag_table_id INT,
+                place_id INT,
+                owner_id INT,
+                category_id INT,
+                scene_name VARCHAR(30),
+                scene_note VARCHAR(100),
+             */
+            index = new int[] {1,2,3,4,5};
         }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());

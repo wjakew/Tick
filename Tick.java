@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class Tick {
 
-    static final String version = "v0.0.1";
+    static final String version = "v0.5.1";
     
     static Tick_Log session_log;
     static Database database;

@@ -96,6 +96,10 @@ public class CUI_Tick_Inteface {
                 CUI_FUN_link(words);
                 break;
             }
+            else if (word.equals("scene")){
+                CUI_FUN_scene(words);
+                break;
+            }
             // not supported command
             else{
                 ui.interface_print("Wrong command");
@@ -235,6 +239,10 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - adrplp /address_id/ /place_id/   ( address to place )");
             ui.interface_print("    - hshtag    /tag_id/ /hashtag_table_id/( hashtag table to tag )");
             ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("scene ");
+            ui.interface_print("    ( without parameters show active scenes )");
+            ui.interface_print("    - add ( inits scene maker ) ");
+            ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
             ui.interface_print("    - update ");
@@ -264,6 +272,12 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    Linking is used for connecting two information");
             ui.interface_print("    - adrplp /address_id/ /place_id/   ( address to place )");
             ui.interface_print("    - hshtag    /tag_id/ /hashtag_table_id/( hashtag table to tag )");
+        }
+        //help scene
+        else if (addons.size() == 2 && addons.contains("scene")){
+            ui.interface_print("Help for scene ");
+            ui.interface_print("    ( without parameters show active scenes )");
+            ui.interface_print("    - add ( inits scene maker ) ");
         }
         else{
             ui.interface_print("Wrong option");
@@ -384,8 +398,13 @@ public class CUI_Tick_Inteface {
     }
     
     void show_arraylist(ArrayList<String> to_show){
-        for(String line: to_show){
-            ui.interface_print(line);
+        if (to_show.size() == 1){
+            ui.interface_print("Empty");
+        }
+        else{
+            for(String line: to_show){
+                ui.interface_print(line);
+            }
         }
     }
     /**
@@ -431,6 +450,11 @@ public class CUI_Tick_Inteface {
         // show note
         else if ( addons.size() == 2 && addons.contains("note")){
             Database_Viewer view = new Database_Viewer(database,logged_user,"note");
+            show_arraylist(view.make_view());
+        }
+        // show scene
+        else if ( addons.size() == 2 && addons.contains("scene")){
+            Database_Viewer view = new Database_Viewer(database,logged_user,"scene");
             show_arraylist(view.make_view());
         }
         else{
@@ -497,6 +521,34 @@ public class CUI_Tick_Inteface {
             }
         }
         
+        else{
+            ui.interface_print("Wrong option");
+        }
+    }
+    /**
+     * CUI_Tick_Interface.CUI_FUN_scene(List<String> addons)
+     * @param addons 
+     */
+    void CUI_FUN_scene(List<String> addons) throws SQLException{
+        // scene
+        if (addons.size() == 1){
+            ui.interface_print("Currently active scenes:");
+            Database_Viewer view = new Database_Viewer(database,logged_user,"scene");
+            show_arraylist(view.make_view());
+        }
+        // scene add
+        else if (addons.size() == 2 && addons.contains("add")){
+            ui.interface_print("Welcome in the scene creator: ");
+            Database_Viewer category_view = new Database_Viewer(database,logged_user,"category");
+            Database_Viewer place_view = new Database_Viewer(database,logged_user,"place");
+            Database_Viewer hashtag_table_view = new Database_Viewer(database,logged_user,"hashtag table");
+            System.out.printf("%30s %30s %30s", "CATEGORIES", "PLACES", "HASHTAG TABLES\n");
+            ArrayList<String> array_category = category_view.make_view();
+            ArrayList<String> array_place = place_view.make_view();
+            ArrayList<String> array_hshtable = hashtag_table_view.make_view();
+            
+        }
+
         else{
             ui.interface_print("Wrong option");
         }

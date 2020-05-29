@@ -1,0 +1,128 @@
+/*
+by Jakub Wawak
+kubawawak@gmail.com
+all rights reserved
+ */
+package tick;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+/**
+ *Object for storing and making scenes
+ * @author jakub
+ */
+public class Tick_Scene extends Tick_Element{
+    /**
+     * CREATE TABLE SCENE
+        (
+        scene_id INT AUTO_INCREMENT PRIMARY KEY,
+        hashtag_table_id INT,
+        place_id INT,
+        owner_id INT,
+        category_id INT,
+        scene_name VARCHAR(30),
+        scene_note VARCHAR(100),
+        CONSTRAINT fk_scene FOREIGN KEY (hashtag_table_id) REFERENCES HASHTAG_TABLE(hashtag_table_id),
+        CONSTRAINT fk_scene2 FOREIGN KEY (place_id) REFERENCES PLACE(place_id),
+        CONSTRAINT fk_scene3 FOREIGN KEY (owner_id) REFERENCES OWN(owner_id),
+        CONSTRAINT fk_scene4 FOREIGN KEY (category_id) REFERENCES CATEGORY(category_id)
+        );
+    */
+    int scene_id;
+    int hashtag_table_id;
+    int place_id;
+    int owner_id;
+    int category_id;
+    String scene_name;
+    String scene_note;
+    
+    // main constructor
+    Tick_Scene(){
+        super("Tick_Scene");
+        scene_id = -1;
+        hashtag_table_id = -1;
+        place_id = -1;
+        owner_id = -1;
+        category_id = -1;
+        scene_name = "";
+        scene_note = "";
+        super.put_elements(wall_updater());
+    }
+    // constructor with one argument
+    Tick_Scene(ArrayList<Tick_Brick> to_add){
+        super("Tick_Scene");
+        scene_id = to_add.get(0).i_get();
+        hashtag_table_id = to_add.get(1).i_get();
+        place_id = to_add.get(2).i_get();
+        owner_id = to_add.get(3).i_get();
+        category_id = to_add.get(4).i_get();
+        scene_name = to_add.get(5).s_get();
+        scene_note = to_add.get(6).s_get();
+        super.put_elements(wall_updater());
+    }
+    /**
+     * Tick_Scene.wall_updater()
+     * @return ArrayList
+     * Returns 'brick wall'
+     */
+    ArrayList<Tick_Brick> wall_updater(){
+        ArrayList<Tick_Brick> to_ret = new ArrayList<>();
+        to_ret.add(new Tick_Brick(scene_id));
+        to_ret.add(new Tick_Brick(hashtag_table_id));
+        to_ret.add(new Tick_Brick(place_id));
+        to_ret.add(new Tick_Brick(owner_id));
+        to_ret.add(new Tick_Brick(category_id));
+        to_ret.add(new Tick_Brick(scene_name));
+        to_ret.add(new Tick_Brick(scene_note));
+        return to_ret;
+    }
+    /**
+     * Tick_Scene.init_CUI()
+     * Input for console interface
+     */
+    void init_CUI(){
+        super.inter.interface_print("Place id: ");
+        super.inter.interface_get();
+        place_id = super.inter.last_input;
+        super.inter.interface_print("Category id: ");
+        super.inter.interface_get();
+        category_id = super.inter.last_input;
+        super.inter.interface_print("Hastag Table id: ");
+        super.inter.interface_get();
+        hashtag_table_id = super.inter.last_input;
+        super.put_elements(wall_updater());
+    }
+    
+    /**
+     * Tick_Scene.check_integrity()
+     * @param database
+     * @return boolean
+     * @throws SQLException 
+     * Check if user input is correct
+     */
+    boolean check_integrity(Database database) throws SQLException{
+        return ( database.check_if_record_exists(place_id, "place") 
+                && database.check_if_record_exists(category_id, "category")
+                    && database.check_if_record_exists(hashtag_table_id, "hashtag table"));
+    }
+    /**
+     * Tick_Scene.get_lines_to_show()
+     * @return ArrayList
+     * Function returns lines to show in Database Viewer
+     */
+    ArrayList<String> get_lines_to_show(){
+        ArrayList<String> to_ret = new ArrayList<>();
+        /**
+         * Scene name: /scene name/ ------------------------->/scene_id/
+         * Category: /category_id/
+         * Hashtag Table: /hashtag_table_id/
+         * Place id: /place_id/
+         */
+        to_ret.add("Scene name: "+scene_name+" ------------------------->"+ Integer.toString(scene_id));
+        to_ret.add("Category: "+Integer.toString(category_id));
+        to_ret.add("Hashtag Table: "+Integer.toString(hashtag_table_id));
+        to_ret.add("Place id: "+Integer.toString(place_id));
+        return to_ret;
+    }
+}

@@ -189,6 +189,27 @@ public class Container {
                 }
             }
         }
+        else if (mode.equals("scene")){
+            /**
+             *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
+                hashtag_table_id INT,
+                place_id INT,
+                owner_id INT,
+                category_id INT,
+                scene_name VARCHAR(30),
+                scene_note VARCHAR(100),
+             */
+            for (Tick_Brick element : wall){    // looping on Tick_Brick objects
+                if ( !element.STOP ){
+                    part.add(element);
+                }
+                else{
+                    Tick_Scene to_add = new Tick_Scene(part);
+                    copy_list(lines,kick_list(to_add.get_lines_to_show()));
+                    part.clear();
+                }
+            }
+        }
         return lines;
     }
     
