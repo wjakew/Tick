@@ -52,6 +52,7 @@ public class CUI_Tick_Inteface {
     
         while ( run ){  // main loop of the program
             // showing main menu
+            ui.interface_print("------------------------------------------------");
             String user_input = ui.interface_get();
             CUI_logic(user_input);   
         }
@@ -88,6 +89,11 @@ public class CUI_Tick_Inteface {
             // show
             else if ( word.equals("show")){
                 CUI_FUN_show(words);
+                break;
+            }
+            // link
+            else if ( word.equals("link")){
+                CUI_FUN_link(words);
                 break;
             }
             // not supported command
@@ -225,6 +231,10 @@ public class CUI_Tick_Inteface {
             ui.interface_print("show ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
             ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("link ");
+            ui.interface_print("    - adrplp /address_id/ /place_id/   ( address to place )");
+            ui.interface_print("    - hshtag    /tag_id/ /hashtag_table_id/( hashtag table to tag )");
+            ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
             ui.interface_print("    - update ");
@@ -240,12 +250,23 @@ public class CUI_Tick_Inteface {
         else if (addons.size() == 2 && addons.contains("me")){
             ui.interface_print("Help for me ");
             ui.interface_print(" ( without parameters shows account )"); 
-            ui.interface_print("    - password ( changes password ) ");
+            ui.interface_print("    - update ");
+            ui.interface_print("        address | password ");
         }
         // help show
         else if (addons.size() == 2 && addons.contains("show")){
             ui.interface_print("Help for show ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
+        }
+        //help link
+        else if (addons.size() == 2 && addons.contains("link")){
+            ui.interface_print(" Help for link ");
+            ui.interface_print("    Linking is used for connecting two information");
+            ui.interface_print("    - adrplp /address_id/ /place_id/   ( address to place )");
+            ui.interface_print("    - hshtag    /tag_id/ /hashtag_table_id/( hashtag table to tag )");
+        }
+        else{
+            ui.interface_print("Wrong option");
         }
     }
     /**
@@ -336,9 +357,12 @@ public class CUI_Tick_Inteface {
                 ui.interface_print("Something goes wrong");
             }
         }
+        else{
+            ui.interface_print("Wrong option");
+        }
     }
     /**
-     * CUI_Tick_Inteface.CUI_FUN_me(List<String> addons)
+     * CUI_Tick_Interface.CUI_FUN_me(List<String> addons)
      * @param addons
      * @throws SQLException 
      * Function of showing and changing user stuff
@@ -350,9 +374,12 @@ public class CUI_Tick_Inteface {
             logged_user.show();
         }
         // me password 'content'
-        else if ( addons.size() == 3 && addons.contains("password")){
-            run = !database.change_password(logged_user, addons.get(2));
+        else if ( addons.size() == 4 && addons.contains("password")){
+            run = !database.change_password(logged_user, addons.get(3));
             ui.interface_print("Password change, please log again.");
+        }
+        else{
+            ui.interface_print("Wrong option");
         }
     }
     
@@ -361,7 +388,12 @@ public class CUI_Tick_Inteface {
             ui.interface_print(line);
         }
     }
-    
+    /**
+     * CUI_Tick_Interface.CUI_FUN_show(List<String> addons)
+     * @param addons
+     * @throws SQLException 
+     * Function for showing data from database
+     */
     void CUI_FUN_show(List<String> addons) throws SQLException{
         /**
          *     +        +          +        +       + 
@@ -400,6 +432,73 @@ public class CUI_Tick_Inteface {
         else if ( addons.size() == 2 && addons.contains("note")){
             Database_Viewer view = new Database_Viewer(database,logged_user,"note");
             show_arraylist(view.make_view());
+        }
+        else{
+            ui.interface_print("Wrong option");
+        }
+    }
+    /**
+     * CUI_Tick_Interface.CUI_FUN_link(List<String> addons)
+     * @param addons 
+     * Function for linking two objects of data
+     */
+    void CUI_FUN_link(List<String> addons) throws SQLException{
+        /**
+         * - adrplp /address_id/ /place_id/              ( address to place )
+           - hshtag    /tag_id/ /hashtag_table_id/       ( hashtag table to tag )
+         */
+        Database_Link linker = new Database_Link(database);
+        if ( addons.size() == 1){
+            ui.interface_print("No additional arguments. See help (help link)");
+        }
+        // link adrplp /address_id/ /place_id/
+        else if ( addons.size() == 4 && addons.contains("adrplp")){
+            // check if records exists
+            if ( database.check_if_record_exists(ui.numbers.get(0), "address") 
+                    && database.check_if_record_exists(ui.numbers.get(1), "place")){
+                int address_id = ui.numbers.get(0);
+                int place_id = ui.numbers.get(1);
+                // preparing objects
+                
+                Tick_Address to_link_address = linker.get_object_address(address_id);
+                Tick_Place to_link_place = linker.get_object_place(place_id);
+                
+                if ( linker.link_place_address(to_link_place, to_link_address) ){
+                    ui.interface_print("Link succesfull");
+                }
+                else{
+                    ui.interface_print("Link occured a problem");
+                }
+            }
+            else{
+                ui.interface_print("One of the objects not exist");
+            }
+        }
+        // hshtag    /tag_id/ /hashtag_table_id/
+        else if ( addons.size() == 4 && addons.contains("hshtag")){
+            if ( database.check_if_record_exists(ui.numbers.get(0), "tag") 
+                    && database.check_if_record_exists(ui.numbers.get(1), "hashtag table")){
+                int tag_id = ui.numbers.get(0);
+                int hashtag_table_id = ui.numbers.get(1);
+                
+                // preparing objects
+                Tick_Tag to_link_tag = linker.get_object_tag(tag_id);
+                Tick_HashtagT to_link_hashtagT = linker.get_object_hashtagT(hashtag_table_id);         
+                
+                if ( linker.link_tag_hashtagT(to_link_tag, to_link_hashtagT) ){
+                    ui.interface_print("Link succesfull");
+                }
+                else{
+                    ui.interface_print("Link occured a problem");
+                }
+            }
+            else{
+                ui.interface_print("One of the objects not exist");
+            }
+        }
+        
+        else{
+            ui.interface_print("Wrong option");
         }
     }
     

@@ -67,6 +67,40 @@ public class Database {
         ppst.setInt(1, user.owner_id);
         ppst.execute();
     }
+    
+    /**
+     * Database.check_if_record_exists(int id,String mode)
+     * @param id
+     * @param mode
+     * @return
+     * @throws SQLException 
+     * Function checks if record exists
+     */
+    boolean check_if_record_exists(int id,String mode) throws SQLException{
+        String query = "";
+        if (mode.equals("address")){
+            query = "SELECT * FROM ADDRESS where address_id = ?;";
+        }
+        else if (mode.equals("category")){
+            query = "SELECT * FROM CATEGORY where category_id = ?;";
+        }
+        else if (mode.equals("hashtag table")){
+            query = "SELECT * FROM HASHTAG_TABLE where hashtag_table_id = ?;";
+        }
+        else if (mode.equals("note")){
+            query = "SELECT * FROM NOTE where note_id = ?;";
+        }
+        else if (mode.equals("place")){
+            query = "SELECT * FROM PLACE where place_id = ?;";
+        }
+        else if (mode.equals("tag")){
+            query = "SELECT * FROM TAG where tag_id = ?;";
+        }
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1, id);
+        ResultSet rs = ppst.executeQuery();
+        return rs.next();
+    }
     /**
      * Database.get_debug_info(int owner_id)
      * @param user

@@ -14,6 +14,7 @@ import java.util.Scanner;
  * @author jakub
  */
 public class UI_Tick_Interface {
+    final String version = "v1.0.1";
     
     Scanner sc;                     // main object for scanning 
     ArrayList<String> history;      // main log of the input,output
@@ -27,12 +28,16 @@ public class UI_Tick_Interface {
     
     int last_input;
     
+    ArrayList<Integer> numbers; // collection for found 
+                                // numbers in user input
+    
     /**
      * Main constructor of the object.
      */
     UI_Tick_Interface(){
         sc = new Scanner(System.in);
         history = new ArrayList<>();
+        numbers = new ArrayList<>();
         last_und = -1;
     }
     
@@ -41,10 +46,12 @@ public class UI_Tick_Interface {
      * @return String 
      */
     String interface_get(){
+        numbers.clear();
         System.out.print(tab+PROMPT);
         String input = sc.nextLine();
         history.add("UI - > USER INPUT : "+input+"\n");
         last_und = understand(input);
+        get_numbers(input);
         return input;
     }
     /**
@@ -99,6 +106,16 @@ public class UI_Tick_Interface {
                         return 0;
                 }
              }
+        }
+    }
+    
+    void get_numbers(String input){
+        // looping on words
+        for (String word : input.split(" ")){
+            try{
+                int number = Integer.parseInt(word);
+                numbers.add(number);
+            }catch(NumberFormatException e){}
         }
     }
 }
