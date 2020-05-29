@@ -6,6 +6,7 @@ all rights reserved
 package tick;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -82,6 +83,11 @@ public class CUI_Tick_Inteface {
             // me
             else if ( word.equals("me")){
                 CUI_FUN_me(words);
+                break;
+            }
+            // show
+            else if ( word.equals("show")){
+                CUI_FUN_show(words);
                 break;
             }
             // not supported command
@@ -216,6 +222,9 @@ public class CUI_Tick_Inteface {
             ui.interface_print("add ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
             ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("show ");
+            ui.interface_print("    - place | address | hashtable | tag | category | note ");
+            ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
             ui.interface_print("    - update ");
@@ -232,6 +241,11 @@ public class CUI_Tick_Inteface {
             ui.interface_print("Help for me ");
             ui.interface_print(" ( without parameters shows account )"); 
             ui.interface_print("    - password ( changes password ) ");
+        }
+        // help show
+        else if (addons.size() == 2 && addons.contains("show")){
+            ui.interface_print("Help for show ");
+            ui.interface_print("    - place | address | hashtable | tag | category | note ");
         }
     }
     /**
@@ -340,7 +354,53 @@ public class CUI_Tick_Inteface {
             run = !database.change_password(logged_user, addons.get(2));
             ui.interface_print("Password change, please log again.");
         }
-        
+    }
+    
+    void show_arraylist(ArrayList<String> to_show){
+        for(String line: to_show){
+            ui.interface_print(line);
+        }
+    }
+    
+    void CUI_FUN_show(List<String> addons) throws SQLException{
+        /**
+         *     +        +          +        +       + 
+         * - place | address | hashtable | tag | category | note 
+         */
+        // show
+        if ( addons.size() == 1){
+            ui.interface_print("No additional arguments. See help ( help show )");
+        }
+        // show place
+        else if ( addons.size() == 2 && addons.contains("place")){
+            Database_Viewer view = new Database_Viewer(database,logged_user,"place");
+            show_arraylist(view.make_view());
+        }
+        // show address
+        else if ( addons.size() == 2 && addons.contains("address")){
+            Database_Viewer view = new Database_Viewer(database,logged_user,"address");
+            show_arraylist(view.make_view());
+        }
+        // show hashtable
+        else if ( addons.size() == 2 && addons.contains("hashtable")){
+            Database_Viewer view = new Database_Viewer(database,logged_user,"hashtag table");
+            show_arraylist(view.make_view());
+        }
+        // show tag
+        else if ( addons.size() == 2 && addons.contains("tag")){
+            Database_Viewer view = new Database_Viewer(database,logged_user,"tag");
+            show_arraylist(view.make_view());
+        }
+        // show category
+        else if ( addons.size() == 2 && addons.contains("category")){
+            Database_Viewer view = new Database_Viewer(database,logged_user,"category");
+            show_arraylist(view.make_view());
+        }
+        // show note
+        else if ( addons.size() == 2 && addons.contains("note")){
+            Database_Viewer view = new Database_Viewer(database,logged_user,"note");
+            show_arraylist(view.make_view());
+        }
     }
     
     

@@ -16,6 +16,7 @@ public class Tick_Brick {
     
     int MAX = -2147483648;
     int index_in_collection = -1;
+    boolean STOP = false;
     
     // fields for storing data
     int data_int;

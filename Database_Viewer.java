@@ -64,31 +64,8 @@ public class Database_Viewer {
      * Returns lines to show
      */
     ArrayList<String> get_lines(ArrayList<Tick_Brick> to_get){
-        if (this.mode.equals("address")){
-            Tick_Address act = new Tick_Address(to_get);
-            return act.get_lines_to_show();
-        }
-        else if (this.mode.equals("category")){
-            Tick_Category act = new Tick_Category(to_get);
-            return act.get_lines_to_show();
-        }
-        else if (this.mode.equals("hashtag table")){
-            Tick_HashtagT act = new Tick_HashtagT(to_get);
-            return act.get_lines_to_show();
-        }
-        else if (this.mode.equals("note")){
-            Tick_Note act = new Tick_Note(to_get);
-            return act.get_lines_to_show();
-        }
-        else if (this.mode.equals("place")){
-            Tick_Place act = new Tick_Place(to_get);
-            return act.get_lines_to_show();
-        }
-        else if (mode.equals("tag")){
-            Tick_Tag act = new Tick_Tag(to_get);
-            return act.get_lines_to_show();
-        }
-        return null;
+        Container obj = new Container ( to_get, mode);
+        return obj.make_lines();
     }
     /**
      * Database_Viewer.prepare_query(String mode)
@@ -102,21 +79,24 @@ public class Database_Viewer {
             query = "SELECT * FROM ADDRESS;";
         }
         else if (this.mode.equals("category")){
-            query = "SELECT * FROM CATEGORY;";
+            query = "SELECT * FROM CATEGORY where owner_id = ?;";
         }
         else if (this.mode.equals("hashtag table")){
-            query = "SELECT * FROM HASHTAG_TABLE;";
+            query = "SELECT * FROM HASHTAG_TABLE where owner_id = ?;";
         }
         else if (this.mode.equals("note")){
-            query = "SELECT * FROM NOTE;";
+            query = "SELECT * FROM NOTE where owner_id = ?;";
         }
         else if (this.mode.equals("place")){
-            query = "SELECT * FROM PLACE;";
+            query = "SELECT * FROM PLACE where owner_id = ?;";
         }
         else if (mode.equals("tag")){
-            query = "SELECT * FROM TAG;";
+            query = "SELECT * FROM TAG where owner_id = ?;";
         }
         PreparedStatement ppst = database.con.prepareStatement(query);
+        if ( !mode.equals("address") ){
+            ppst.setInt(1,logged.owner_id);
+        }
         try{
             return ppst.executeQuery();
         }catch(SQLException e){
@@ -200,7 +180,7 @@ public class Database_Viewer {
                 tag_name VARCHAR(45),
                 tag_note VARCHAR(100),
              */
-            index = new int[] {1,4,3};
+            index = new int[] {1,2,3};
         }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
@@ -210,6 +190,7 @@ public class Database_Viewer {
             // looping on all database records returned by ResultSet
             while( rs.next() ){
                 // looping on one record
+                
                 for ( int i = 1 ; i <= colmax; i++){
                     if ( int_index.contains(i)){
                         to_ret.add(new Tick_Brick(rs.getInt(meta.getColumnName(i))));
@@ -218,9 +199,12 @@ public class Database_Viewer {
                         to_ret.add(new Tick_Brick(rs.getString(meta.getColumnName(i))));
                     }
                 }
-            database.log.add("Tick_Brick Collection returns succesfully", HEADER);
-                
+                // flagging end of the object
+                Tick_Brick brake = new Tick_Brick();
+                brake.STOP = true;
+                to_ret.add(brake);
             } 
+            database.log.add("Tick_Brick Collection returns succesfully", HEADER); 
         }
         else{
             database.log.add("Tick_Brick Collection failed", HEADER);
