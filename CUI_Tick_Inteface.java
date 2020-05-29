@@ -16,7 +16,7 @@ import java.util.List;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v0.0.1";
+    final String version = "v0.0.4";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;

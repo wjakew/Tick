@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *Object for maintaining connection to the database.
@@ -21,7 +22,7 @@ import java.util.List;
  */
 public class Database {
     
-    final String version = "v0.0.3B";
+    final String version = "v0.0.6B";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -146,7 +147,7 @@ public class Database {
      * Database.get_last_address_id()
      * @return int
      * @throws SQLException 
-     * 
+     * Returning last address id
      */
     int get_last_address_id() throws SQLException{
         String query = "select address_id from ADDRESS ORDER BY id DESC LIMIT 1;";
@@ -156,6 +157,175 @@ public class Database {
             return rs.getInt("address_id");
         }
         return -1;
+    }
+    ResultSet return_resultset(String query) throws SQLException{
+         PreparedStatement ppst = con.prepareStatement(query);
+         return ppst.executeQuery();
+    }
+    /**
+     * Database.return_resultset(String mode,Tick_User logged_user)
+     * @param mode
+     * @param logged_user
+     * @return
+     * @throws SQLException 
+     * Returns ResultSet for choosen object
+     */
+    ResultSet return_resultset(String mode,Tick_User logged_user) throws SQLException{
+        String query = "";
+        if (mode.equals("address")){
+            query = "SELECT * FROM ADDRESS;";
+        }
+        else if (mode.equals("category")){
+            query = "SELECT * FROM CATEGORY where owner_id = ?;";
+        }
+        else if (mode.equals("hashtag table")){
+            query = "SELECT * FROM HASHTAG_TABLE where owner_id = ?;";
+        }
+        else if (mode.equals("note")){
+            query = "SELECT * FROM NOTE where owner_id = ?;";
+        }
+        else if (mode.equals("place")){
+            query = "SELECT * FROM PLACE where owner_id = ?;";
+        }
+        else if (equals("tag")){
+            query = "SELECT * FROM TAG where owner_id = ?;";
+        }
+        PreparedStatement ppst = con.prepareStatement(query);
+        if ( !mode.equals("address") ){
+            ppst.setInt(1,logged_user.owner_id);
+        }
+        try{
+            return ppst.executeQuery();
+        }catch(SQLException e){
+            log.add("Cant return ResultSet",HEADER);
+            return null;
+        }
+    }
+    /**
+     * Database.prepare_tick_brick(ResultSet rs,String mode)
+     * @param rs
+     * @param mode
+     * @return ArrayList
+     * @throws SQLException
+     * Returns collection of Tick_Brick to make object
+     */
+    ArrayList<Tick_Brick> return_tick_brick(ResultSet rs,String mode) throws SQLException{
+        // metadata for number of columns
+        ResultSetMetaData meta   = (ResultSetMetaData) rs.getMetaData();
+        
+        ArrayList<Tick_Brick> to_ret = new ArrayList<>();  // tick_brick to ret
+        
+        int index[] = {};                // array of int indexes
+        
+        if (mode.equals("address")){
+            /**
+             *  address_id INT AUTO_INCREMENT PRIMARY KEY,
+                address_city VARCHAR(30),
+                address_street VARCHAR (30),
+                address_house_number INT,
+                address_flat_number INT,
+                address_postal VARCHAR(15),
+                address_country VARCHAR(30)
+             */
+            index = new int[] {1,4,5};
+            
+        }
+        else if (mode.equals("category")){
+            /**
+             *  category_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                category_name VARCHAR(45),
+                category_note VARCHAR(100),
+             */
+            index = new int[] {1,2};
+            
+        }
+        else if (mode.equals("hashtag table")){
+            /**
+             *  hashtag_table_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                hashtag_table_name VARCHAR(45),
+                hashtag_table_note VARCHAR(100),
+                * 
+             */
+            index = new int[] {1,2};
+        }
+        else if (mode.equals("note")){
+            /**
+             *  note_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                note_content VARCHAR(100),
+                setting1 VARCHAR(40),
+                setting2 VARCHAR(40),
+                setting3 VARCHAR(40),
+             */
+            index = new int[] {1,2};
+        }
+        else if (mode.equals("place")){
+            /**
+             *  place_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                place_name VARCHAR(30),
+                address_id INT,
+             */
+            index = new int[] {1,2,4};
+            
+        }
+        else if (mode.equals("tag")){
+            /**
+             *  tag_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                hashtag_table_id INT,
+                tag_name VARCHAR(45),
+                tag_note VARCHAR(100),
+             */
+            index = new int[] {1,2,3};
+        }
+        // coping array to collection
+        List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
+        int colmax = meta.getColumnCount();
+        
+        if ( rs != null ){
+            // looping on all database records returned by ResultSet
+            while( rs.next() ){
+                // looping on one record
+                
+                for ( int i = 1 ; i <= colmax; i++){
+                    if ( int_index.contains(i)){
+                        to_ret.add(new Tick_Brick(rs.getInt(meta.getColumnName(i))));
+                    }
+                    else{
+                        to_ret.add(new Tick_Brick(rs.getString(meta.getColumnName(i))));
+                    }
+                }
+                // flagging end of the object
+                Tick_Brick brake = new Tick_Brick();
+                brake.STOP = true;
+                to_ret.add(brake);
+            } 
+            log.add("Tick_Brick Collection returns succesfully", HEADER); 
+        }
+        else{
+            log.add("Tick_Brick Collection failed", HEADER);
+        }
+        return to_ret;
+    }
+    //----------------------------tick brick function
+    /**
+     * Database.return_collection(Tick_User logged_user, String mode)
+     * @param logged_user
+     * @param mode
+     * @return ArrayList
+     * @throws SQLException
+     * Returns collection of Tick_Brick objects to make Tick_Element object
+     */
+    ArrayList<Tick_Brick> return_TB_collection(Tick_User logged_user, String mode) throws SQLException{
+        ResultSet actual = return_resultset(mode,logged_user);
+        return return_tick_brick(actual,mode);
+    }
+    ArrayList<Tick_Brick> return_TB_collection(Tick_User logged_user, String mode,String query) throws SQLException{
+        ResultSet actual = return_resultset(query);
+        return return_tick_brick(actual,mode);
     }
     //----------------------------USER LOGIN TO THE DATABASE
     /**

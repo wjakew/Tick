@@ -63,8 +63,8 @@ public class Database_Viewer {
      * @return ArrayList
      * Returns lines to show
      */
-    ArrayList<String> get_lines(ArrayList<Tick_Brick> to_get){
-        Container obj = new Container ( to_get, mode);
+    ArrayList<String> get_lines(ArrayList<Tick_Brick> to_get) throws SQLException{
+        Container obj = new Container (to_get, mode,database,logged);
         return obj.make_lines();
     }
     /**
