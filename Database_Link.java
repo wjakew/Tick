@@ -136,4 +136,44 @@ public class Database_Link {
         ArrayList<Tick_Brick> lists = database.return_tick_brick(rs,"hashtag table");
         return new Tick_HashtagT(lists);
     }
+    // functions for checking if data is linked
+    /**
+     * Tick_Own - > Tick_Address + 
+     * Tick_Place - > Tick_Address + 
+     * Tick_Tag - > Tick_HashtagT +
+     */
+    /**
+     * Database_Link.check_link_place(int place_id)
+     * @param place_id
+     * @return boolean
+     * @throws SQLException
+     * Returns if place by given id is linked to the address
+     */
+    boolean check_link_place(int place_id) throws SQLException{
+        String query = "SELECT address_id from PLACE where place_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1, place_id);
+        ResultSet rs = ppst.executeQuery();
+        while (rs.next()){
+            return rs.getInt("address_id") != 1;
+        }
+        return false;
+    }
+    /**
+     * Database_Link.check_link_tag(int tag_id)
+     * @param tag_id
+     * @return boolean
+     * @throws SQLException 
+     * Returns if tag by given id is linked to the address
+     */
+    boolean check_link_tag(int tag_id) throws SQLException{
+        String query = "SELECT hashtag_table_id from TAG where tag_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1, tag_id);
+        ResultSet rs = ppst.executeQuery();
+        while (rs.next()){
+            return rs.getInt("hashtag_table_id") != 1;
+        }
+        return false;
+    }
 }

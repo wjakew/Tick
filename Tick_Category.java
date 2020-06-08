@@ -87,8 +87,7 @@ public class Tick_Category extends Tick_Element{
         ArrayList<String> to_ret = new ArrayList<>();
         to_ret.add("id: "+Integer.toString(category_id));
         to_ret.add("Category name: "+category_name);
-        to_ret.add("Note:");
-        to_ret.add(category_note);
+        to_ret.add("Note:\n"+category_note);
         
         return to_ret;
     }

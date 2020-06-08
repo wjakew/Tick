@@ -8,6 +8,7 @@ package tick;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v0.0.4";
+    final String version = "v0.0.6";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -37,7 +38,7 @@ public class CUI_Tick_Inteface {
     /**
      * CUI_Tick_Interface.run()
      * @throws SQLException 
-     * Main run function of the inteface
+     * Main run function of the interface
      */
     void run() throws SQLException{
         welcome_screen();
@@ -383,14 +384,42 @@ public class CUI_Tick_Inteface {
      */
     void CUI_FUN_me(List<String> addons) throws SQLException{
         // me
+        Database_Link dl = new Database_Link(database);
         if ( addons.size() == 1){
             ui.interface_print("Info about your account:");
             logged_user.show();
+            if ( logged_user.address_id == 1){
+                ui.interface_print("No address linked");
+            }
+            else{
+                ui.interface_print("Linked address:");
+                Tick_Address to_show = dl.get_object_address(logged_user.address_id);
+                show_arraylist(to_show.get_lines_to_show());
+            }
         }
-        // me password 'content'
+        // me update password 'content'
         else if ( addons.size() == 4 && addons.contains("password")){
             run = !database.change_password(logged_user, addons.get(3));
             ui.interface_print("Password change, please log again.");
+        }
+        // me update address
+        else if ( addons.size() == 3 && addons.contains("address")){
+            Database_Viewer usr_addr_viewer = new Database_Viewer(database,logged_user,"address");
+            show_arraylist(usr_addr_viewer.make_view());
+            ui.interface_print("Choose address to link: ");
+            ui.interface_get();
+            if(ui.int_flag){
+                logged_user.address_id = ui.last_input;
+                logged_user.wall_updater();
+                Tick_Address usr_adr = new Tick_Address(database.return_TB_collection(logged_user, "address"));
+                Database_Link linker = new Database_Link(database);
+                if ( linker.link_user_address(logged_user, usr_adr) ){
+                    ui.interface_print("Address linked");
+                }
+            }
+            else{
+                ui.interface_print("Wrong option");
+            }
         }
         else{
             ui.interface_print("Wrong option");
@@ -539,14 +568,38 @@ public class CUI_Tick_Inteface {
         // scene add
         else if (addons.size() == 2 && addons.contains("add")){
             ui.interface_print("Welcome in the scene creator: ");
-            Database_Viewer category_view = new Database_Viewer(database,logged_user,"category");
-            Database_Viewer place_view = new Database_Viewer(database,logged_user,"place");
-            Database_Viewer hashtag_table_view = new Database_Viewer(database,logged_user,"hashtag table");
             System.out.printf("%30s %30s %30s", "CATEGORIES", "PLACES", "HASHTAG TABLES\n");
-            ArrayList<String> array_category = category_view.make_view();
-            ArrayList<String> array_place = place_view.make_view();
-            ArrayList<String> array_hshtable = hashtag_table_view.make_view();
             
+            Database_Viewer scene_v = new Database_Viewer(database,logged_user,"scene view");
+            ArrayList<String> lines_to_show = scene_v.make_view();
+            lines_to_show.remove(0);
+            lines_to_show.remove(0);
+            lines_to_show.remove(0);
+            // showing lines from database viewer
+            for (int i = 0; i < lines_to_show.size(); i = i+3){
+                System.out.printf("%30s",lines_to_show.get(i));
+                if ( i + 3 < lines_to_show.size() ){
+                    System.out.printf(" %30s",lines_to_show.get(i+1));
+                }
+                if ( i + 6 < lines_to_show.size() ){
+                    System.out.printf(" %30s",lines_to_show.get(i+2));
+                }
+                System.out.printf("\n");
+            }
+            // adding scene
+            Tick_Scene to_add = new Tick_Scene();
+            to_add.init_CUI();
+            
+            try{
+                if ( database.add_scene(to_add) ){
+                    ui.interface_print("Scene added");
+                }
+                else{
+                    ui.interface_print("Scene adding occured a problem");
+                }
+            }catch(SQLException e){
+                ui.interface_print("");
+            }
         }
 
         else{

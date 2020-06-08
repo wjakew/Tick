@@ -93,8 +93,7 @@ public class Tick_Note extends Tick_Element{
          */
         ArrayList<String> to_ret = new ArrayList<>();
         to_ret.add("id: "+Integer.toString(note_id));
-        to_ret.add("Note Content:");
-        to_ret.add(note_content);
+        to_ret.add("Note Content:\n"+note_content);
         return to_ret;
     }
     

@@ -664,4 +664,41 @@ public class Database {
             return false;
         }
     }
+    //--------------------------------------FUNCTIONS FOR SCENE
+    /**
+     * Database.add_scene(Tick_Scene to_add)
+     * @param to_add
+     * @return boolean
+     * @throws SQLException
+     * Function for adding scene
+     */
+    boolean add_scene(Tick_Scene to_add) throws SQLException{
+        log.add("Adding new scene",HEADER);
+        String query = "INSERT INTO SCENE\n"
+                + "(hashtag_table_id,place_id,owner_id,category_id,scene_name,scene_note)\n"
+                + "VALUES\n"
+                + "(?,?,?,?,?,?);";
+        PreparedStatement ppst = con.prepareStatement(query);
+        
+        for ( int i = 1,j=1 ; i < to_add.tick_Element_size ; i++,j++){
+            Tick_Brick act = to_add.tick_Element_Elements.get(j);
+            
+            if (act.category == 1){
+                ppst.setInt(i,act.i_get());
+            }
+            else if (act.category == 2){
+                ppst.setString(i, act.s_get());
+            }
+        }
+        try{
+            log.add("QUERY: "+ppst.toString(),HEADER);
+            ppst.execute();
+            return true;
+        }catch (Exception e){
+            log.add("Failed to add scene",HEADER);
+            log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
+            return false;
+        }
+        
+    }
 }

@@ -52,10 +52,16 @@ public class Database_Viewer {
      * Returns lines to show
      */
     ArrayList<String> make_view() throws SQLException{
-        ResultSet actual= prepare_query();      // getting data from the base
-        // based on the mode variable
-        ArrayList<Tick_Brick> wall = prepare_tick_brick(actual);    // prepared universal storage object
-        return get_lines(wall); // getting object from Tick_Brick collection
+        if ( mode.equals("scene view") ){
+            return view_scene_creator();
+        }
+        else{
+            ResultSet actual= prepare_query();      // getting data from the base
+            // based on the mode variable
+            ArrayList<Tick_Brick> wall = prepare_tick_brick(actual);    // prepared universal storage object
+            return get_lines(wall); // getting object from Tick_Brick collection
+        }
+        
     }
     /**
      * Database_Viewer.get_lines(ArrayList<Tick_Brick> to_get)
@@ -229,5 +235,30 @@ public class Database_Viewer {
             database.log.add("Tick_Brick Collection failed", HEADER);
         }
         return to_ret;
+    }
+    /**
+     * Database_Viewer.view_scene_creator()
+     * @return ArrayList
+     * @throws SQLException 
+     */
+    ArrayList<String> view_scene_creator() throws SQLException{
+        ArrayList<ResultSet> rs_list = new ArrayList<>();
+        mode = "category";
+        ArrayList<String> hsh_array = get_lines(prepare_tick_brick(prepare_query()));
+        mode = "place";
+        ArrayList<String> plp_array = get_lines(prepare_tick_brick(prepare_query()));
+        mode = "hashtag table";
+        ArrayList<String> ctg_array = get_lines(prepare_tick_brick(prepare_query()));
+        int c1 = 0,c2 = 0,c3 = 0;
+        ArrayList<String> result = new ArrayList<>();
+        while(c1 < hsh_array.size() || c2 < plp_array.size() || c3 < ctg_array.size()) {
+            if(c1 < hsh_array.size())
+                result.add(hsh_array.get(c1++));
+            if(c2 < plp_array.size())
+                result.add(plp_array.get(c2++));
+            if(c3 < ctg_array.size())
+                result.add(ctg_array.get(c3++));
+        }
+    return result;
     }
 }

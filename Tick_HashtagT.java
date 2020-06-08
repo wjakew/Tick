@@ -87,8 +87,7 @@ public class Tick_HashtagT extends Tick_Element{
         ArrayList<String> to_ret = new ArrayList<>();
         to_ret.add("id: "+Integer.toString(hashtag_table_id));
         to_ret.add("Hashtag Table Name: "+hashtag_table_name);
-        to_ret.add("Hashtag Table Note:");
-        to_ret.add(hashtag_table_note);
+        to_ret.add("Hashtag Table Note:\n"+hashtag_table_note);
         return to_ret;
     }
     

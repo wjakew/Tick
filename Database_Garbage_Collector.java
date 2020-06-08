@@ -20,4 +20,16 @@ public class Database_Garbage_Collector {
         this.mode = mode;
     }
     
+    boolean delete_address(int address_id){
+        Database_Link dl = new Database_Link(database);
+        
+        
+    }
+    
+    
+    
+    
+    
+    
+    
 }
