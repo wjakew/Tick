@@ -61,7 +61,6 @@ public class Database_Viewer {
             ArrayList<Tick_Brick> wall = prepare_tick_brick(actual);    // prepared universal storage object
             return get_lines(wall); // getting object from Tick_Brick collection
         }
-        
     }
     /**
      * Database_Viewer.get_lines(ArrayList<Tick_Brick> to_get)
@@ -105,6 +104,9 @@ public class Database_Viewer {
         }
         else if (mode.equals("scene")){
             query = "SELECT * FROM SCENE where owner_id = ?;";
+        }
+        else if (mode.equals("tick")){
+            query = "SELECT * FROM TICK where owner_id = ?;";
         }
         PreparedStatement ppst = database.con.prepareStatement(query);
         if ( !mode.equals("address") ){
@@ -207,6 +209,21 @@ public class Database_Viewer {
              */
             index = new int[] {1,2,3,4,5};
         }
+        else if (mode.equals("tick")){
+            /**
+             *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                place_id INT,
+                category_id INT,
+                note_id INT,
+                hashtag_table_id INT,
+                tick_done_id INT,
+                tick_done_start VARCHAR(60),
+                tick_date_end VARCHAR(60),
+                tick_name VARCHAR(60),
+             */
+            index = new int[] {1,2,3,4,5,6,7};
+        }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
         int colmax = meta.getColumnCount();
@@ -237,6 +254,18 @@ public class Database_Viewer {
         return to_ret;
     }
     /**
+     * Database_Viewer.slicer(String text)
+     * @param text
+     * @return String
+     * Slices text 
+     */
+    String slicer(String text){
+        if ( text.contains(":") ){
+            return text.split(":")[1];
+        }
+        return text;
+    }
+    /**
      * Database_Viewer.view_scene_creator()
      * @return ArrayList
      * @throws SQLException 
@@ -253,11 +282,11 @@ public class Database_Viewer {
         ArrayList<String> result = new ArrayList<>();
         while(c1 < hsh_array.size() || c2 < plp_array.size() || c3 < ctg_array.size()) {
             if(c1 < hsh_array.size())
-                result.add(hsh_array.get(c1++));
+                result.add(slicer(hsh_array.get(c1++)));
             if(c2 < plp_array.size())
-                result.add(plp_array.get(c2++));
+                result.add(slicer(plp_array.get(c2++)));
             if(c3 < ctg_array.size())
-                result.add(ctg_array.get(c3++));
+                result.add(slicer(ctg_array.get(c3++)));
         }
     return result;
     }

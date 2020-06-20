@@ -29,7 +29,7 @@ public class Database {
     Connection con = null;          // connection to the database
     ResultSet rs = null;            // result set of the query
     boolean connected = false;
-    
+    Tick_User logged;               // actual logged user on the database
     Tick_Log log;                   // program log saver
     
     /**
@@ -138,6 +138,7 @@ public class Database {
     void close() throws SQLException{
         con.close();
         connected = false;
+        logged = null;
         this.log.add("Database connection ended", HEADER);
     }
     /**
@@ -372,7 +373,7 @@ public class Database {
     Tick_User user_login(String user_login, String user_password) throws SQLException{
         String query = "SELECT * FROM OWN WHERE owner_login = ? and owner_password = ?;";
         this.log.add("Trying to log, user credentials: "+user_login+"/"+user_password, HEADER);
-        Tick_User logged = null;
+        logged = null;
         PreparedStatement ppst = con.prepareStatement(query);
         ppst.setString(1, user_login);
         ppst.setString(2, user_password);

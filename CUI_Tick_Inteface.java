@@ -101,6 +101,10 @@ public class CUI_Tick_Inteface {
                 CUI_FUN_scene(words);
                 break;
             }
+            else if (word.equals("tick")){
+                CUI_FUN_tick(words);
+                break;
+            }
             // not supported command
             else{
                 ui.interface_print("Wrong command");
@@ -230,6 +234,16 @@ public class CUI_Tick_Inteface {
         if ( addons.size() == 1){
             ui.interface_print("Help for the program: ");
             ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("tick");
+            ui.interface_print("    - add ( add simple tick reminder )");
+            ui.interface_print("tick /tick_id/");
+            ui.interface_print("    - link |  /place/ | /address/ | /hashtable/ | /tag/ | /category/ | /note/ ");
+            ui.interface_print("          ( links tick to the choosen object ) ");
+            ui.interface_print("    - mark | /done/ |");
+            ui.interface_print("          ( marks tick and gives it new atribute )");
+            ui.interface_print("    - delete ( delete tick ) ");
+            ui.interface_print("    - det ( shows details of the tick ) ");
+            ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("add ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
             ui.interface_print("-----------------------------------------------------------");
@@ -279,6 +293,19 @@ public class CUI_Tick_Inteface {
             ui.interface_print("Help for scene ");
             ui.interface_print("    ( without parameters show active scenes )");
             ui.interface_print("    - add ( inits scene maker ) ");
+        }
+        // help tick
+        else if ( addons.size() == 2 && addons.contains("tick")){
+            ui.interface_print("Help for tick");
+            ui.interface_print("    ( without parameters show active ticks )");
+            ui.interface_print("    - add ( add simple tick reminder )");
+            ui.interface_print("tick /tick_id/");
+            ui.interface_print("    - link |  /place/ | /address/ | /hashtable/ | /tag/ | /category/ | /note/ ");
+            ui.interface_print("          ( links tick to the choosen object ) ");
+            ui.interface_print("    - mark | /done/ |");
+            ui.interface_print("          ( marks tick and gives it new atribute )");
+            ui.interface_print("    - delete ( delete tick ) ");  
+            ui.interface_print("    - det ( shows details of the tick ) ");
         }
         else{
             ui.interface_print("Wrong option");
@@ -606,6 +633,30 @@ public class CUI_Tick_Inteface {
             ui.interface_print("Wrong option");
         }
     }
-    
-    
+    /**
+     * CUI_Tick_Interface.CUI_Tick_tick(List<String> addons)
+     * @param addons 
+     * Function for using functionality tick
+     */
+    void CUI_FUN_tick(List<String> addons) throws SQLException{
+        if ( addons.size() == 1 ){
+            ui.interface_print("Showing active ticks: ");
+            Database_Viewer dv = new Database_Viewer(database,database.logged,"tick");
+            show_arraylist(dv.make_view());
+        }
+        else if ( addons.size() == 2 && addons.contains("add")){
+            Tick_Tick to_add = new Tick_Tick();
+            to_add.init_CUI();
+            to_add.owner_id = database.logged.owner_id;
+            to_add.wall_updater();
+            Database_Tick adder = new Database_Tick(database);
+            
+            if ( adder.add_tick(to_add) ){
+                ui.interface_print("Tick added");
+            }
+            else{
+                ui.interface_print("Error adding tick");
+            }
+        }
+    }
 }

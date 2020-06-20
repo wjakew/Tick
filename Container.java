@@ -210,6 +210,30 @@ public class Container {
                 }
             }
         }
+        else if (mode.equals("tick")){
+            /**
+             *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                place_id INT,
+                category_id INT,
+                note_id INT,
+                hashtag_table_id INT,
+                tick_done_id INT,
+                tick_done_start VARCHAR(60),
+                tick_date_end VARCHAR(60),
+                tick_name VARCHAR(60),
+             */
+            for (Tick_Brick element : wall){    // looping on Tick_Brick objects
+                if ( !element.STOP ){
+                    part.add(element);
+                }
+                else{
+                    Tick_Tick to_add = new Tick_Tick(part);
+                    copy_list(lines,kick_list(to_add.get_lines_to_show()));
+                    part.clear();
+                }
+            }
+        }
         return lines;
     }
     

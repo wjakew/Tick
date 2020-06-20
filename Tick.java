@@ -7,7 +7,6 @@ package tick;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  *Main program
@@ -15,7 +14,7 @@ import java.util.ArrayList;
  */
 public class Tick {
 
-    static final String version = "v0.5.1";
+    static final String version = "v0.5.2";
     
     static Tick_Log session_log;
     static Database database;
