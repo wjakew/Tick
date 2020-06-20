@@ -11,7 +11,7 @@ CREATE TABLE TICK_DONE
 tick_done_id INT AUTO_INCREMENT PRIMARY KEY,
 tick_done_date VARCHAR(40),
 tick_done_duration VARCHAR(40),
-tick_done_note VARCHAR(100)
+tick_done_note VARCHAR(100)	
 );
 -- table address for storing addresses of places and owners (1.5)
 CREATE TABLE ADDRESS
