@@ -237,7 +237,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("tick");
             ui.interface_print("    - add ( add simple tick reminder )");
             ui.interface_print("tick /tick_id/");
-            ui.interface_print("    - link |  /place/ | /address/ | /hashtable/ | /tag/ | /category/ | /note/ ");
+            ui.interface_print("    - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ ");
             ui.interface_print("          ( links tick to the choosen object ) ");
             ui.interface_print("    - mark | /done/ |");
             ui.interface_print("          ( marks tick and gives it new atribute )");
@@ -300,7 +300,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    ( without parameters show active ticks )");
             ui.interface_print("    - add ( add simple tick reminder )");
             ui.interface_print("tick /tick_id/");
-            ui.interface_print("    - link |  /place/ | /address/ | /hashtable/ | /tag/ | /category/ | /note/ ");
+            ui.interface_print("    - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ ");
             ui.interface_print("          ( links tick to the choosen object ) ");
             ui.interface_print("    - mark | /done/ |");
             ui.interface_print("          ( marks tick and gives it new atribute )");
@@ -639,11 +639,24 @@ public class CUI_Tick_Inteface {
      * Function for using functionality tick
      */
     void CUI_FUN_tick(List<String> addons) throws SQLException{
+        /**
+         * ( without parameters show active ticks )
+                - add ( add simple tick reminder )
+            tick /tick_id/
+                 - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ 
+                    ( links tick to the choosen object ) 
+                - mark | /done/ |
+                    ( marks tick and gives it new atribute )
+                - delete ( delete tick )
+                - det ( shows details of the tick ) 
+         */
+        // tick
         if ( addons.size() == 1 ){
             ui.interface_print("Showing active ticks: ");
             Database_Viewer dv = new Database_Viewer(database,database.logged,"tick");
             show_arraylist(dv.make_view());
         }
+        // tick add
         else if ( addons.size() == 2 && addons.contains("add")){
             Tick_Tick to_add = new Tick_Tick();
             to_add.init_CUI();
@@ -657,6 +670,60 @@ public class CUI_Tick_Inteface {
             else{
                 ui.interface_print("Error adding tick");
             }
+        }
+        // tick /tick_id/ link
+        else if ( addons.size() == 4 && addons.contains("link") && ui.check_existance_int(addons)!= -1){
+            int tick_id = ui.last_input;
+            Database_Tick linker = new Database_Tick(database);
+            if ( linker.check_if_exists(ui.last_input)){
+                // here we have checked if tick exists
+                String [] keys = new String[] {"place","address","hashtag_table","category","note"};
+                String mode = ui.check_existance(addons, keys);
+                // showing viewer for database
+                if (  mode != null ){
+                    Database_Viewer view = new Database_Viewer(database,database.logged,mode);
+                    show_arraylist(view.make_view());
+                    ui.interface_get();
+                    int index = ui.last_input;
+                    
+                    if ( database.check_if_record_exists(index, mode) ){
+                        // we have correct id
+                        ui.interface_print("Tick id found: "+tick_id);
+                        ui.interface_print("Mode: "+ mode);
+                        ui.interface_print("Object id: "+index);
+                        if ( linker.update_data(index,tick_id,mode)){
+                            ui.interface_print("Data linked ("+mode+")");
+                        }
+                        else{
+                            ui.interface_print("Unable to link data. Error");
+                        }
+                    }
+                    else{
+                        ui.interface_print("Wrong id for the object");
+                    }
+                }
+                else{
+                    ui.interface_print("Wrong object to link");
+                }
+                
+            }
+            else{
+                ui.interface_print("No tick with given id");
+            }
+        }
+        // tick /tick_id/ det
+        else if ( addons.size() == 3 && addons.contains("det") && ui.check_existance_int(addons)!= -1){
+            Database_Tick shower = new Database_Tick(database);
+            
+            if ( database.check_if_record_exists(ui.last_input, "tick") ){
+                show_arraylist(shower.view_tick(ui.last_input));
+            }
+            else{
+                ui.interface_print("Wrong tick id");
+            }
+        }
+        else{
+            ui.interface_print("Wrong arguments for tick. See: help tick ");
         }
     }
 }

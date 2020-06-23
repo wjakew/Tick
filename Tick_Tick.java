@@ -75,6 +75,7 @@ public class Tick_Tick extends Tick_Element{
         tick_done_id = to_add.get(6).i_get();
         tick_done_start = to_add.get(7).s_get();
         tick_done_end = to_add.get(8).s_get();
+        tick_name = to_add.get(9).s_get();
         super.put_elements(wall_updater());
     }
     

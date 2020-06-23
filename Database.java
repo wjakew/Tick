@@ -96,6 +96,9 @@ public class Database {
         else if (mode.equals("tag")){
             query = "SELECT * FROM TAG where tag_id = ?;";
         }
+        else if (mode.equals("tick")){
+            query = "SELECT * FROM TICK where tick_id = ?;";
+        }
         PreparedStatement ppst = con.prepareStatement(query);
         ppst.setInt(1, id);
         ResultSet rs = ppst.executeQuery();
@@ -195,6 +198,24 @@ public class Database {
     ResultSet return_resultset(String query) throws SQLException{
          PreparedStatement ppst = con.prepareStatement(query);
          return ppst.executeQuery();
+    }
+    
+    /**
+     * Database.make_query(String query_head, int [] numbers)
+     * @param query_head
+     * @param numbers
+     * @return String
+     * Function returns string for query
+     */
+    String make_query(String query_head, int [] numbers){
+        String [] parts = query_head.split("?");
+        String result = "";
+        int i = 0;
+        for( String part : parts ){
+            result = result + part.substring(0, part.length()-2) + Integer.toString(numbers[i]);
+            i++;
+        }
+        return result;
     }
     /**
      * Database.return_resultset(String mode,Tick_User logged_user)
@@ -314,6 +335,18 @@ public class Database {
                 tag_note VARCHAR(100),
              */
             index = new int[] {1,2,3};
+        }
+        else if (mode.equals("tick")){
+            /**
+             *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
+                hashtag_table_id INT,
+                place_id INT,
+                owner_id INT,
+                category_id INT,
+                scene_name VARCHAR(30),
+                scene_note VARCHAR(100),
+             */
+            index = new int[] {1,2,3,4,5};
         }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
@@ -700,6 +733,5 @@ public class Database {
             log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
             return false;
         }
-        
     }
 }

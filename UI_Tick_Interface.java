@@ -7,6 +7,8 @@ package tick;
 
 import java.io.Console;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -14,7 +16,7 @@ import java.util.Scanner;
  * @author jakub
  */
 public class UI_Tick_Interface {
-    final String version = "v1.0.2";
+    final String version = "v1.0.3";
     
     Scanner sc;                     // main object for scanning 
     ArrayList<String> history;      // main log of the input,output
@@ -90,6 +92,7 @@ public class UI_Tick_Interface {
         try{
             int a = Integer.parseInt(input);
             last_input = a;
+            int_flag = true;
             return 1;
         }catch( NumberFormatException e){
             // it's not an int
@@ -120,5 +123,51 @@ public class UI_Tick_Interface {
                 int_flag = false;
             }
         }
+    }
+    
+    /**
+     * UI_Tick_Interface.check_existance(String line, String [] keys)
+     * @param line
+     * @param keys
+     * @return String
+     * Method checks if in line is key word given in the array
+     */
+    String check_existance(String line, String [] keys){
+        List<String> user_input = new ArrayList<String>(Arrays.asList(line.split(" ")));
+        List<String> given_keys = new ArrayList<String>(Arrays.asList(keys));
+        
+        for ( String word : user_input ){
+            if ( given_keys.contains(word) ){
+                return word;
+            }
+        }
+        return null;
+    }
+    
+    String check_existance(List<String> user_input, String [] keys){
+        List<String> given_keys = new ArrayList<String>(Arrays.asList(keys));
+        for ( String word : user_input ){
+            if ( given_keys.contains(word) ){
+                return word;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * UI_Tick_Interface.check_existance_int( List<String> user_input )
+     * @param user_input
+     * @return int
+     * Returns first found integer, if not found returns -1
+     */
+    int check_existance_int ( List<String> user_input ){
+        for ( String word : user_input ){
+            try{
+                Integer i = Integer.parseInt(word);
+                return i; 
+            }catch(NumberFormatException e){
+            }
+        }
+        return -1;
     }
 }
