@@ -338,15 +338,18 @@ public class Database {
         }
         else if (mode.equals("tick")){
             /**
-             *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
-                hashtag_table_id INT,
-                place_id INT,
+             *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
                 owner_id INT,
+                place_id INT,
                 category_id INT,
-                scene_name VARCHAR(30),
-                scene_note VARCHAR(100),
+                note_id INT,
+                hashtag_table_id INT,
+                tick_done_id INT,
+                tick_done_start VARCHAR(60),
+                tick_date_end VARCHAR(60),
+                tick_name VARCHAR(60),
              */
-            index = new int[] {1,2,3,4,5};
+            index = new int[] {1,2,3,4,5,6,7};
         }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
@@ -371,6 +374,7 @@ public class Database {
                 to_ret.add(brake);
             } 
             log.add("Tick_Brick Collection returns succesfully", HEADER); 
+            log.add("RS DATA: "+rs.toString(), HEADER);
         }
         else{
             log.add("Tick_Brick Collection failed", HEADER);

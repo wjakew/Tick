@@ -139,15 +139,19 @@ public class Database_Tick {
             ResultSet rs = ppst.executeQuery();
             
             Tick_Tick to_show = new Tick_Tick(database.return_tick_brick(rs, "tick"));
+            
             to_ret_lines.add(to_show.simple_show());
             if ( to_show.tick_done_id == 1){
                 to_ret_lines.add(tab + "TICK NOT DONE");
+                to_ret_lines.add("---");
             }
             else{
                 to_ret_lines.add(tab + "TICK DONE");
+                to_ret_lines.add("---");
             }
             // setting categories
             if ( to_show.category_id != 1){
+                to_ret_lines.add("Category linked:");
                 String clear_query = "SELECT * FROM CATEGORY WHERE category_id = ?;";
                 ppst = database.con.prepareStatement(clear_query);
                 
@@ -157,12 +161,15 @@ public class Database_Tick {
                 
                 Tick_Category tc = new Tick_Category ( database.return_tick_brick(rs, "category"));
                 to_ret_lines.addAll(tc.get_lines_to_show());
+                to_ret_lines.add("---");
             }
             else {
                 to_ret_lines.add(tab + "NO CATEGORIES");
+                to_ret_lines.add("---");
             }
             // setting hashtag table
             if ( to_show.hashtag_table_id != 1){
+                to_ret_lines.add("Hashtag table linked:");
                 String clear_query = "SELECT * FROM HASHTAG_TABLE WHERE hashtag_table_id = ?;";
                 ppst = database.con.prepareStatement(clear_query);
                 
@@ -173,18 +180,49 @@ public class Database_Tick {
                 Tick_HashtagT tht = new Tick_HashtagT(database.return_tick_brick(rs,"hashtag table"));
                 
                 to_ret_lines.addAll(tht.get_lines_to_show());
+                to_ret_lines.add("---");
             }
             else{
                 to_ret_lines.add(tab + "NO HASHTAG TABLES");
+                to_ret_lines.add("---");
             }
             // setting places
-            
-            
-            // setting addresses
-            
-            
+            if ( to_show.place_id != 1){
+                to_ret_lines.add("Place linked:");
+                String clear_query = "SELECT * FROM PLACE where place_id = ?;";
+                
+                ppst = database.con.prepareStatement(clear_query);
+                ppst.setInt(1,to_show.place_id);
+                rs = ppst.executeQuery();
+                
+                Tick_Place tp = new Tick_Place(database.return_tick_brick(rs, "place"));
+                
+                to_ret_lines.addAll(tp.get_lines_to_show());
+                to_ret_lines.add("---");
+            }
+            else{
+                to_ret_lines.add(tab + "NO PLACES");
+                to_ret_lines.add("---");
+            }
             // setting note
-            
+            if ( to_show.note_id != 1){
+                to_ret_lines.add("Note linked:");
+                String clear_query = "SELECT * FROM NOTE where note_id = ?;";
+                
+                ppst = database.con.prepareStatement(clear_query);
+                
+                ppst.setInt(1, to_show.note_id);
+                rs = ppst.executeQuery();
+                
+                Tick_Note tn = new Tick_Note(database.return_tick_brick(rs,"note"));
+                
+                to_ret_lines.addAll(tn.get_lines_to_show());
+                to_ret_lines.add("---");
+            }
+            else{
+                to_ret_lines.add(tab + "NO NOTES");
+                to_ret_lines.add("---");
+            }
             return to_ret_lines;
             
         }catch (SQLException e){

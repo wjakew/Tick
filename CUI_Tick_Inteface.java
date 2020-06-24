@@ -236,13 +236,15 @@ public class CUI_Tick_Inteface {
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("tick");
             ui.interface_print("    - add ( add simple tick reminder )");
+            ui.interface_print("    - arch ( shows archived ticks )");
             ui.interface_print("tick /tick_id/");
             ui.interface_print("    - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ ");
             ui.interface_print("          ( links tick to the choosen object ) ");
-            ui.interface_print("    - mark | /done/ |");
+            ui.interface_print("    - mark | /done/ | or - done");
             ui.interface_print("          ( marks tick and gives it new atribute )");
             ui.interface_print("    - delete ( delete tick ) ");
             ui.interface_print("    - det ( shows details of the tick ) ");
+            ui.interface_print("    - def  ( clearing links, setting default )");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("add ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
@@ -299,13 +301,15 @@ public class CUI_Tick_Inteface {
             ui.interface_print("Help for tick");
             ui.interface_print("    ( without parameters show active ticks )");
             ui.interface_print("    - add ( add simple tick reminder )");
+            ui.interface_print("    - arch ( shows archived ticks )");
             ui.interface_print("tick /tick_id/");
             ui.interface_print("    - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ ");
             ui.interface_print("          ( links tick to the choosen object ) ");
-            ui.interface_print("    - mark | /done/ |");
+            ui.interface_print("    - mark | /done/ | or -done");
             ui.interface_print("          ( marks tick and gives it new atribute )");
             ui.interface_print("    - delete ( delete tick ) ");  
             ui.interface_print("    - det ( shows details of the tick ) ");
+            ui.interface_print("    - def  ( clearing links, setting default )");
         }
         else{
             ui.interface_print("Wrong option");
@@ -641,14 +645,17 @@ public class CUI_Tick_Inteface {
     void CUI_FUN_tick(List<String> addons) throws SQLException{
         /**
          * ( without parameters show active ticks )
-                - add ( add simple tick reminder )
+                - add  ( add simple tick reminder ) DONE
+                - arch ( shows archived ticks ) DONE
             tick /tick_id/
                  - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ 
-                    ( links tick to the choosen object ) 
-                - mark | /done/ |
+                    ( links tick to the choosen object )  DONE
+                - mark | /done/ | or - done
                     ( marks tick and gives it new atribute )
                 - delete ( delete tick )
-                - det ( shows details of the tick ) 
+                - det  ( shows details of the tick ) DONE
+                - def  ( clearing links, setting default )
+                
          */
         // tick
         if ( addons.size() == 1 ){
@@ -670,6 +677,12 @@ public class CUI_Tick_Inteface {
             else{
                 ui.interface_print("Error adding tick");
             }
+        }
+        // tick arch
+        else if ( addons.size() == 2 && addons.contains("arch")){
+            ui.interface_print("Showing inactive ticks: ");
+            Database_Viewer dv = new Database_Viewer(database,database.logged,"tick_done");
+            show_arraylist(dv.make_view());
         }
         // tick /tick_id/ link
         else if ( addons.size() == 4 && addons.contains("link") && ui.check_existance_int(addons)!= -1){
@@ -716,11 +729,21 @@ public class CUI_Tick_Inteface {
             Database_Tick shower = new Database_Tick(database);
             
             if ( database.check_if_record_exists(ui.last_input, "tick") ){
-                show_arraylist(shower.view_tick(ui.last_input));
+                if ( shower.view_tick(ui.last_input) != null){
+                    show_arraylist(shower.view_tick(ui.last_input));
+                }
+                else{
+                    ui.interface_print("Failed loading tick details");
+                }
+                
             }
             else{
                 ui.interface_print("Wrong tick id");
             }
+        }
+        // tick /tick_id/ mark done / tick /tick_id/ mark done
+        else if ( addons.size() >= 3 && addons.contains("done") && ui.check_existance_int(addons)!= -1){
+            
         }
         else{
             ui.interface_print("Wrong arguments for tick. See: help tick ");

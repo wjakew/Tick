@@ -106,7 +106,10 @@ public class Database_Viewer {
             query = "SELECT * FROM SCENE where owner_id = ?;";
         }
         else if (mode.equals("tick")){
-            query = "SELECT * FROM TICK where owner_id = ?;";
+            query = "SELECT * FROM TICK where owner_id = ? and tick_done_id = 1;";
+        }
+        else if (mode.equals("tick_done")){
+            query = "SELECT * FROM TICK where owner_id = ? and tick_done_id != 1;";
         }
         PreparedStatement ppst = database.con.prepareStatement(query);
         if ( !mode.equals("address") ){

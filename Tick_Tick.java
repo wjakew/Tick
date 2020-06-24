@@ -111,6 +111,19 @@ public class Tick_Tick extends Tick_Element{
     String simple_show(){
         return Integer.toString(tick_id)+ ": "+tick_name+" ("+tick_done_start+")";
     }
+    
+    void debug_show(){
+        System.out.println(tick_id);
+        System.out.println(owner_id);
+        System.out.println(place_id);
+        System.out.println(category_id);
+        System.out.println(note_id);
+        System.out.println(hashtag_table_id);
+        System.out.println(tick_done_id);
+        System.out.println(tick_done_start);
+        System.out.println(tick_done_end);
+        System.out.println(tick_name);
+    }
     /**
      * Tick_Tick.get_lines_to_show()
      * @return ArrayList
