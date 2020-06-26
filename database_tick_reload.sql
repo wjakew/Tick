@@ -3,8 +3,20 @@ programmer Jakub Wawak
 all rights reserved
 kubawawak@gmail.com
 version (from schema) v1.1
-sql script makes tables for tick database
-*/	
+sql script reloades tables for tick database
+*/
+drop table if exists TICK;
+drop table if exists CONFIGURATION;
+drop table if exists SCENE;
+drop table if exists NOTE;
+drop table if exists CATEGORY;
+drop table if exists TAG;
+drop table if exists HASHTAG_TABLE;
+drop table if exists PLACE;
+drop table if exists TICK_DONE;
+drop table if exists OWN;
+drop table if exists ADDRESS;
+
 -- table address for storing addresses of places and owners (1.5)
 CREATE TABLE ADDRESS
 (
@@ -140,4 +152,51 @@ CONSTRAINT fk_tick3 FOREIGN KEY (note_id) REFERENCES NOTE(note_id),
 CONSTRAINT fk_tick4 FOREIGN KEY (hashtag_table_id) REFERENCES HASHTAG_TABLE(hashtag_table_id),
 CONSTRAINT fk_tick5 FOREIGN KEY (tick_done_id) REFERENCES TICK_DONE(tick_done_id)
 );
--- end of the file
+
+INSERT INTO ADDRESS
+(address_city,address_street,address_house_number,address_flat_number,address_postal,
+address_country)
+VALUES
+('','',-1,-1,'','');
+INSERT INTO ADDRESS
+(address_city,address_street,address_house_number,address_flat_number,address_postal,
+address_country)
+VALUES
+('Plock','Leszczynowa',9,0,'90-473','Poland');
+
+INSERT INTO OWN
+(owner_login,address_id,owner_password,owner_name,owner_surname,owner_email_address,
+owner_age,owner_status)
+VALUES
+('wjakew',1,'test','Jakub','Wawak','kubawawak@gmail.com',24,1);
+INSERT INTO PLACE
+(owner_id,place_name,address_id)
+VALUES
+(1,'No place',1);
+
+INSERT INTO HASHTAG_TABLE
+(owner_id,hashtag_table_name,hashtag_table_note)
+VALUES
+(1,'Main Table','Main table for users');
+
+INSERT INTO CONFIGURATION
+(owner_id,sum_entries,debug,conf2,conf3,conf4,conf5,conf6,conf7)
+VALUES
+(1,1,1,'','','','','','');
+INSERT INTO NOTE
+(owner_id,note_content,setting1,setting2,setting3)
+VALUES
+(1,'No note','','','');
+INSERT INTO TAG
+(owner_id,hashtag_table_id,tag_name,tag_note)
+VALUES
+(1,1,'No tags','Tag do testowania');
+INSERT INTO CATEGORY
+(owner_id,category_name,category_note)
+VALUES
+(1,'Main category','Main category for all of the tick reminders');
+INSERT INTO TICK_DONE
+(tick_done_date,tick_done_duration,tick_done_note)
+VALUES
+("no date","no duration","tick done not happen");
+-- end of file
