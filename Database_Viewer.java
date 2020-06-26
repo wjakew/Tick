@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class Database_Viewer {
     
-    final String version = "v1.0.1";
+    final String version = "v1.0.2";
     final String HEADER = "DATABASE_VIEWER ("+version+")"; 
     /**
      * modes:
@@ -69,6 +69,9 @@ public class Database_Viewer {
      * Returns lines to show
      */
     ArrayList<String> get_lines(ArrayList<Tick_Brick> to_get) throws SQLException{
+        if ( mode.equals("tick_done")){
+            mode = "tick";
+        }
         Container obj = new Container (to_get, mode,database,logged);
         ArrayList<String> to_ret = obj.make_lines();
         if ( to_ret.isEmpty() ){
@@ -283,14 +286,15 @@ public class Database_Viewer {
         ArrayList<String> ctg_array = get_lines(prepare_tick_brick(prepare_query()));
         int c1 = 0,c2 = 0,c3 = 0;
         ArrayList<String> result = new ArrayList<>();
-        while(c1 < hsh_array.size() || c2 < plp_array.size() || c3 < ctg_array.size()) {
-            if(c1 < hsh_array.size())
-                result.add(slicer(hsh_array.get(c1++)));
-            if(c2 < plp_array.size())
-                result.add(slicer(plp_array.get(c2++)));
-            if(c3 < ctg_array.size())
-                result.add(slicer(ctg_array.get(c3++)));
-        }
+        result.add("                      HASHTAGS TABLES:");
+        result.addAll(hsh_array);
+        result.add("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        result.add("                      PLACES:");
+        result.addAll(plp_array);
+        result.add("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        result.add("                      CATEGORIES:");
+        result.addAll(ctg_array);
+        result.add("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
     return result;
     }
 }

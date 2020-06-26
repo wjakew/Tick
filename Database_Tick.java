@@ -88,6 +88,7 @@ public class Database_Tick {
      * hashtag_table
      * category
      * note
+     * tick_done
      */
     boolean update_data(int data_id,int tick_id,String mode) throws SQLException{
         String query = "UPDATE TICK SET "+mode+"_id = ? where tick_id = ? and owner_id = ?;";
@@ -96,7 +97,6 @@ public class Database_Tick {
         ppst.setInt(1,data_id);
         ppst.setInt(2,tick_id);
         ppst.setInt(3,database.logged.owner_id);
-        System.out.println(ppst.toString());
         try{
             ppst.execute();
             return true;
@@ -104,6 +104,93 @@ public class Database_Tick {
             database.log.add("FAILED TO UPDATE TICK ( "+e.toString()+")", HEADER);
             return false;
         }
+    }
+    
+    /**
+     * Database_Tick.make_default(int tick_id)
+     * @param tick_id
+     * @return boolean
+     * @throws SQLException
+     * Returns boolean when makes default data to given tick by tick_id
+     */
+    boolean make_default(int tick_id) throws SQLException{
+        /**
+         *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
+            owner_id INT,
+            place_id INT,
+            category_id INT,
+            note_id INT,
+            hashtag_table_id INT,
+            tick_done_id INT,
+            tick_done_start VARCHAR(60),
+            tick_date_end VARCHAR(60),
+            tick_name VARCHAR(60),
+         */
+        String query = "UPDATE TICK set "
+                + "place_id = 1, category_id = 1,note_id = 1,hashtag_table_id = 1"
+                + ",tick_done_id = 1 where tick_id = ? and owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1,tick_id);
+        ppst.setInt(2,database.logged.owner_id);
+        
+        try{
+            ppst.execute();
+            return true;
+        }catch(SQLException e){
+            database.log.add("FAILED TO SET TICK DEFAULT ("+e.toString()+")", HEADER);
+            return false;
+        }
+    }
+    
+    /**
+     * Database_Tick.last_mark_done_id()
+     * @return int
+     * @throws SQLException
+     * Function return index of the last tick_done_id
+     */
+    int last_mark_done_id() throws SQLException{
+        String query = "SELECT tick_done_id FROM TICK_DONE where owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        int index = 0;
+        ppst.setInt(1,database.logged.owner_id);
+        
+        ResultSet rs = ppst.executeQuery();
+        
+        while(rs.next()){
+            index = rs.getInt("tick_done_id");
+        }
+        
+        return index;
+        
+    }
+    /**
+     * Database_Tick.mark_done(String note)
+     * @param note
+     * @return boolean
+     * @throws SQLException 
+     * Function for adding 
+     */
+    boolean mark_done(String note, int tick_id) throws SQLException{
+        Date actual = new Date();
+        String query = "INSERT INTO TICK_DONE\n" +
+                       "(owner_id,tick_done_date,tick_done_duration,tick_done_note)\n"+
+                       "VALUES\n" +
+                       "(?,?,?,?);";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1,database.logged.owner_id);
+        ppst.setString(2, actual.toString());
+        ppst.setString(3,"no data");
+        ppst.setString(4, note);
+        
+        try{
+            ppst.execute();
+            update_data(last_mark_done_id(),tick_id,"tick_done");
+            return true;
+        }catch(SQLException e ){
+            database.log.add("FAILED TO MARK DONE ( "+e.toString()+")",HEADER);
+            return false;
+        }
+                       
     }
     
     /**

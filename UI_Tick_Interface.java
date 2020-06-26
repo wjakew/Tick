@@ -16,7 +16,7 @@ import java.util.Scanner;
  * @author jakub
  */
 public class UI_Tick_Interface {
-    final String version = "v1.0.3";
+    final String version = "v1.0.4";
     
     Scanner sc;                     // main object for scanning 
     ArrayList<String> history;      // main log of the input,output
@@ -122,6 +122,9 @@ public class UI_Tick_Interface {
             }catch(NumberFormatException e){
                 int_flag = false;
             }
+        }
+        if ( !numbers.isEmpty() ){
+            last_input = numbers.get(0);
         }
     }
     

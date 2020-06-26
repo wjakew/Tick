@@ -105,6 +105,10 @@ public class CUI_Tick_Inteface {
                 CUI_FUN_tick(words);
                 break;
             }
+            else if (word.equals("delete")){
+                CUI_FUN_delete(words);
+                break;
+            }
             // not supported command
             else{
                 ui.interface_print("Wrong command");
@@ -249,6 +253,10 @@ public class CUI_Tick_Inteface {
             ui.interface_print("add ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
             ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("delete ");
+            ui.interface_print("    - place | address | hashtable | tag | category | note /data_id/");
+            ui.interface_print("        ( delete object by given id ) ");
+            ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("show ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
             ui.interface_print("-----------------------------------------------------------");
@@ -258,7 +266,8 @@ public class CUI_Tick_Inteface {
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("scene ");
             ui.interface_print("    ( without parameters show active scenes )");
-            ui.interface_print("    - add ( inits scene maker ) ");
+            ui.interface_print("    - add    ( inits scene maker ) ");
+            ui.interface_print("    - delete ( delete scene by id )");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
@@ -311,6 +320,12 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - det ( shows details of the tick ) ");
             ui.interface_print("    - def  ( clearing links, setting default )");
         }
+        // help delete
+        else if ( addons.size() == 2 && addons.contains("delete")){
+            ui.interface_print("Help for delete ");
+            ui.interface_print("    - place | address | hashtable | tag | category | note /data_id/");
+            ui.interface_print("        ( delete object by given id ) ");
+        }
         else{
             ui.interface_print("Wrong option");
         }
@@ -334,6 +349,7 @@ public class CUI_Tick_Inteface {
             to_add.init_CUI();
             if ( database.add_address(to_add) ) {
                 ui.interface_print("Address added");
+                ui.interface_print("Given id: "+Integer.toString(database.get_last_id("ADDRESS")));
             }
             else{
                 ui.interface_print("Something goes wrong");
@@ -346,6 +362,7 @@ public class CUI_Tick_Inteface {
             to_add.owner_id = logged_user.owner_id;
             if ( database.add_place(to_add)){
                 ui.interface_print("Place added");
+                ui.interface_print("Given id: "+Integer.toString(database.get_last_id("PLACE")));
             }
             else{
                 ui.interface_print("Something goes wrong");
@@ -359,6 +376,7 @@ public class CUI_Tick_Inteface {
             to_add.put_elements(to_add.wall_updater());
             if (database.add_hashtagT(to_add)){
                 ui.interface_print("Hashtag Table added");
+                ui.interface_print("Given id: "+Integer.toString(database.get_last_id("HASHTAG_TABLE")));
             }
             else{
                 ui.interface_print("Something goes wrong");
@@ -372,6 +390,7 @@ public class CUI_Tick_Inteface {
             to_add.put_elements(to_add.wall_updater());
             if (database.add_tag(to_add)){
                 ui.interface_print("Tag added");
+                ui.interface_print("Given id: "+Integer.toString(database.get_last_id("TAG")));
             }
             else{
                 ui.interface_print("Something goes wrong");
@@ -385,6 +404,7 @@ public class CUI_Tick_Inteface {
             to_add.put_elements(to_add.wall_updater());
             if (database.add_category(to_add)){
                 ui.interface_print("Category added");
+                ui.interface_print("Given id: "+Integer.toString(database.get_last_id("CATEGORY")));
             }
             else{
                 ui.interface_print("Something goes wrong");
@@ -398,6 +418,7 @@ public class CUI_Tick_Inteface {
             to_add.put_elements(to_add.wall_updater());
             if (database.add_note(to_add)){
                 ui.interface_print("Note added");
+                ui.interface_print("Given id: "+Integer.toString(database.get_last_id("NOTE")));
             }
             else{
                 ui.interface_print("Something goes wrong");
@@ -588,6 +609,7 @@ public class CUI_Tick_Inteface {
     /**
      * CUI_Tick_Interface.CUI_FUN_scene(List<String> addons)
      * @param addons 
+     * Adding functionality of scene
      */
     void CUI_FUN_scene(List<String> addons) throws SQLException{
         // scene
@@ -599,24 +621,12 @@ public class CUI_Tick_Inteface {
         // scene add
         else if (addons.size() == 2 && addons.contains("add")){
             ui.interface_print("Welcome in the scene creator: ");
-            System.out.printf("%30s %30s %30s", "CATEGORIES", "PLACES", "HASHTAG TABLES\n");
-            
+       
             Database_Viewer scene_v = new Database_Viewer(database,logged_user,"scene view");
             ArrayList<String> lines_to_show = scene_v.make_view();
-            lines_to_show.remove(0);
-            lines_to_show.remove(0);
-            lines_to_show.remove(0);
+ 
             // showing lines from database viewer
-            for (int i = 0; i < lines_to_show.size(); i = i+3){
-                System.out.printf("%30s",lines_to_show.get(i));
-                if ( i + 3 < lines_to_show.size() ){
-                    System.out.printf(" %30s",lines_to_show.get(i+1));
-                }
-                if ( i + 6 < lines_to_show.size() ){
-                    System.out.printf(" %30s",lines_to_show.get(i+2));
-                }
-                System.out.printf("\n");
-            }
+            show_arraylist(lines_to_show);
             // adding scene
             Tick_Scene to_add = new Tick_Scene();
             to_add.init_CUI();
@@ -632,6 +642,31 @@ public class CUI_Tick_Inteface {
                 ui.interface_print("");
             }
         }
+        // scene delete
+        else if ( addons.size() == 2 && addons.contains("delete")){
+            ui.interface_print("Choose scene to delete:");
+            Database_Viewer view = new Database_Viewer(database,logged_user,"scene");
+            show_arraylist(view.make_view());
+            String i = ui.interface_get();
+            
+            if ( ui.int_flag ){
+                if ( database.check_if_record_exists(ui.last_input, "scene")){
+                    Database_Garbage_Collector dgc = new Database_Garbage_Collector(database);
+                    if ( approval_window("scene")){
+                        dgc.delete_scene(ui.last_input);
+                    }
+                    else{
+                        ui.interface_print("Cancelled");
+                    }
+                }
+                else{
+                    ui.interface_print("Wrong scene id");
+                }
+            }
+            else{
+                ui.interface_print("Wrong input");
+            }
+        }
 
         else{
             ui.interface_print("Wrong option");
@@ -644,17 +679,17 @@ public class CUI_Tick_Inteface {
      */
     void CUI_FUN_tick(List<String> addons) throws SQLException{
         /**
-         * ( without parameters show active ticks )
+         * ( without parameters show active ticks ) DONE
                 - add  ( add simple tick reminder ) DONE
                 - arch ( shows archived ticks ) DONE
             tick /tick_id/
                  - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ 
                     ( links tick to the choosen object )  DONE
                 - mark | /done/ | or - done
-                    ( marks tick and gives it new atribute )
+                    ( marks tick and gives it new atribute ) DONE
                 - delete ( delete tick )
                 - det  ( shows details of the tick ) DONE
-                - def  ( clearing links, setting default )
+                - def  ( clearing links, setting default ) DONE
                 
          */
         // tick
@@ -727,7 +762,7 @@ public class CUI_Tick_Inteface {
         // tick /tick_id/ det
         else if ( addons.size() == 3 && addons.contains("det") && ui.check_existance_int(addons)!= -1){
             Database_Tick shower = new Database_Tick(database);
-            
+            System.out.println(ui.last_input);
             if ( database.check_if_record_exists(ui.last_input, "tick") ){
                 if ( shower.view_tick(ui.last_input) != null){
                     show_arraylist(shower.view_tick(ui.last_input));
@@ -741,12 +776,180 @@ public class CUI_Tick_Inteface {
                 ui.interface_print("Wrong tick id");
             }
         }
-        // tick /tick_id/ mark done / tick /tick_id/ mark done
+        // tick /tick_id/ mark done / tick /tick_id/ done
         else if ( addons.size() >= 3 && addons.contains("done") && ui.check_existance_int(addons)!= -1){
-            
+            if ( database.check_if_record_exists(ui.last_input, "tick")){
+                ui.interface_print("Any notes for marking done this tick?");
+                String note = ui.interface_get();
+                if ( note.isBlank() ){
+                     note = "no note";
+                }
+                Database_Tick dt = new Database_Tick(database);
+                if (dt.mark_done(note, ui.last_input)){
+                    ui.interface_print("Tick marked as done");
+                    ui.interface_print("You can see it in the archve");
+                }
+                else{
+                    ui.interface_print("Failed to mark as done");
+                }
+                
+            }
+            else{
+                ui.interface_print("Wrong tick id");
+            }
+        }
+        // tick /tick_id/ def
+        else if ( addons.size() == 3 && addons.contains("def") && ui.check_existance_int(addons) != -1){
+            if (database.check_if_record_exists(ui.last_input, "tick")){
+                ui.interface_print("Are you sure to set default data to tick? (y/n)");
+                String ans = ui.interface_get();
+                
+                if ( ans.equals("y") ){
+                    Database_Tick dt = new Database_Tick(database);
+                    
+                    if ( dt.make_default(ui.last_input) ){
+                        ui.interface_print("Tick set to default");
+                    }
+                    else{
+                        ui.interface_print("Failed to set to default");
+                    }
+                }
+                else{
+                    ui.interface_print("Cancelled");
+                }
+            }
+            else{
+                ui.interface_print("Wrong tick id");
+            }
+        }
+        // tick /tick_id/ delete
+        else if ( addons.size() == 3 && addons.contains("delete") && ui.check_existance_int(addons) != -1){
+            if ( database.check_if_record_exists(ui.last_input, "tick") ){
+                
+                if(approval_window("tick")){
+                    Database_Garbage_Collector dgc = new Database_Garbage_Collector(database);
+                    if (dgc.delete_tick(ui.last_input)){
+                        ui.interface_print("Tick deleted");
+                    }
+                    else{
+                        ui.interface_print("Unable to delete tick");
+                    }
+                }
+                else{
+                    ui.interface_print("Cancelled");
+                }
+            }
+            else{
+                ui.interface_print("Wrong tick id");
+            }
         }
         else{
             ui.interface_print("Wrong arguments for tick. See: help tick ");
+        }
+    }
+    
+    /**
+     * CUI_Tick_Interface.approval_window(String option)
+     * @param option 
+     */
+    boolean approval_window(String option){
+        ui.interface_print("This operation cause to update your data and change some records.");
+        ui.interface_print("Are you sure to continue?(y/n)");
+        String ans = ui.interface_get();
+        return ans.equals("y");
+    }
+    
+    /**
+     * CUI_Tick_Interface.CUI_FUN_delete(List<String> addons)
+     * @param addons 
+     * Implements functionality of deleting data
+     */
+    void CUI_FUN_delete(List<String> addons) throws SQLException{
+        Database_Garbage_Collector dgc = new Database_Garbage_Collector(database);
+        // delete
+        if ( addons.size() == 1){
+            ui.interface_print("No enough options. See help delete");
+        }
+        // delete address /data_id/
+        else if ( addons.size() == 3 && addons.contains("address") && ui.check_existance_int(addons) != -1){
+            
+            if ( approval_window("address")){
+                if (dgc.delete_address(ui.last_input)){
+                    ui.interface_print("Data deleted");
+                }
+                else{
+                    ui.interface_print("Failed to delete data");
+                }
+            }
+            else{
+                ui.interface_print("Canelled");
+            }
+        }
+        // delete place /data_id/
+        else if ( addons.size() == 3 && addons.contains("place") && ui.check_existance_int(addons) != -1){
+            
+            if ( approval_window("place") ){
+                if ( dgc.delete_place(ui.last_input) ){
+                    ui.interface_print("Data deleted");
+                }
+                else{
+                    ui.interface_print("Failed to delete data");
+                }
+            }
+            else{
+                ui.interface_print("Cancelled");
+            }
+        }
+        // delete category /data_id/
+        else if (addons.size() == 3 && addons.contains("category") && ui.check_existance_int(addons) != -1){
+            
+            if (approval_window("category")){
+                if ( dgc.delete_category(ui.last_input)){
+                    ui.interface_print("Data deleted");
+                }
+                else{
+                    ui.interface_print("Failed to delete data");
+                }
+            }
+        }
+        // delete tag /data_id/
+        else if (addons.size() == 3 && addons.contains("tag") && ui.check_existance_int(addons) != -1){
+            
+            if (approval_window("tag")){
+                if ( dgc.delete_tag(ui.last_input)){
+                    ui.interface_print("Data deleted");
+                }
+                else{
+                    ui.interface_print("Failed to delete data");
+                }
+            }
+        }
+        //delete hashtag_table /data_id/
+        else if (addons.size() == 3 && addons.contains("hashtag_table") && ui.check_existance_int(addons) != -1){
+            
+            if (approval_window("hashtag table")){
+                if ( dgc.delete_hashtag_table(ui.last_input)){
+                    ui.interface_print("Data deleted");
+                }
+                else{
+                    ui.interface_print("Failed to delete data");
+                }
+            }
+        }
+        // delete note /data_id/
+        else if (addons.size() == 3 && addons.contains("note") && ui.check_existance_int(addons) != -1){
+            
+            if (approval_window("note")){
+                if ( dgc.delete_note(ui.last_input)){
+                    ui.interface_print("Data deleted");
+                }
+                else{
+                    ui.interface_print("Failed to delete data");
+                }
+            }
+        }
+        else{
+            ui.interface_print("Wrong options. See help delete");
         }
     }
 }

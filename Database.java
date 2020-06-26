@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class Database {
     
-    final String version = "v0.0.7B";
+    final String version = "v0.0.9";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -98,6 +98,9 @@ public class Database {
         }
         else if (mode.equals("tick")){
             query = "SELECT * FROM TICK where tick_id = ?;";
+        }
+        else if (mode.equals("tick_done")){
+            query = "SELECT * FROM TICK_DONE where tick_done_id = ?;";
         }
         PreparedStatement ppst = con.prepareStatement(query);
         ppst.setInt(1, id);
@@ -195,6 +198,40 @@ public class Database {
         }
         return -1;
     }
+    
+    /**
+     * Database.get_last_id(String table_name)
+     * @param table_name
+     * @return int
+     * @throws SQLException 
+     * Returns last id of given table
+     */
+    int get_last_id(String table_name) throws SQLException{
+        int index = 0;
+        String field = table_name.toLowerCase();
+        field = field + "_id";
+        String query = "SELECT * from "+table_name+" where owner_id = ?;";
+        PreparedStatement ppst = con.prepareStatement(query);
+        
+        ppst.setInt(1,logged.owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            while ( rs.next() ){
+                index = rs.getInt(field);
+            }
+        }catch(SQLException e){}
+        return index;
+    }
+    
+    /**
+     * Database.return_resultset(String query)
+     * @param query
+     * @return ResultSet
+     * @throws SQLException
+     * Returns resultset of given string
+     */
     ResultSet return_resultset(String query) throws SQLException{
          PreparedStatement ppst = con.prepareStatement(query);
          return ppst.executeQuery();
