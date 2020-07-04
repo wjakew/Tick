@@ -8,7 +8,6 @@ package tick;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -621,7 +620,7 @@ public class CUI_Tick_Inteface {
         // scene add
         else if (addons.size() == 2 && addons.contains("add")){
             ui.interface_print("Welcome in the scene creator: ");
-       
+            ui.interface_print("Input '0' if you don't want to use this categorization ");
             Database_Viewer scene_v = new Database_Viewer(database,logged_user,"scene view");
             ArrayList<String> lines_to_show = scene_v.make_view();
  
@@ -629,18 +628,49 @@ public class CUI_Tick_Inteface {
             show_arraylist(lines_to_show);
             // adding scene
             Tick_Scene to_add = new Tick_Scene();
+            to_add.owner_id = database.logged.owner_id;
             to_add.init_CUI();
             
-            try{
-                if ( database.add_scene(to_add) ){
-                    ui.interface_print("Scene added");
+            if ( !to_add.stop_CUI() ){
+                
+                if (to_add.check_integrity(database)){
+                    try{
+                    if ( database.add_scene(to_add) ){
+                        ui.interface_print("Scene added");
+                        ui.interface_print("Scene id:" +database.get_last_id("scene"));
+                    }
+                    else{
+                        ui.interface_print("Scene adding occured a problem");
+                    }
+                    }catch(SQLException e){
+                        ui.interface_print("");
+                    }
                 }
                 else{
-                    ui.interface_print("Scene adding occured a problem");
+                    ui.interface_print("Wrong id of one of the objects");
+                    ui.interface_print("Do you want to repair scene data?");
+                    if ( approval_window("scene")){
+                        try{
+                        if ( database.add_scene(to_add) ){
+                            ui.interface_print("Scene added");
+                        }
+                        else{
+                            ui.interface_print("Scene adding occured a problem");
+                        }
+                        }catch(SQLException e){
+                            ui.interface_print("");
+                        }
+                    }
+                    else{
+                        ui.interface_print("Stopped");
+                    }
+                    
                 }
-            }catch(SQLException e){
-                ui.interface_print("");
             }
+            else{
+                ui.interface_print("Stopped");
+            }
+            
         }
         // scene delete
         else if ( addons.size() == 2 && addons.contains("delete")){
@@ -665,6 +695,21 @@ public class CUI_Tick_Inteface {
             }
             else{
                 ui.interface_print("Wrong input");
+            }
+        }
+        
+        // scene select /scene_id/
+        else if ( addons.size() == 3 && addons.contains("select") && ui.check_existance_int(addons)!= -1 ){
+            int scene_id = ui.last_input;
+            
+            if ( database.check_if_record_exists(scene_id, "scene") ){
+                // we found scene with this id
+                Tick_Scene to_categorize = new Tick_Scene(database.return_TB_collection(logged_user,"scene",ui.last_input));
+                
+                ui.interface_print(to_categorize.query_creator());
+            }
+            else{
+                ui.interface_print("Wrong scene id");
             }
         }
 
@@ -708,6 +753,7 @@ public class CUI_Tick_Inteface {
             
             if ( adder.add_tick(to_add) ){
                 ui.interface_print("Tick added");
+                ui.interface_print("Tick id: "+database.get_last_id("TICK"));
             }
             else{
                 ui.interface_print("Error adding tick");

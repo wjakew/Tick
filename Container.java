@@ -41,7 +41,8 @@ public class Container {
     /**
      * Container.kick_list(ArrayList<String> to_kick)
      * @param to_kick
-     * @return 
+     * @return ArrayList
+     * Returns moved text by 'move' variable
      */
     ArrayList<String> kick_list(ArrayList<String> to_kick){
         ArrayList<String> to_ret = new ArrayList<>();

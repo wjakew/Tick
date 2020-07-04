@@ -102,6 +102,9 @@ public class Database {
         else if (mode.equals("tick_done")){
             query = "SELECT * FROM TICK_DONE where tick_done_id = ?;";
         }
+        else if (mode.equals("scene")){
+            query = "SELECT * FROM SCENE where scene_id =?;";
+        }
         PreparedStatement ppst = con.prepareStatement(query);
         ppst.setInt(1, id);
         ResultSet rs = ppst.executeQuery();
@@ -279,7 +282,7 @@ public class Database {
         else if (mode.equals("place")){
             query = "SELECT * FROM PLACE where owner_id = ?;";
         }
-        else if (equals("tag")){
+        else if (mode.equals("tag")){
             query = "SELECT * FROM TAG where owner_id = ?;";
         }
         PreparedStatement ppst = con.prepareStatement(query);
@@ -388,6 +391,18 @@ public class Database {
              */
             index = new int[] {1,2,3,4,5,6,7};
         }
+        else if (mode.equals("scene")){
+            /**
+             *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
+                hashtag_table_id INT,
+                place_id INT,
+                owner_id INT,
+                category_id INT,
+                scene_name VARCHAR(30),
+                scene_note VARCHAR(100),
+             */
+            index = new int[] {1,2,3,4,5};
+        }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
         int colmax = meta.getColumnCount();
@@ -434,6 +449,49 @@ public class Database {
     ArrayList<Tick_Brick> return_TB_collection(Tick_User logged_user, String mode,String query) throws SQLException{
         ResultSet actual = return_resultset(query);
         return return_tick_brick(actual,mode);
+    }
+    ArrayList<Tick_Brick> return_TB_collection(Tick_User logged_user, String mode, int object_id) throws SQLException{
+        ArrayList<Tick_Brick> object_elemetns = new ArrayList<>();
+        String query = "";
+        if (mode.equals("address")){
+            query = "SELECT * FROM ADDRESS where address_id = ?;";
+        }
+        else if (mode.equals("category")){
+            query = "SELECT * FROM CATEGORY where owner_id = ? and category_id = ?;";
+        }
+        else if (mode.equals("hashtag table")){
+            query = "SELECT * FROM HASHTAG_TABLE where owner_id = ? and hashtag_table_id = ?;";
+        }
+        else if (mode.equals("note")){
+            query = "SELECT * FROM NOTE where owner_id = ? and note_id = ?;";
+        }
+        else if (mode.equals("place")){
+            query = "SELECT * FROM PLACE where owner_id = ? and place_id = ?;";
+        }
+        else if (mode.equals("tag")){
+            query = "SELECT * FROM TAG where owner_id = ? and tag_id = ?;";
+        }
+        else if (mode.equals("scene")){
+            query = "SELECT * FROM SCENE where owner_id = ? and scene_id = ?;";
+        }
+        else if (mode.equals("tick")){
+            query = "SELECT * FROM TICK where owner_id = ? and tick_id = ?;";
+        }
+        else{
+            return null;
+        }
+        
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1,logged_user.owner_id);
+        ppst.setInt(2,object_id);
+        
+        ResultSet rs = ppst.executeQuery();
+        
+        if (rs.next()){
+            return return_tick_brick(rs,mode);
+        }
+        return null;
+        
     }
     //----------------------------USER LOGIN TO THE DATABASE
     /**

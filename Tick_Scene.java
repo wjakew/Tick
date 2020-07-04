@@ -88,10 +88,23 @@ public class Tick_Scene extends Tick_Element{
         super.inter.interface_print("Category id: ");
         super.inter.interface_get();
         category_id = super.inter.last_input;
-        super.inter.interface_print("Hastag Table id: ");
+        super.inter.interface_print("Hashtag Table id: ");
         super.inter.interface_get();
         hashtag_table_id = super.inter.last_input;
+        super.inter.interface_print("Name of the scene: ");
+        scene_name = super.inter.interface_get();
+        super.inter.interface_print("Note: ");
+        scene_note = super.inter.interface_get();
         super.put_elements(wall_updater());
+    }
+    
+    /**
+     * Tick_Scene.stop_CUI()
+     * @return boolean
+     * Checks if data is okey
+     */
+    boolean stop_CUI(){
+        return place_id == -1 || category_id == -1 || hashtag_table_id == -1;
     }
     
     /**
@@ -105,6 +118,30 @@ public class Tick_Scene extends Tick_Element{
         return ( database.check_if_record_exists(place_id, "place") 
                 && database.check_if_record_exists(category_id, "category")
                     && database.check_if_record_exists(hashtag_table_id, "hashtag table"));
+    }
+    
+    /**
+     * Tick_Scene.repair()
+     * @param database
+     * @return boolean
+     * @throws SQLException 
+     */
+    boolean repair(Database database) throws SQLException{
+        boolean to_ret = false;
+        if (database.check_if_record_exists(place_id, "place")){
+            place_id = 1;
+            to_ret = true;
+        }
+        if (database.check_if_record_exists(category_id, "category")){
+            category_id = 1;
+            to_ret = true;
+        }
+        if(database.check_if_record_exists(hashtag_table_id, "hashtag table")){
+            hashtag_table_id = 1;
+            to_ret = true;
+        }
+        super.put_elements(wall_updater());
+        return to_ret;
     }
     /**
      * Tick_Scene.get_lines_to_show()
@@ -125,4 +162,55 @@ public class Tick_Scene extends Tick_Element{
         to_ret.add("Place id: "+Integer.toString(place_id));
         return to_ret;
     }
+    
+    /**
+     * Tick_Scene.query_creator()
+     * @return String
+     * Returns query to select ticks
+     */
+    String query_creator(){
+        
+        /**
+         *      scene_id INT AUTO_INCREMENT PRIMARY KEY,
+                hashtag_table_id INT, --> 1 - default
+                place_id INT,   --> 1 - default
+                owner_id INT,   
+                category_id INT,--> 1 - default
+                scene_name VARCHAR(30),  
+                scene_note VARCHAR(100),
+                 
+         */
+        
+        String query = "";
+        
+        query = " SELECT * from TICK where ";
+        
+        String copy = query;
+        
+        // checking hashtags
+        if ( hashtag_table_id != 1){
+            query = query + "hashtag_table_id = "+Integer.toString(hashtag_table_id) + " ";
+        }
+        
+        // checking places
+        
+        if ( place_id != 1 ){
+            if ( !query.equals(copy) ){
+                query = query +"and";
+            }
+            query = query +"place_id = "+Integer.toString(place_id)+" ";
+        }
+        
+        // checking categories
+        if ( category_id != 1){
+            if ( !query.equals(copy) ){
+                query = query + "and";
+            }
+            query = query + "category_id = "+Integer.toString(category_id)+" ";
+        }
+        
+        query = query + ";";
+        
+        return query;
+    } 
 }

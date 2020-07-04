@@ -15,8 +15,8 @@ import java.util.ArrayList;
  * @author jakub
  */
 public class Database_Link {
-    
-    final String HEADER = "DATABASE_LINK";
+    final String version = "v1.0.0";
+    final String HEADER = "DATABASE_LINK ("+version+")";
     
     /**
      * Tick_Own - > Tick_Address + 
@@ -87,7 +87,7 @@ public class Database_Link {
      */
     boolean link_tag_hashtagT(Tick_Tag tag, Tick_HashtagT table) throws SQLException{
         database.log.add("Trying to link hashtag table to tag",HEADER);
-        String query = "update TAG set hashtag_table_id = ? WHERE tag_id = ?;";
+        String query = "UPDATE TAG set hashtag_table_id = ? WHERE tag_id = ?;";
         PreparedStatement ppst = database.con.prepareStatement(query);
         ppst.setInt(1,table.hashtag_table_id);
         ppst.setInt(2, tag.tag_id);

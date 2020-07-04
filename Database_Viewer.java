@@ -121,7 +121,7 @@ public class Database_Viewer {
         try{
             return ppst.executeQuery();
         }catch(SQLException e){
-            database.log.add("Cant return ResultSet",HEADER);
+            database.log.add("Cant return ResultSet ("+e.toString()+")",HEADER);
             return null;
         }
     }
@@ -277,14 +277,13 @@ public class Database_Viewer {
      * @throws SQLException 
      */
     ArrayList<String> view_scene_creator() throws SQLException{
-        ArrayList<ResultSet> rs_list = new ArrayList<>();
-        mode = "category";
+        mode = "hashtag table";
         ArrayList<String> hsh_array = get_lines(prepare_tick_brick(prepare_query()));
         mode = "place";
         ArrayList<String> plp_array = get_lines(prepare_tick_brick(prepare_query()));
-        mode = "hashtag table";
+        mode = "category";
         ArrayList<String> ctg_array = get_lines(prepare_tick_brick(prepare_query()));
-        int c1 = 0,c2 = 0,c3 = 0;
+
         ArrayList<String> result = new ArrayList<>();
         result.add("                      HASHTAGS TABLES:");
         result.addAll(hsh_array);
@@ -295,6 +294,7 @@ public class Database_Viewer {
         result.add("                      CATEGORIES:");
         result.addAll(ctg_array);
         result.add("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-    return result;
+        
+        return result;
     }
 }
