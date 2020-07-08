@@ -307,7 +307,6 @@ public class Database {
     ArrayList<Tick_Brick> return_tick_brick(ResultSet rs,String mode) throws SQLException{
         // metadata for number of columns
         ResultSetMetaData meta   = (ResultSetMetaData) rs.getMetaData();
-        
         ArrayList<Tick_Brick> to_ret = new ArrayList<>();  // tick_brick to ret
         
         int index[] = {};                // array of int indexes
@@ -407,30 +406,29 @@ public class Database {
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
         int colmax = meta.getColumnCount();
         
-        if ( rs != null ){
-            // looping on all database records returned by ResultSet
-            while( rs.next() ){
-                // looping on one record
-                
-                for ( int i = 1 ; i <= colmax; i++){
-                    if ( int_index.contains(i)){
-                        to_ret.add(new Tick_Brick(rs.getInt(meta.getColumnName(i))));
-                    }
-                    else{
-                        to_ret.add(new Tick_Brick(rs.getString(meta.getColumnName(i))));
-                    }
+        // looping on all database records returned by ResultSet
+            // looping on one record
+            for ( int i = 1 ; i <= colmax; i++){
+                if ( int_index.contains(i)){
+                    to_ret.add(new Tick_Brick(rs.getInt(meta.getColumnName(i))));
                 }
-                // flagging end of the object
-                Tick_Brick brake = new Tick_Brick();
-                brake.STOP = true;
-                to_ret.add(brake);
-            } 
+                else{
+                    to_ret.add(new Tick_Brick(rs.getString(meta.getColumnName(i))));
+                }
+            }
+            // flagging end of the object
+            Tick_Brick brake = new Tick_Brick();
+            brake.STOP = true;
+            to_ret.add(brake);
+        if (to_ret.size()>0){
             log.add("Tick_Brick Collection returns succesfully", HEADER); 
             log.add("RS DATA: "+rs.toString(), HEADER);
         }
         else{
-            log.add("Tick_Brick Collection failed", HEADER);
+            log.add("RS size is probably 0.",HEADER+"E!!!");
+            log.add("Failed to reach RS",HEADER+"E!!!");
         }
+
         return to_ret;
     }
     //----------------------------tick brick function
@@ -451,7 +449,6 @@ public class Database {
         return return_tick_brick(actual,mode);
     }
     ArrayList<Tick_Brick> return_TB_collection(Tick_User logged_user, String mode, int object_id) throws SQLException{
-        ArrayList<Tick_Brick> object_elemetns = new ArrayList<>();
         String query = "";
         if (mode.equals("address")){
             query = "SELECT * FROM ADDRESS where address_id = ?;";
@@ -477,18 +474,18 @@ public class Database {
         else if (mode.equals("tick")){
             query = "SELECT * FROM TICK where owner_id = ? and tick_id = ?;";
         }
-        else{
-            return null;
-        }
         
         PreparedStatement ppst = con.prepareStatement(query);
         ppst.setInt(1,logged_user.owner_id);
         ppst.setInt(2,object_id);
         
-        ResultSet rs = ppst.executeQuery();
+        ResultSet result = ppst.executeQuery();
         
-        if (rs.next()){
-            return return_tick_brick(rs,mode);
+        log.add("RS QUERY : "+ppst.toString(),HEADER);
+        
+        if (result.next()){
+            log.add("RS OWNER ID: "+Integer.toString(result.getInt("owner_id")),HEADER);
+            return return_tick_brick(result,mode);
         }
         return null;
         

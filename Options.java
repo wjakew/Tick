@@ -103,55 +103,6 @@ public class Options {
     }
     
     /**
-     * Options.save_seed()
-     * @return boolean
-     * Function for saving seed
-     */
-    boolean save_seed(){
-        try {
-            File myObj = new File("filename.txt");
-            myObj.createNewFile();
-            // saving to file
-            try {
-                FileWriter myWriter = new FileWriter("filename.txt");
-                myWriter.write(random_generator());
-                myWriter.close();
-                return true;
-                } catch (IOException e) {
-                    return false;
-                }
-            } catch (IOException e) {
-                return false;
-        }catch(Exception e){
-            return false;
-        }
-    }
-    
-    /**
-     * Options.get_seed()
-     * @return int
-     * @throws IOException
-     * Function for getting seed from file
-     */
-    int get_seed() throws IOException{
-        try{
-            Path path = Paths.get("/config.txt");
-            Scanner scanner = new Scanner(path);
-            System.out.println("Read text file using Scanner");
-            //read line by line
-            if(scanner.hasNextLine()){
-                //process each line
-                String line = scanner.nextLine();
-                return Integer.parseInt(line);
-            }
-            scanner.close();
-        }catch(IOException e){
-            return -1;
-        }
-        return -1;
-    }
-    
-    /**
      * Options.get_rs_config(int seed)
      * @param seed
      * @return ResultSet
@@ -188,21 +139,7 @@ public class Options {
      * All instructions for options startup
      */
     void startup() throws SQLException, IOException{
-        // getting seed from file
-        File tmpDir = new File("/config.txt");
-        
-        if (tmpDir.exists()){
-            // file exists
-            int seed = get_seed();
-            
-            if ( seed != -1 ){
-                
-            }
-        }
-        
-        else{
-            
-        }
+
         
     }
     

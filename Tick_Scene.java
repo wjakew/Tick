@@ -85,17 +85,23 @@ public class Tick_Scene extends Tick_Element{
         super.inter.interface_print("Place id: ");
         super.inter.interface_get();
         place_id = super.inter.last_input;
-        super.inter.interface_print("Category id: ");
-        super.inter.interface_get();
-        category_id = super.inter.last_input;
-        super.inter.interface_print("Hashtag Table id: ");
-        super.inter.interface_get();
-        hashtag_table_id = super.inter.last_input;
-        super.inter.interface_print("Name of the scene: ");
-        scene_name = super.inter.interface_get();
-        super.inter.interface_print("Note: ");
-        scene_note = super.inter.interface_get();
-        super.put_elements(wall_updater());
+        if (place_id !=-1){
+            super.inter.interface_print("Category id: ");
+            super.inter.interface_get();
+            category_id = super.inter.last_input;
+            if ( category_id != -1){
+                super.inter.interface_print("Hashtag Table id: ");
+                super.inter.interface_get();
+                hashtag_table_id = super.inter.last_input;
+                if ( hashtag_table_id != -1){
+                    super.inter.interface_print("Name of the scene: ");
+                    scene_name = super.inter.interface_get();
+                    super.inter.interface_print("Note: ");
+                    scene_note = super.inter.interface_get();
+                    super.put_elements(wall_updater());
+                }
+            }
+        }
     }
     
     /**
@@ -126,19 +132,19 @@ public class Tick_Scene extends Tick_Element{
      * @return boolean
      * @throws SQLException 
      */
-    boolean repair(Database database) throws SQLException{
-        boolean to_ret = false;
-        if (database.check_if_record_exists(place_id, "place")){
+    String repair(Database database) throws SQLException{
+        String to_ret = "";
+        if (!database.check_if_record_exists(place_id, "place")){
             place_id = 1;
-            to_ret = true;
+            to_ret = to_ret + "place ";
         }
-        if (database.check_if_record_exists(category_id, "category")){
+        if (!database.check_if_record_exists(category_id, "category")){
             category_id = 1;
-            to_ret = true;
+            to_ret = to_ret + " category ";
         }
-        if(database.check_if_record_exists(hashtag_table_id, "hashtag table")){
+        if(!database.check_if_record_exists(hashtag_table_id, "hashtag table")){
             hashtag_table_id = 1;
-            to_ret = true;
+            to_ret = to_ret + " hashtag_table";
         }
         super.put_elements(wall_updater());
         return to_ret;
@@ -198,7 +204,7 @@ public class Tick_Scene extends Tick_Element{
             if ( !query.equals(copy) ){
                 query = query +"and";
             }
-            query = query +"place_id = "+Integer.toString(place_id)+" ";
+            query = query +" place_id = "+Integer.toString(place_id)+" ";
         }
         
         // checking categories
@@ -206,7 +212,7 @@ public class Tick_Scene extends Tick_Element{
             if ( !query.equals(copy) ){
                 query = query + "and";
             }
-            query = query + "category_id = "+Integer.toString(category_id)+" ";
+            query = query + " category_id = "+Integer.toString(category_id)+" ";
         }
         
         query = query + ";";

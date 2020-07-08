@@ -16,7 +16,7 @@ import java.util.List;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v0.0.6";
+    final String version = "v0.0.8";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -620,7 +620,8 @@ public class CUI_Tick_Inteface {
         // scene add
         else if (addons.size() == 2 && addons.contains("add")){
             ui.interface_print("Welcome in the scene creator: ");
-            ui.interface_print("Input '0' if you don't want to use this categorization ");
+            ui.interface_print("Input '0' if you don't want to use this categorization");
+            ui.interface_print("Input '-1' if you want to cancel");
             Database_Viewer scene_v = new Database_Viewer(database,logged_user,"scene view");
             ArrayList<String> lines_to_show = scene_v.make_view();
  
@@ -651,6 +652,13 @@ public class CUI_Tick_Inteface {
                     ui.interface_print("Do you want to repair scene data?");
                     if ( approval_window("scene")){
                         try{
+                            String ret = to_add.repair(database);   // repairing datastructure
+                            if(!ret.equals("")){
+                               ui.interface_print("Scene integrity (edited): "+ret);
+                            }
+                            else{
+                                ui.interface_print("Scene integrity check: OK");
+                            }
                         if ( database.add_scene(to_add) ){
                             ui.interface_print("Scene added");
                         }
@@ -658,7 +666,8 @@ public class CUI_Tick_Inteface {
                             ui.interface_print("Scene adding occured a problem");
                         }
                         }catch(SQLException e){
-                            ui.interface_print("");
+                            ui.interface_print("Failed adding scene");
+                            database.log.add("Failed to add scene "+e.toString(),HEADER+"E!!!");
                         }
                     }
                     else{
@@ -684,6 +693,7 @@ public class CUI_Tick_Inteface {
                     Database_Garbage_Collector dgc = new Database_Garbage_Collector(database);
                     if ( approval_window("scene")){
                         dgc.delete_scene(ui.last_input);
+                        ui.interface_print("Scene deleted");
                     }
                     else{
                         ui.interface_print("Cancelled");
@@ -701,12 +711,18 @@ public class CUI_Tick_Inteface {
         // scene select /scene_id/
         else if ( addons.size() == 3 && addons.contains("select") && ui.check_existance_int(addons)!= -1 ){
             int scene_id = ui.last_input;
-            
             if ( database.check_if_record_exists(scene_id, "scene") ){
                 // we found scene with this id
-                Tick_Scene to_categorize = new Tick_Scene(database.return_TB_collection(logged_user,"scene",ui.last_input));
-                
-                ui.interface_print(to_categorize.query_creator());
+                //Tick_Scene to_categorize = new Tick_Scene(database.return_TB_collection(logged_user,"scene",ui.last_input));
+                ArrayList<Tick_Brick> tb = database.return_TB_collection(logged_user,"scene",ui.last_input);
+                if( tb != null){
+                    Tick_Scene ts = new Tick_Scene(tb);
+                    System.out.println(ts.query_creator());
+                }
+                else{
+                    ui.interface_print("Failed to reach scene from database");
+                }
+                //ui.interface_print(to_categorize.query_creator());
             }
             else{
                 ui.interface_print("Wrong scene id");
@@ -858,6 +874,7 @@ public class CUI_Tick_Inteface {
                     }
                     else{
                         ui.interface_print("Failed to set to default");
+                        database.log.add("Failed to set default tick data",HEADER+"E!!!");
                     }
                 }
                 else{

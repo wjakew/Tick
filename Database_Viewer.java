@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class Database_Viewer {
     
-    final String version = "v1.0.2";
+    final String version = "v1.0.3";
     final String HEADER = "DATABASE_VIEWER ("+version+")"; 
     /**
      * modes:
@@ -287,12 +287,21 @@ public class Database_Viewer {
         ArrayList<String> result = new ArrayList<>();
         result.add("                      HASHTAGS TABLES:");
         result.addAll(hsh_array);
+        if (hsh_array.size() == 1){
+            result.add("Empty");
+        }
         result.add("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         result.add("                      PLACES:");
         result.addAll(plp_array);
+        if (plp_array.size() == 1){
+            result.add("Empty");
+        }
         result.add("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         result.add("                      CATEGORIES:");
         result.addAll(ctg_array);
+        if (ctg_array.size() == 1){
+            result.add("Empty");
+        }
         result.add("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         
         return result;
