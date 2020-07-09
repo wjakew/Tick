@@ -2,7 +2,7 @@
 programmer Jakub Wawak
 all rights reserved
 kubawawak@gmail.com
-version (from schema) v1.1
+version (from schema) v1.2.0
 sql script makes tables for tick database
 */	
 -- table address for storing addresses of places and owners (1.5)
@@ -113,7 +113,7 @@ owner_id INT,
 sum_entries INT,
 debug INT,
 conf2 VARCHAR(40),
-conf3 VARCHAR(40),
+conf3 INT,
 conf4 VARCHAR(40),
 conf5 VARCHAR(40),
 conf6 VARCHAR(40),
@@ -139,5 +139,14 @@ CONSTRAINT fk_tick2 FOREIGN KEY (category_id) REFERENCES CATEGORY(category_id),
 CONSTRAINT fk_tick3 FOREIGN KEY (note_id) REFERENCES NOTE(note_id),
 CONSTRAINT fk_tick4 FOREIGN KEY (hashtag_table_id) REFERENCES HASHTAG_TABLE(hashtag_table_id),
 CONSTRAINT fk_tick5 FOREIGN KEY (tick_done_id) REFERENCES TICK_DONE(tick_done_id)
+);
+CREATE TABLE LISTS
+(
+list_id INT AUTO_INCREMENT PRIMARY KEY,
+owner_id INT,
+tick_list_id VARCHAR(100),
+list_name VARCHAR(50),
+list_date VARCHAR(50),
+CONSTRAINT fk_list FOREIGN KEY (owner_id) REFERENCES OWN(owner_id)
 );
 -- end of the file

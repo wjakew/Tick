@@ -6,6 +6,7 @@ version (from schema) v1.1
 sql script reloades tables for tick database
 */
 drop table if exists TICK;
+drop table if exists LISTS;
 drop table if exists CONFIGURATION;
 drop table if exists SCENE;
 drop table if exists NOTE;
@@ -125,7 +126,7 @@ owner_id INT,
 sum_entries INT,
 debug INT,
 conf2 VARCHAR(40),
-conf3 VARCHAR(40),
+conf3 INT,
 conf4 VARCHAR(40),
 conf5 VARCHAR(40),
 conf6 VARCHAR(40),
@@ -152,17 +153,27 @@ CONSTRAINT fk_tick3 FOREIGN KEY (note_id) REFERENCES NOTE(note_id),
 CONSTRAINT fk_tick4 FOREIGN KEY (hashtag_table_id) REFERENCES HASHTAG_TABLE(hashtag_table_id),
 CONSTRAINT fk_tick5 FOREIGN KEY (tick_done_id) REFERENCES TICK_DONE(tick_done_id)
 );
+CREATE TABLE LISTS
+(
+list_id INT AUTO_INCREMENT PRIMARY KEY,
+owner_id INT,
+tick_list_id VARCHAR(100),
+list_name VARCHAR(50),
+list_date VARCHAR(50),
+CONSTRAINT fk_list FOREIGN KEY (owner_id) REFERENCES OWN(owner_id)
+);
 
 INSERT INTO ADDRESS
 (address_city,address_street,address_house_number,address_flat_number,address_postal,
 address_country)
 VALUES
 ('','',-1,-1,'','');
-INSERT INTO ADDRESS
-(address_city,address_street,address_house_number,address_flat_number,address_postal,
-address_country)
+
+INSERT INTO OWN
+(owner_login,address_id,owner_password,owner_name,owner_surname,owner_email_address,
+owner_age,owner_status)
 VALUES
-('Plock','Leszczynowa',9,0,'90-473','Poland');
+('nouser',1,'test','noname','nosurname','nomail',0,1);
 
 INSERT INTO OWN
 (owner_login,address_id,owner_password,owner_name,owner_surname,owner_email_address,
@@ -172,29 +183,28 @@ VALUES
 INSERT INTO PLACE
 (owner_id,place_name,address_id)
 VALUES
-(1,'No place',1);
+(1,'Default place',1);
 
 INSERT INTO HASHTAG_TABLE
 (owner_id,hashtag_table_name,hashtag_table_note)
 VALUES
 (1,'Main Table','Main table for users');
 
-INSERT INTO CONFIGURATION
-(owner_id,sum_entries,debug,conf2,conf3,conf4,conf5,conf6,conf7)
-VALUES
-(1,1,1,'','','','','','');
 INSERT INTO NOTE
 (owner_id,note_content,setting1,setting2,setting3)
 VALUES
 (1,'No note','','','');
+
 INSERT INTO TAG
 (owner_id,hashtag_table_id,tag_name,tag_note)
 VALUES
-(1,1,'No tags','Tag do testowania');
+(1,1,'No tags','No tags');
+
 INSERT INTO CATEGORY
 (owner_id,category_name,category_note)
 VALUES
 (1,'Main category','Main category for all of the tick reminders');
+
 INSERT INTO TICK_DONE
 (tick_done_date,tick_done_duration,tick_done_note)
 VALUES
