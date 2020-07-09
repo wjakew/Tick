@@ -5,6 +5,9 @@ all rights reserved
  */
 package tick;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +19,7 @@ import java.util.List;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v0.0.8";
+    final String version = "v0.0.9";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -248,6 +251,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - delete ( delete tick ) ");
             ui.interface_print("    - det ( shows details of the tick ) ");
             ui.interface_print("    - def  ( clearing links, setting default )");
+            ui.interface_print("    - clip ( copies content of tick to clipboard )");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("add ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
@@ -267,6 +271,8 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    ( without parameters show active scenes )");
             ui.interface_print("    - add    ( inits scene maker ) ");
             ui.interface_print("    - delete ( delete scene by id )");
+            ui.interface_print("    - select /scene_id/ ( shows tick in scene )");
+            ui.interface_print("    - copy /scene_id/ ( copies ticks to clipboard )");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
@@ -302,7 +308,10 @@ public class CUI_Tick_Inteface {
         else if (addons.size() == 2 && addons.contains("scene")){
             ui.interface_print("Help for scene ");
             ui.interface_print("    ( without parameters show active scenes )");
-            ui.interface_print("    - add ( inits scene maker ) ");
+            ui.interface_print("    - add    ( inits scene maker ) ");
+            ui.interface_print("    - delete ( delete scene by id )");
+            ui.interface_print("    - select /scene_id/ ( shows tick in scene )");
+            ui.interface_print("    - copy /scene_id/ ( copies ticks to clipboard )");
         }
         // help tick
         else if ( addons.size() == 2 && addons.contains("tick")){
@@ -315,9 +324,10 @@ public class CUI_Tick_Inteface {
             ui.interface_print("          ( links tick to the choosen object ) ");
             ui.interface_print("    - mark | /done/ | or -done");
             ui.interface_print("          ( marks tick and gives it new atribute )");
-            ui.interface_print("    - delete ( delete tick ) ");  
+            ui.interface_print("    - delete ( delete tick ) ");
             ui.interface_print("    - det ( shows details of the tick ) ");
             ui.interface_print("    - def  ( clearing links, setting default )");
+            ui.interface_print("    - clip ( copies content of tick to clipboard )");
         }
         // help delete
         else if ( addons.size() == 2 && addons.contains("delete")){
@@ -717,7 +727,44 @@ public class CUI_Tick_Inteface {
                 ArrayList<Tick_Brick> tb = database.return_TB_collection(logged_user,"scene",ui.last_input);
                 if( tb != null){
                     Tick_Scene ts = new Tick_Scene(tb);
-                    System.out.println(ts.query_creator());
+                    Database_Viewer dv = new Database_Viewer(database,database.logged,"tick");
+                    
+                    dv.custom_query = ts.query_creator();
+                    ui.interface_print("Showing ticks by scene");
+                    show_arraylist(dv.make_view());
+                }
+                else{
+                    ui.interface_print("Failed to reach scene from database");
+                }
+                //ui.interface_print(to_categorize.query_creator());
+            }
+            else{
+                ui.interface_print("Wrong scene id");
+            }
+        }
+        
+        // scene copy /scene_id/
+        else if( addons.size() == 3 && addons.contains("copy") && ui.check_existance_int(addons)!= -1 ){
+            int scene_id = ui.last_input;
+            
+            if ( database.check_if_record_exists(scene_id, "scene")){
+                // we found scene with this id
+                //Tick_Scene to_categorize = new Tick_Scene(database.return_TB_collection(logged_user,"scene",ui.last_input));
+                ArrayList<Tick_Brick> tb = database.return_TB_collection(logged_user,"scene",ui.last_input);
+                if( tb != null){
+                    Tick_Scene ts = new Tick_Scene(tb);
+                    Database_Viewer dv = new Database_Viewer(database,database.logged,"tick");
+                    
+                    dv.custom_query = ts.query_creator();
+                    ArrayList<String> lines = dv.make_view();
+                    String content = "";
+                    for(String line : lines){
+                        content = content + line+"\n";  
+                    }
+                    content = content + " Ticks by "+database.logged.owner_login+"\n" + "TICK";
+                    StringSelection data = new StringSelection(content);
+                    Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    cb.setContents(data,data);
                 }
                 else{
                     ui.interface_print("Failed to reach scene from database");
@@ -831,6 +878,32 @@ public class CUI_Tick_Inteface {
                 }
                 else{
                     ui.interface_print("Failed loading tick details");
+                }
+                
+            }
+            else{
+                ui.interface_print("Wrong tick id");
+            }
+        }
+        //tick /tick_id/ clip
+        else if ( addons.size() == 3 && addons.contains("clip") && ui.check_existance_int(addons)!= -1){
+            Database_Tick shower = new Database_Tick(database);
+            System.out.println(ui.last_input);
+            if ( database.check_if_record_exists(ui.last_input, "tick") ){
+                if ( shower.view_tick(ui.last_input) != null){
+                    ArrayList<String> lines = shower.view_tick(ui.last_input);
+                    String content = "TICK\n";
+                    for(String line : lines){
+                        content = content + line + "\n";
+                    }
+                    content = content + "by "+database.logged.owner_login;
+                    StringSelection data = new StringSelection(content);
+                 Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+                 cb.setContents(data, data);
+                 ui.interface_print("Copied to clipboard");
+                }
+                else{
+                    ui.interface_print("Failed loading tick to clipboard");
                 }
                 
             }

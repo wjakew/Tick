@@ -405,8 +405,8 @@ public class Database {
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
         int colmax = meta.getColumnCount();
-        
-        // looping on all database records returned by ResultSet
+        while(rs.next()){
+                    // looping on all database records returned by ResultSet
             // looping on one record
             for ( int i = 1 ; i <= colmax; i++){
                 if ( int_index.contains(i)){
@@ -420,6 +420,136 @@ public class Database {
             Tick_Brick brake = new Tick_Brick();
             brake.STOP = true;
             to_ret.add(brake);
+        }
+        if (to_ret.size()>0){
+            log.add("Tick_Brick Collection returns succesfully", HEADER); 
+            log.add("RS DATA: "+rs.toString(), HEADER);
+        }
+        else{
+            log.add("RS size is probably 0.",HEADER+"E!!!");
+            log.add("Failed to reach RS",HEADER+"E!!!");
+        }
+
+        return to_ret;
+    }
+    
+    ArrayList<Tick_Brick> return_one_tick_brick(ResultSet rs,String mode) throws SQLException{
+        // metadata for number of columns
+        ResultSetMetaData meta   = (ResultSetMetaData) rs.getMetaData();
+        ArrayList<Tick_Brick> to_ret = new ArrayList<>();  // tick_brick to ret
+        
+        int index[] = {};                // array of int indexes
+        
+        if (mode.equals("address")){
+            /**
+             *  address_id INT AUTO_INCREMENT PRIMARY KEY,
+                address_city VARCHAR(30),
+                address_street VARCHAR (30),
+                address_house_number INT,
+                address_flat_number INT,
+                address_postal VARCHAR(15),
+                address_country VARCHAR(30)
+             */
+            index = new int[] {1,4,5};
+            
+        }
+        else if (mode.equals("category")){
+            /**
+             *  category_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                category_name VARCHAR(45),
+                category_note VARCHAR(100),
+             */
+            index = new int[] {1,2};
+            
+        }
+        else if (mode.equals("hashtag table")){
+            /**
+             *  hashtag_table_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                hashtag_table_name VARCHAR(45),
+                hashtag_table_note VARCHAR(100),
+                * 
+             */
+            index = new int[] {1,2};
+        }
+        else if (mode.equals("note")){
+            /**
+             *  note_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                note_content VARCHAR(100),
+                setting1 VARCHAR(40),
+                setting2 VARCHAR(40),
+                setting3 VARCHAR(40),
+             */
+            index = new int[] {1,2};
+        }
+        else if (mode.equals("place")){
+            /**
+             *  place_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                place_name VARCHAR(30),
+                address_id INT,
+             */
+            index = new int[] {1,2,4};
+            
+        }
+        else if (mode.equals("tag")){
+            /**
+             *  tag_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                hashtag_table_id INT,
+                tag_name VARCHAR(45),
+                tag_note VARCHAR(100),
+             */
+            index = new int[] {1,2,3};
+        }
+        else if (mode.equals("tick")){
+            /**
+             *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                place_id INT,
+                category_id INT,
+                note_id INT,
+                hashtag_table_id INT,
+                tick_done_id INT,
+                tick_done_start VARCHAR(60),
+                tick_date_end VARCHAR(60),
+                tick_name VARCHAR(60),
+             */
+            index = new int[] {1,2,3,4,5,6,7};
+        }
+        else if (mode.equals("scene")){
+            /**
+             *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
+                hashtag_table_id INT,
+                place_id INT,
+                owner_id INT,
+                category_id INT,
+                scene_name VARCHAR(30),
+                scene_note VARCHAR(100),
+             */
+            index = new int[] {1,2,3,4,5};
+        }
+        // coping array to collection
+        List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
+        int colmax = meta.getColumnCount();
+        
+        // looping on all database records returned by ResultSet
+        // looping on one record
+        for ( int i = 1 ; i <= colmax; i++){
+            if ( int_index.contains(i)){
+                to_ret.add(new Tick_Brick(rs.getInt(meta.getColumnName(i))));
+            }
+            else{
+                to_ret.add(new Tick_Brick(rs.getString(meta.getColumnName(i))));
+            }
+        }
+        // flagging end of the object
+        Tick_Brick brake = new Tick_Brick();
+        brake.STOP = true;
+        to_ret.add(brake);
+        
         if (to_ret.size()>0){
             log.add("Tick_Brick Collection returns succesfully", HEADER); 
             log.add("RS DATA: "+rs.toString(), HEADER);
@@ -485,7 +615,7 @@ public class Database {
         
         if (result.next()){
             log.add("RS OWNER ID: "+Integer.toString(result.getInt("owner_id")),HEADER);
-            return return_tick_brick(result,mode);
+            return return_one_tick_brick(result,mode);
         }
         return null;
         

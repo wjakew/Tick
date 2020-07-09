@@ -20,6 +20,7 @@ public class Database_Viewer {
     
     final String version = "v1.0.3";
     final String HEADER = "DATABASE_VIEWER ("+version+")"; 
+    public String custom_query;
     /**
      * modes:
      *      1 - address
@@ -44,6 +45,7 @@ public class Database_Viewer {
         this.logged = logged;
         this.mode = mode;
         i = new UI_Tick_Interface();
+        custom_query = null;
     }
     /**
      * Database_Viewer.make_view()
@@ -114,8 +116,14 @@ public class Database_Viewer {
         else if (mode.equals("tick_done")){
             query = "SELECT * FROM TICK where owner_id = ? and tick_done_id != 1;";
         }
+        
+        // checking if custom query is not flagged
+        if ( custom_query != null){
+            query = custom_query;
+        }
+
         PreparedStatement ppst = database.con.prepareStatement(query);
-        if ( !mode.equals("address") ){
+        if ( !mode.equals("address") && custom_query == null){
             ppst.setInt(1,logged.owner_id);
         }
         try{

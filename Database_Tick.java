@@ -221,6 +221,7 @@ public class Database_Tick {
         
         ppst.setInt(1,tick_id);
         ppst.setInt(2,database.logged.owner_id);
+        database.log.add("TICK QUERY: " +ppst.toString(),"DATABASE TICK");
         
         try{
             ResultSet rs = ppst.executeQuery();
@@ -313,6 +314,7 @@ public class Database_Tick {
             return to_ret_lines;
             
         }catch (SQLException e){
+            database.log.add("TICK ERROR: "+e.toString(),"DATABASE TICK E!!!");
             return null;
         }
     }
