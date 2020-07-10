@@ -19,10 +19,14 @@ import java.util.List;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v0.0.9";
+    final String version = "v1.0.0B";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
+    
+    int scene_selected = -1;
+    int list_selected = -1;
+    
     
     boolean run = true;
     Date actual_date = null;
@@ -99,16 +103,24 @@ public class CUI_Tick_Inteface {
                 CUI_FUN_link(words);
                 break;
             }
+            // scene
             else if (word.equals("scene")){
                 CUI_FUN_scene(words);
                 break;
             }
+            // tick
             else if (word.equals("tick")){
                 CUI_FUN_tick(words);
                 break;
             }
+            // delete
             else if (word.equals("delete")){
                 CUI_FUN_delete(words);
+                break;
+            }
+            // lists
+            else if (word.equals("lists")){
+                CUI_FUN_lists(words);
                 break;
             }
             // not supported command
@@ -274,6 +286,10 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - select /scene_id/ ( shows tick in scene )");
             ui.interface_print("    - copy /scene_id/ ( copies ticks to clipboard )");
             ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("lists ");
+            ui.interface_print("    ( without parameters show lists of ticks )");
+            ui.interface_print("    -lists delete /list_id/ ( delete list by given id )");
+            ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
             ui.interface_print("    - update ");
@@ -334,6 +350,12 @@ public class CUI_Tick_Inteface {
             ui.interface_print("Help for delete ");
             ui.interface_print("    - place | address | hashtable | tag | category | note /data_id/");
             ui.interface_print("        ( delete object by given id ) ");
+        }
+        // help lists
+        else if ( addons.size() == 2 && addons.contains("lists")){
+            ui.interface_print("Help for lists ");
+            ui.interface_print("    ( without parameters show lists of ticks )");
+            ui.interface_print("    -lists delete /list_id/ ( delete list by given id )");
         }
         else{
             ui.interface_print("Wrong option");
@@ -671,6 +693,8 @@ public class CUI_Tick_Inteface {
                             }
                         if ( database.add_scene(to_add) ){
                             ui.interface_print("Scene added");
+                            ui.interface_print("Scene id: "+Integer.toString(database.get_last_id("SCENE")));
+                            scene_selected = database.get_last_id("SCENE");
                         }
                         else{
                             ui.interface_print("Scene adding occured a problem");
@@ -721,6 +745,7 @@ public class CUI_Tick_Inteface {
         // scene select /scene_id/
         else if ( addons.size() == 3 && addons.contains("select") && ui.check_existance_int(addons)!= -1 ){
             int scene_id = ui.last_input;
+            scene_selected = scene_id;
             if ( database.check_if_record_exists(scene_id, "scene") ){
                 // we found scene with this id
                 //Tick_Scene to_categorize = new Tick_Scene(database.return_TB_collection(logged_user,"scene",ui.last_input));
@@ -1086,6 +1111,59 @@ public class CUI_Tick_Inteface {
         }
         else{
             ui.interface_print("Wrong options. See help delete");
+        }
+    }
+    
+    /**
+     * CUI_Tick_Interface.CUI_FUN_lists(List<String> addons)
+     * @param addons
+     * @throws SQLException 
+     * Implements functionality of lists
+     */
+    void CUI_FUN_lists(List<String> addons) throws SQLException{
+        Database_Viewer dv = new Database_Viewer(database,database.logged,"lists");
+        Database_List dl = new Database_List(database);
+        // lists
+        if ( addons.size() == 1){
+            ui.interface_print("Actual Lists:");
+            show_arraylist(dv.make_view());
+        }
+        // lists add
+        else if ( addons.size() == 2 && addons.contains("add")){
+            Tick_List to_add = new Tick_List();
+            to_add.init_CUI();
+            
+            if ( dl.add_list(to_add) ){
+                ui.interface_print("List add");
+            }
+            else{
+                ui.interface_print("Failed to add list");
+            }
+        }
+        // lists delete /list_id
+        else if (addons.size() == 3 && addons.contains("delete") && ui.check_existance_int(addons) != -1){
+            if ( database.check_if_record_exists(ui.last_input, "list") ){
+                if ( dl.delete_list(ui.last_input) ){
+                    if ( approval_window("list")){
+                        ui.interface_print("List deleted");
+                    }
+                    else{
+                        ui.interface_print("Cancelled");
+                    }
+                    
+                }
+                else{
+                    ui.interface_print("Failed to delete list");
+                }
+            }
+        }
+        
+        // lists ticka /tick_id/ ( adding one tick to list )
+        else if (addons.size() == 3 && addons.contains("ticka") && ui.check_existance_int(addons) != -1){
+            if ( database.check_if_record_exists(ui.last_input,"list") ){
+                // list exists
+                
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ import java.sql.SQLException;
  */
 public class Database_Garbage_Collector {
     
-    final String version = "v0.0.1B";
+    final String version = "v0.0.2";
     Database database;
     
     // main constructor
@@ -49,6 +49,7 @@ public class Database_Garbage_Collector {
             }
             return 0;
         }catch(SQLException e ){
+            database.log.add("Failed to check given id. ("+e.toString()+")","DATABASE GARBAGE COLLECTOR E!!!");
             return -1;
         }
     }
@@ -75,6 +76,7 @@ public class Database_Garbage_Collector {
             return true;
         }catch(SQLException e){
             System.out.println("Update failed: "+e.toString());
+            database.log.add("Failed to update data. ("+e.toString()+")","DATABASE GARBAGE COLLECTOR E!!!");
             return false;
         }
     }
@@ -100,6 +102,7 @@ public class Database_Garbage_Collector {
             return true;
         }catch(SQLException e){
             System.out.println("Delete failed "+e.toString());
+            database.log.add("Failed to delete object. ("+e.toString()+")","DATABASE GARBAGE COLLECTOR E!!!");
             return false;
         }
     }
@@ -135,6 +138,7 @@ public class Database_Garbage_Collector {
             return true;
         }catch(SQLException e){
             System.out.println("Failed: "+e.toString());
+            database.log.add("Failed to delete address. ("+e.toString()+")","DATABASE GARBAGE COLLECTOR E!!!");
             return false;
         }
     }

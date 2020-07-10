@@ -1,0 +1,116 @@
+/*
+by Jakub Wawak
+kubawawak@gmail.com
+all rights reserved
+ */
+package tick;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+/**
+ *Object for storing List
+ * @author jakubwawak
+ */
+public class Tick_List extends Tick_Element{
+    
+    /**
+     *  list_id INT AUTO_INCREMENT PRIMARY KEY,
+        owner_id INT,
+        tick_list_id VARCHAR(100),
+        list_name VARCHAR(50),
+        list_date VARCHAR(50),
+     */
+    
+    int list_id;
+    int owner_id;
+    String tick_list_id;
+    String list_name;
+    String list_date;
+    
+    // main constructor
+    Tick_List(){
+        super("Tick_List");
+        list_id = -1;
+        owner_id = -1;
+        tick_list_id = "";
+        list_name = "";
+        list_date = "";
+        super.put_elements(wall_updater());
+    }
+    
+    // constructor implementing Tick_Brick
+    Tick_List(ArrayList<Tick_Brick> to_add){
+        super("Tick_List");
+        list_id = to_add.get(0).i_get();
+        owner_id = to_add.get(1).i_get();
+        tick_list_id = to_add.get(2).s_get();
+        list_name = to_add.get(3).s_get();
+        list_date = to_add.get(4).s_get();
+        super.put_elements(wall_updater());
+    }
+    
+    /**
+     * Tick_List.wall_updater()
+     * @return ArrayList
+     * Returns 'brick wall'
+     */
+    ArrayList<Tick_Brick> wall_updater(){
+        ArrayList<Tick_Brick> to_ret = new ArrayList<>();
+        to_ret.add(new Tick_Brick(list_id));
+        to_ret.add(new Tick_Brick(owner_id));
+        to_ret.add(new Tick_Brick(tick_list_id));
+        to_ret.add(new Tick_Brick(list_name));
+        to_ret.add(new Tick_Brick(list_date));
+        return to_ret;
+    }
+    /**
+     * Tick_List.init_CUI()
+     * Input for CUI
+     */
+    void init_CUI(){
+        Date ac = new Date();
+        super.inter.interface_print("List Name:");
+        list_name = super.inter.interface_get();
+        list_date = ac.toString();
+    }
+    
+    /**
+     * Tick_List.understand_id()
+     * @return ArrayList
+     * Returns arraylist of ids from tick_list_id field
+     */
+    ArrayList<Integer> understand_id(){
+        ArrayList<Integer> to_ret = new ArrayList<>();
+        
+        String [] ids = tick_list_id.split(",");
+        
+        for(String number : ids){
+            try{
+                int num = Integer.parseInt(number);
+                to_ret.add(num);
+            }catch(Exception e){}
+        }
+        return to_ret;
+    }
+    
+    /**
+     * Tick_List.show_glance()
+     * @return String
+     * Showing simple information about list
+     */
+    String show_glance(){
+        return Integer.toString(list_id)+ ":" + list_name + " " + list_date + "\n" + tick_list_id;
+    }
+    
+    /**
+     * Tick_List.get_lines_to_show()
+     * @return String
+     * Show lines to show in UI
+     */
+    ArrayList<String> get_lines_to_show(){
+        ArrayList<String> to_ret = new ArrayList<>();
+        to_ret.add(show_glance());
+        return to_ret;
+    }
+}

@@ -235,6 +235,25 @@ public class Container {
                 }
             }
         }
+        else if (mode.equals("lists")){
+                /**
+                *  list_id INT AUTO_INCREMENT PRIMARY KEY,
+                   owner_id INT,
+                   tick_list_id VARCHAR(100),
+                   list_name VARCHAR(50),
+                   list_date VARCHAR(50),
+                */
+            for (Tick_Brick element : wall){    // looping on Tick_Brick objects
+                if ( !element.STOP ){
+                    part.add(element);
+                }
+                else{
+                    Tick_List to_add = new Tick_List(part);
+                    copy_list(lines,kick_list(to_add.get_lines_to_show()));
+                    part.clear();
+                }
+            }
+        }
         return lines;
     }
     

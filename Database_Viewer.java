@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class Database_Viewer {
     
-    final String version = "v1.0.3";
+    final String version = "v1.0.5";
     final String HEADER = "DATABASE_VIEWER ("+version+")"; 
     public String custom_query;
     /**
@@ -115,6 +115,9 @@ public class Database_Viewer {
         }
         else if (mode.equals("tick_done")){
             query = "SELECT * FROM TICK where owner_id = ? and tick_done_id != 1;";
+        }
+        else if (mode.equals("lists")){
+            query = "SELECT * FROM LISTS where owner_id = ?;";
         }
         
         // checking if custom query is not flagged
@@ -237,6 +240,16 @@ public class Database_Viewer {
                 tick_name VARCHAR(60),
              */
             index = new int[] {1,2,3,4,5,6,7};
+        }
+        else if (mode.equals("lists")){
+                /**
+                *  list_id INT AUTO_INCREMENT PRIMARY KEY,
+                   owner_id INT,
+                   tick_list_id VARCHAR(100),
+                   list_name VARCHAR(50),
+                   list_date VARCHAR(50),
+                */
+            index = new int[] {1,2};
         }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());

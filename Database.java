@@ -105,6 +105,9 @@ public class Database {
         else if (mode.equals("scene")){
             query = "SELECT * FROM SCENE where scene_id =?;";
         }
+        else if (mode.equals("list")){
+            query = "SELECT * FROM LISTS where list_id =?;";
+        }
         PreparedStatement ppst = con.prepareStatement(query);
         ppst.setInt(1, id);
         ResultSet rs = ppst.executeQuery();
