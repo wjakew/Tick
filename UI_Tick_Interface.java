@@ -16,7 +16,7 @@ import java.util.Scanner;
  * @author jakub
  */
 public class UI_Tick_Interface {
-    final String version = "v1.0.4";
+    final String version = "v1.0.5";
     
     Scanner sc;                     // main object for scanning 
     ArrayList<String> history;      // main log of the input,output
@@ -27,7 +27,8 @@ public class UI_Tick_Interface {
     
     String tab = "";                // variable used to 'move' print
     int last_und;
-    boolean int_flag = false;
+    boolean int_flag = false;       // variable used to flag if number found in input
+    boolean blank = true;           // variable set if input is blank
     int last_input;
     
     ArrayList<Integer> numbers; // collection for found 
@@ -54,6 +55,9 @@ public class UI_Tick_Interface {
         history.add("UI - > USER INPUT : "+input+"\n");
         last_und = understand(input);
         get_numbers(input);
+        if ( !input.isBlank() || !input.isEmpty() ){
+            blank = false;
+        }
         return input;
     }
     /**

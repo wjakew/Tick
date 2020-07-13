@@ -100,7 +100,7 @@ public class Tick_List extends Tick_Element{
      * Showing simple information about list
      */
     String show_glance(){
-        return Integer.toString(list_id)+ ":" + list_name + " " + list_date + "\n" + tick_list_id;
+        return Integer.toString(list_id)+ ":" + list_name + " " + list_date + ":" + understand_id().toString();
     }
     
     /**

@@ -14,7 +14,7 @@ import java.sql.SQLException;
  */
 public class Tick {
 
-    static final String version = "v0.7.0B";
+    static final String version = "v0.7.0";
     
     static Tick_Log session_log;
     static Database database;

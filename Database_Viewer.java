@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class Database_Viewer {
     
-    final String version = "v1.0.5";
+    final String version = "v1.0.6";
     final String HEADER = "DATABASE_VIEWER ("+version+")"; 
     public String custom_query;
     /**
@@ -56,6 +56,9 @@ public class Database_Viewer {
     ArrayList<String> make_view() throws SQLException{
         if ( mode.equals("scene view") ){
             return view_scene_creator();
+        }
+        else if (mode.equals("list view")){
+            return view_list_creator();
         }
         else{
             ResultSet actual= prepare_query();      // getting data from the base
@@ -296,6 +299,7 @@ public class Database_Viewer {
      * Database_Viewer.view_scene_creator()
      * @return ArrayList
      * @throws SQLException 
+     * Shows view of objects for making scenes
      */
     ArrayList<String> view_scene_creator() throws SQLException{
         mode = "hashtag table";
@@ -326,5 +330,44 @@ public class Database_Viewer {
         result.add("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         
         return result;
+    }
+    
+    /**
+     * Database_Viewer.view_list_creator()
+     * @return ArrayList
+     * @throws SQLException
+     * Returns view for list creator
+     */
+    ArrayList<String> view_list_creator() throws SQLException{
+        ArrayList<String> to_ret = new ArrayList<>();
+        
+        String query = "SELECT * FROM LISTS where owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setInt(1,database.logged.owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            while (rs.next()){
+                
+                // major list info
+                to_ret.add("List name: "+rs.getString("list_name"));
+                to_ret.add("List id: "+Integer.toString(rs.getInt("list_id")));
+                to_ret.add("List content:");
+
+                Tick_List tl = new Tick_List(database.return_TB_collection(database.logged, "list", rs.getInt("list_id")));
+                
+                for( Integer n : tl.understand_id() ){
+                    Tick_Tick tt = new Tick_Tick(database.return_TB_collection(database.logged, "tick", n));
+                    to_ret.add("    "+tt.simple_show() + tt.done_label);
+                }
+                to_ret.add("----------");
+            }
+        }catch(SQLException e){
+            database.log.add("Failed to load lists... ("+e.toString()+")","DATABASE VIEWER E!!!");
+            return null;
+        }
+        return to_ret;
     }
 }

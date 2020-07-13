@@ -8,6 +8,7 @@ package tick;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 /**
  *Object for list database link implementation
@@ -92,7 +93,7 @@ public class Database_List {
         if ( database.check_if_record_exists(tick_id, "tick")){
             String ticks = get_tick_list(list_id);
             
-            if ( ticks != null){
+            if ( ticks != null && !check_tick_in_list(tick_id,list_id)){
                 ticks = ticks + "," + Integer.toString(tick_id);
                 String query = "UPDATE LISTS SET tick_list_id = ? where list_id = ?;";
                 
@@ -114,6 +115,74 @@ public class Database_List {
         else{
             return false;
         }
+    }
+    
+    /**
+     * Database_List.delete_tick_from_list(int tick_id,int list_id)
+     * @param tick_id
+     * @param list_id
+     * @return boolean
+     * @throws SQLException
+     * Function for deleting tick from list
+     */
+    boolean delete_tick_from_list(int tick_id,int list_id) throws SQLException{
+        if ( database.check_if_record_exists(list_id, "list")){
+            
+            Tick_List tl = new Tick_List(database.return_TB_collection(database.logged, "list", list_id));
+            
+            ArrayList<Integer> numbers = tl.understand_id();
+            
+            if ( numbers.contains(tick_id)){
+                numbers.remove(numbers.indexOf(tick_id));
+                String ret = ",";
+                for(Integer n : numbers){
+                    ret = ret + Integer.toString(n)+",";
+                }
+                
+                String query = "UPDATE LISTS SET tick_list_id = ? where list_id = ?;";
+                PreparedStatement ppst = database.con.prepareStatement(query);
+                ppst.setString(1,ret);
+                ppst.setInt(2,list_id);
+                
+                try{
+                    ppst.execute();
+                    return true;
+                }catch(SQLException e){
+                    database.log.add("Failed to delete tick id from list ("+e.toString()+")","DATABASE LIST E!!!");
+                    return false;
+                }
+                
+            }
+        }
+        database.log.add("User asked to find non existing list!","DATABASE LIST W!!!");
+        return false;
+    }
+    
+    /**
+     * Database_List.check_tick_in_list(int tick_id,int list_id)
+     * @param tick_id
+     * @param list_id
+     * @return boolean
+     * @throws SQLException 
+     * Checks if number is in list
+     */
+    boolean check_tick_in_list(int tick_id,int list_id) throws SQLException{
+        String tick_list = get_tick_list(list_id);
+        String[] numbers = tick_list.split(",");
+        
+        for(String n : numbers){
+            try{
+                int nn = Integer.parseInt(n);
+
+                if ( nn == tick_id){
+                    return true;
+                }
+            }catch(NumberFormatException e){
+                database.log.add("String is not a number ("+e.toString()+")","DATABASE LIST W!!!");
+            }
+            
+        }
+        return false;
     }
     
     /**

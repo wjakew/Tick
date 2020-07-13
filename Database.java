@@ -534,6 +534,16 @@ public class Database {
              */
             index = new int[] {1,2,3,4,5};
         }
+        else if (mode.equals("list")){
+            /**
+             *  list_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                tick_list_id VARCHAR(100),
+                list_name VARCHAR(50),
+                list_date VARCHAR(50),
+             */
+            index = new int[] {1,2};
+        }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
         int colmax = meta.getColumnCount();
@@ -606,6 +616,9 @@ public class Database {
         }
         else if (mode.equals("tick")){
             query = "SELECT * FROM TICK where owner_id = ? and tick_id = ?;";
+        }
+        else if (mode.equals("list")){
+            query = "SELECT * FROM LISTS where owner_id = ? and list_id =?;";
         }
         
         PreparedStatement ppst = con.prepareStatement(query);

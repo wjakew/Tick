@@ -46,6 +46,8 @@ public class Tick_Tick extends Tick_Element{
     String tick_done_end;
     String tick_name;
     
+    String done_label = "NOT DONE";
+    
     
     // main constructor
     Tick_Tick(){
@@ -61,6 +63,7 @@ public class Tick_Tick extends Tick_Element{
         tick_done_end = "";
         tick_name = "";
         super.put_elements(wall_updater());
+        
     }
     
     // constructor with tick brick functionality
@@ -97,6 +100,10 @@ public class Tick_Tick extends Tick_Element{
         to_ret.add(new Tick_Brick(tick_done_start));
         to_ret.add(new Tick_Brick(tick_done_end));
         to_ret.add(new Tick_Brick(tick_name));
+        
+        if ( tick_done_id != 1 ){
+            done_label = "DONE";
+        }
         return to_ret;
     }
     

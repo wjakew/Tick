@@ -19,7 +19,7 @@ import java.util.List;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v1.0.0B";
+    final String version = "v1.0.0";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -255,7 +255,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("tick");
             ui.interface_print("    - add ( add simple tick reminder )");
             ui.interface_print("    - arch ( shows archived ticks )");
-            ui.interface_print("tick /tick_id/");
+            ui.interface_print("tick option /tick_id/");
             ui.interface_print("    - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ ");
             ui.interface_print("          ( links tick to the choosen object ) ");
             ui.interface_print("    - mark | /done/ | or - done");
@@ -264,36 +264,54 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - det ( shows details of the tick ) ");
             ui.interface_print("    - def  ( clearing links, setting default )");
             ui.interface_print("    - clip ( copies content of tick to clipboard )");
+            ui.interface_print("");
+            ui.interface_print("                                          /eg. tick clip 1/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("add ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
+            ui.interface_print("");
+            ui.interface_print("                                         /eg. add category/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("delete ");
             ui.interface_print("    - place | address | hashtable | tag | category | note /data_id/");
             ui.interface_print("        ( delete object by given id ) ");
+            ui.interface_print("");
+            ui.interface_print("                                         /eg. delete place/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("show ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
+            ui.interface_print("");
+            ui.interface_print("                                           /eg. show place/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("link ");
             ui.interface_print("    - adrplp /address_id/ /place_id/   ( address to place )");
-            ui.interface_print("    - hshtag    /tag_id/ /hashtag_table_id/( hashtag table to tag )");
+            ui.interface_print("    - taghsh    /tag_id/ /hashtag_table_id/( hashtag table to tag )");
+            ui.interface_print("");
+             ui.interface_print("                                     /eg. link adrplp 1 1/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("scene ");
             ui.interface_print("    ( without parameters show active scenes )");
             ui.interface_print("    - add    ( inits scene maker ) ");
             ui.interface_print("    - delete ( delete scene by id )");
-            ui.interface_print("    - select /scene_id/ ( shows tick in scene )");
-            ui.interface_print("    - copy /scene_id/ ( copies ticks to clipboard )");
+            ui.interface_print("    -/scene_id/ select ( shows tick in scene )");
+            ui.interface_print("    -/scene_id/ copy ( copies ticks to clipboard )");
+            ui.interface_print("");
+             ui.interface_print("                                     /eg. scene 1 select/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("lists ");
             ui.interface_print("    ( without parameters show lists of ticks )");
-            ui.interface_print("    -lists delete /list_id/ ( delete list by given id )");
+            ui.interface_print("    -/list_id/ delete ( delete list by given id )");
+            ui.interface_print("    -/tick_id/ ticka ( adding one tick to list )");
+            ui.interface_print("    -/list_id/ tickd ( deleting tick from list )");
+            ui.interface_print("    -/list_id/ det ( shows details of list )");
+            ui.interface_print("");
+             ui.interface_print("                                           /eg. lists 1 ticka/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
             ui.interface_print("    - update ");
             ui.interface_print("        address | password ");
+            ui.interface_print("                                to be deleted in next betas");
             ui.interface_print("-----------------------------------------------------------");
         }
         // help add
@@ -355,7 +373,9 @@ public class CUI_Tick_Inteface {
         else if ( addons.size() == 2 && addons.contains("lists")){
             ui.interface_print("Help for lists ");
             ui.interface_print("    ( without parameters show lists of ticks )");
-            ui.interface_print("    -lists delete /list_id/ ( delete list by given id )");
+            ui.interface_print("    -delete /list_id/ ( delete list by given id )");
+            ui.interface_print("    -ticka /tick_id/ ( adding one tick to list )");
+            ui.interface_print("    -tickd /list_id/ ( deleting tick from list )");
         }
         else{
             ui.interface_print("Wrong option");
@@ -611,7 +631,7 @@ public class CUI_Tick_Inteface {
             }
         }
         // hshtag    /tag_id/ /hashtag_table_id/
-        else if ( addons.size() == 4 && addons.contains("hshtag")){
+        else if ( addons.size() == 4 && addons.contains("taghsh")){
             if ( database.check_if_record_exists(ui.numbers.get(0), "tag") 
                     && database.check_if_record_exists(ui.numbers.get(1), "hashtag table")){
                 int tag_id = ui.numbers.get(0);
@@ -1160,10 +1180,80 @@ public class CUI_Tick_Inteface {
         
         // lists ticka /tick_id/ ( adding one tick to list )
         else if (addons.size() == 3 && addons.contains("ticka") && ui.check_existance_int(addons) != -1){
-            if ( database.check_if_record_exists(ui.last_input,"list") ){
-                // list exists
-                
+            if ( database.check_if_record_exists(ui.last_input,"tick") ){
+                // tick exists
+                int tick_id = ui.last_input;
+                ui.interface_print("Choose list:");
+                show_arraylist(dv.make_view());
+                String index = ui.interface_get();
+                if ( database.check_if_record_exists(ui.last_input,"list") ){
+                    // list exists
+                    if(dl.add_tick_to_list(tick_id,ui.last_input)){
+                        ui.interface_print("Tick added to list");
+                    }
+                    else{
+                        if (dl.check_tick_in_list(tick_id, ui.last_input)){
+                            ui.interface_print("Tick already in list");
+                        }
+                        else{
+                            ui.interface_print("Failed to add tick to list");
+                        }
+                        
+                    }
+                }
             }
+            else{
+                ui.interface_print("Wrong tick id");
+            }
+        }
+        // lists tickd /list_id/ ( deleting tick from list )
+        else if (addons.size() == 3 && addons.contains("tickd") && ui.check_existance_int(addons) != -1){
+            if ( database.check_if_record_exists(ui.last_input, "list")){
+                int list_id = ui.last_input;
+                ui.interface_print("Choose tick to delete:");
+                dv = new Database_Viewer(database,database.logged,"list view");
+                
+                show_arraylist(dv.make_view());
+                
+                String choose = ui.interface_get();
+                
+                if ( !ui.blank ){
+                    if ( database.check_if_record_exists(ui.last_input, "tick")){
+                        if ( approval_window("tick")){
+                            if (dl.delete_tick_from_list(ui.last_input, list_id) ){
+                                ui.interface_print("Tick from list deleted");
+                            }
+                            else{
+                                ui.interface_print("Failed to delete list");
+                            }
+                            
+                        }
+                        else{
+                            ui.interface_print("Cancelled");
+                        }
+                    }
+                    else{
+                        ui.interface_print("Wrong tick id");
+                    }
+                }
+                else{
+                    ui.interface_print("Blank input");
+                }
+            }
+            else{
+                ui.interface_print("Wrong list id");
+            }
+        }
+        // lists det /list_id/
+        else if (addons.size() == 3 && addons.contains("det") && ui.check_existance_int(addons) != -1){
+            if ( database.check_if_record_exists(ui.last_input, "list")){
+                dv = new Database_Viewer(database,database.logged,"list view");
+                ui.interface_print("Detailed view of lists: ");
+                show_arraylist(dv.make_view());
+            }
+        }
+        else{
+            ui.interface_print("Wrong arguments. See help lists");
         }
     }
 }
