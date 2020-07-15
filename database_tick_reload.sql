@@ -2,9 +2,10 @@
 programmer Jakub Wawak
 all rights reserved
 kubawawak@gmail.com
-version (from schema) v1.1
+version (from schema) v1.2
 sql script reloades tables for tick database
 */
+drop table if exists SHARE_QUEUE;
 drop table if exists TICK;
 drop table if exists LISTS;
 drop table if exists CONFIGURATION;
@@ -162,6 +163,18 @@ list_name VARCHAR(50),
 list_date VARCHAR(50),
 CONSTRAINT fk_list FOREIGN KEY (owner_id) REFERENCES OWN(owner_id)
 );
+CREATE TABLE SHARE_QUEUE
+(
+share_id INT AUTO_INCREMENT PRIMARY KEY,
+owner_id INT,
+owner_to INT,
+tick_id INT,
+share_date VARCHAR(50),
+share_done VARCHAR(10),
+CONSTRAINT fk_share1 FOREIGN KEY (owner_id) REFERENCES OWN(owner_id),
+CONSTRAINT fk_share2 FOREIGN KEY (owner_to) REFERENCES OWN(owner_id),
+CONSTRAINT fk_share3 FOREIGN KEY (tick_id) REFERENCES TICK(tick_id)
+);
 
 INSERT INTO ADDRESS
 (address_city,address_street,address_house_number,address_flat_number,address_postal,
@@ -180,6 +193,13 @@ INSERT INTO OWN
 owner_age,owner_status)
 VALUES
 ('wjakew',1,'test','Jakub','Wawak','kubawawak@gmail.com',24,1);
+
+INSERT INTO OWN
+(owner_login,address_id,owner_password,owner_name,owner_surname,owner_email_address,
+owner_age,owner_status)
+VALUES
+('kpaulinek',1,'test','Pauline','Karas','paulinekaras@gmail.com',22,1);
+
 INSERT INTO PLACE
 (owner_id,place_name,address_id)
 VALUES

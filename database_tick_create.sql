@@ -140,6 +140,7 @@ CONSTRAINT fk_tick3 FOREIGN KEY (note_id) REFERENCES NOTE(note_id),
 CONSTRAINT fk_tick4 FOREIGN KEY (hashtag_table_id) REFERENCES HASHTAG_TABLE(hashtag_table_id),
 CONSTRAINT fk_tick5 FOREIGN KEY (tick_done_id) REFERENCES TICK_DONE(tick_done_id)
 );
+-- table for storing list data
 CREATE TABLE LISTS
 (
 list_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -148,5 +149,18 @@ tick_list_id VARCHAR(100),
 list_name VARCHAR(50),
 list_date VARCHAR(50),
 CONSTRAINT fk_list FOREIGN KEY (owner_id) REFERENCES OWN(owner_id)
+);
+-- table for storing things to share
+CREATE TABLE SHARE_QUEUE
+(
+share_id INT AUTO_INCREMENT PRIMARY KEY,
+owner_id INT,
+owner_to INT,
+tick_id INT,
+share_date VARCHAR(50),
+share_done VARCHAR(10),
+CONSTRAINT fk_share1 FOREIGN KEY (owner_id) REFERENCES OWN(owner_id),
+CONSTRAINT fk_share2 FOREIGN KEY (owner_to) REFERENCES OWN(owner_id),
+CONSTRAINT fk_share3 FOREIGN KEY (tick_id) REFERENCES TICK(tick_id)
 );
 -- end of the file

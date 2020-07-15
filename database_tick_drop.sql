@@ -5,6 +5,7 @@ kubawawak@gmail.com
 version (from schema) v1.2.0
 sql script drops tables from tick database
 */
+drop table if exists SHARE_QUEUE;
 drop table if exists TICK;
 drop table if exists LISTS;
 drop table if exists CONFIGURATION;
