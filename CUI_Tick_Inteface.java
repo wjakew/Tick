@@ -19,7 +19,7 @@ import java.util.List;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v1.0.0";
+    final String version = "v1.0.1";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -33,12 +33,14 @@ public class CUI_Tick_Inteface {
     
     UI_Tick_Interface ui;
     Database database;
+    Share tso;
     
     //  main constructor
     CUI_Tick_Inteface(Database database) throws SQLException{
         this.database = database;
         ui = new UI_Tick_Interface();
         actual_date = new Date();
+        
     }
     
     /**
@@ -123,6 +125,10 @@ public class CUI_Tick_Inteface {
                 CUI_FUN_lists(words);
                 break;
             }
+            else if (word.equals("share")){
+                CUI_FUN_share(words);
+                break;
+            }
             // not supported command
             else{
                 ui.interface_print("Wrong command");
@@ -155,6 +161,7 @@ public class CUI_Tick_Inteface {
         
         if ( logged_user != null){
             ui.interface_print("Logged!");
+            tso = new Share(this.database);
             return true;
         }
         ui.interface_print("Wrong password or login.");
@@ -253,6 +260,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("Help for the program: ");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("tick");
+            ui.interface_print("    ( without arguments shows active ticks )");
             ui.interface_print("    - add ( add simple tick reminder )");
             ui.interface_print("    - arch ( shows archived ticks )");
             ui.interface_print("tick option /tick_id/");
@@ -266,6 +274,13 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - clip ( copies content of tick to clipboard )");
             ui.interface_print("");
             ui.interface_print("                                          /eg. tick clip 1/");
+            ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("share");
+            ui.interface_print("    ( without arguments shows active shares to load )");
+            ui.interface_print("    -load ( loads shares to your account )");
+            ui.interface_print("    -check ( finds if is any new ticks shared by other users )");
+            ui.interface_print("    -tick /tick_id/ ( shares tick by given id) ");
+            ui.interface_print("                                         /eg. share tick 1/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("add ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
@@ -287,7 +302,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - adrplp /address_id/ /place_id/   ( address to place )");
             ui.interface_print("    - taghsh    /tag_id/ /hashtag_table_id/( hashtag table to tag )");
             ui.interface_print("");
-             ui.interface_print("                                     /eg. link adrplp 1 1/");
+            ui.interface_print("                                     /eg. link adrplp 1 1/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("scene ");
             ui.interface_print("    ( without parameters show active scenes )");
@@ -296,7 +311,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    -/scene_id/ select ( shows tick in scene )");
             ui.interface_print("    -/scene_id/ copy ( copies ticks to clipboard )");
             ui.interface_print("");
-             ui.interface_print("                                     /eg. scene 1 select/");
+            ui.interface_print("                                     /eg. scene 1 select/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("lists ");
             ui.interface_print("    ( without parameters show lists of ticks )");
@@ -305,7 +320,11 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    -/list_id/ tickd ( deleting tick from list )");
             ui.interface_print("    -/list_id/ det ( shows details of list )");
             ui.interface_print("");
-             ui.interface_print("                                           /eg. lists 1 ticka/");
+            ui.interface_print("                                           /eg. lists 1 ticka/");
+            ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("lists ");
+            ui.interface_print("share ");
+            ui.interface_print("    ( without parameters show share )");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
@@ -1254,6 +1273,107 @@ public class CUI_Tick_Inteface {
         }
         else{
             ui.interface_print("Wrong arguments. See help lists");
+        }
+    }
+    /**
+     * CUI_Tick_Interface.CUI_FUN_share(List<String> addons)
+     * @param addons 
+     * Function for adding share functionality
+     */
+    void CUI_FUN_share(List<String> addons) throws SQLException{
+        
+        
+        // share
+        if ( addons.size() == 1){
+            show_arraylist(tso.return_data());
+        }
+        
+        // share his
+        else if ( addons.size() == 2 && addons.contains("his")){ 
+            show_arraylist(tso.return_data_history());
+            ui.interface_print("--------------------");
+            show_arraylist(tso.return_my_data_history());
+        }
+        
+        // share tick /tick_id/
+        else if (addons.size() == 3 && addons.contains("tick") && ui.check_existance_int(addons) != -1){
+            if ( database.check_if_record_exists(ui.last_input, "tick") ){
+                // we found tick
+                int tick_id = ui.last_input;
+                ui.interface_print("Type user to share: ");
+                String user_to = ui.interface_get();
+                if (database.ret_owner_id(user_to) != -1){
+                    ui.interface_print("User found");
+                    
+                    // showing summary
+                    ui.interface_print("Summary:");
+                    ui.interface_print("Tick id:" + Integer.toString(tick_id));
+                    ui.interface_print("Tick det: " + database.ret_tick_name(tick_id));
+                    ui.interface_print("User login: "+ user_to+"/"+Integer.toString(database.ret_owner_id(user_to)));
+                    
+                    ui.interface_print("------------");
+                    
+                    ui.interface_print("You are sure to share this tick? (y/n)");
+                    String ques = ui.interface_get();
+                    
+                    if ( ques.equals("y") ){
+                        if (tso.share_tick(tick_id, database.ret_owner_id(user_to)) == 1){
+                            ui.interface_print("Tick shared");
+                        } 
+                        else{
+                            ui.interface_print("Failed to share tick, check log");
+                        }
+                    }
+                    
+                }
+                else{
+                    ui.interface_print("Cant find user with that login");
+                }
+            }
+            else{
+                ui.interface_print("Wrong tick id");
+            }  
+        }
+        
+        // share check
+        else if (addons.size() == 2 && addons.contains("check") ){
+            tso.share_check_database();
+            
+            if ( tso.status == 1){
+                ui.interface_print("Share check complete. Found new shares.");
+                ui.interface_print("Details:");
+                for(Tick_ShareObject tts : tso.to_do){
+                    ui.interface_print(tts.show_details(database));
+                }
+            }
+            else if ( tso.status == 0){
+                ui.interface_print("Share check complete. No new shares");
+            }
+            else{
+                ui.interface_print("Share check failed. Check log");
+            }
+        }
+        // share load
+        else if ( addons.size() == 2 && addons.contains("load")){
+            show_arraylist(tso.return_data());
+            ui.interface_print("You are sure to add these shares to your data? (y/n)");
+            String choose = ui.interface_get();
+            
+            if(choose.equals("y")){
+                if ( tso.share_load() == 1){
+                    ui.interface_print("Loaded new ticks");
+                    tso.status = -2;
+                }
+                else if ( tso.share_load() == -1){
+                    ui.interface_print("Use /share check/ command first");
+                }
+                else{
+                    ui.interface_print("Failed loading new ticks. Check log");
+                }
+            }
+            else{
+                ui.interface_print("Cancelled");
+            }
         }
     }
 }

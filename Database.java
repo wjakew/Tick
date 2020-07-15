@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class Database {
     
-    final String version = "v0.0.9";
+    final String version = "v1.0.0";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -188,6 +188,59 @@ public class Database {
         }
         
         return -1;
+    }
+    
+    /**
+     * Database.ret_owner_name(int owner_id)
+     * @param owner_id
+     * @return String
+     * @throws SQLException 
+     * Returns owner login by owner_id
+     */
+    String ret_owner_name(int owner_id) throws SQLException{
+        String query = "SELECT owner_login FROM OWN where owner_id = ?;";
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1, owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            log.add("RET NAME: QUERY "+ ppst.toString(),HEADER);
+            if ( rs.next() ){
+            return rs.getString("owner_login");
+            }
+            else{
+                return null;
+            }
+        }catch(SQLException e){
+            log.add("Failed to get owner name by id ("+e.toString()+")",HEADER+" E!!!");
+            return null;
+        }
+        
+        
+    }
+    /**
+     * Database.tick_name(int tick_id)
+     * @param tick_id
+     * @return String
+     * @throws SQLException
+     * Returns name of the tick by given tick id
+     */
+    String ret_tick_name(int tick_id) throws SQLException{
+        String query = "SELECT * from TICK where tick_id = ?;";
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1, tick_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            if ( rs.next()){
+                return rs.getString("tick_name");
+            }
+            return null;
+            
+        }catch(SQLException e){
+            log.add("Failed to find tick name ("+e.toString()+")",HEADER+" E!!!");
+            return null;
+        }
     }
     /**
      * Database.get_last_address_id()
@@ -592,6 +645,7 @@ public class Database {
         return return_tick_brick(actual,mode);
     }
     ArrayList<Tick_Brick> return_TB_collection(Tick_User logged_user, String mode, int object_id) throws SQLException{
+        log.add("Started return_TB_collection function : tick_user, mode and object",HEADER);
         String query = "";
         if (mode.equals("address")){
             query = "SELECT * FROM ADDRESS where address_id = ?;";
@@ -633,8 +687,51 @@ public class Database {
             log.add("RS OWNER ID: "+Integer.toString(result.getInt("owner_id")),HEADER);
             return return_one_tick_brick(result,mode);
         }
-        return null;
+        return null; 
+    }
+    ArrayList<Tick_Brick> return_TB_collection(String mode,int object_id) throws SQLException{
+        log.add("Started return_TB_collection function : object and mode",HEADER);
+        String query = "";
+        if (mode.equals("address")){
+            query = "SELECT * FROM ADDRESS where address_id = ?;";
+        }
+        else if (mode.equals("category")){
+            query = "SELECT * FROM CATEGORY where category_id = ?;";
+        }
+        else if (mode.equals("hashtag table")){
+            query = "SELECT * FROM HASHTAG_TABLE where and hashtag_table_id = ?;";
+        }
+        else if (mode.equals("note")){
+            query = "SELECT * FROM NOTE where note_id = ?;";
+        }
+        else if (mode.equals("place")){
+            query = "SELECT * FROM PLACE where place_id = ?;";
+        }
+        else if (mode.equals("tag")){
+            query = "SELECT * FROM TAG where tag_id = ?;";
+        }
+        else if (mode.equals("scene")){
+            query = "SELECT * FROM SCENE where scene_id = ?;";
+        }
+        else if (mode.equals("tick")){
+            query = "SELECT * FROM TICK where tick_id = ?;";
+        }
+        else if (mode.equals("list")){
+            query = "SELECT * FROM LISTS where list_id =?;";
+        }
         
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1,object_id);
+        
+        ResultSet result = ppst.executeQuery();
+        
+        log.add("RS QUERY : "+ppst.toString(),HEADER);
+        
+        if (result.next()){
+            log.add("RS OWNER ID: "+Integer.toString(result.getInt("owner_id")),HEADER);
+            return return_one_tick_brick(result,mode);
+        }
+        return null; 
     }
     //----------------------------USER LOGIN TO THE DATABASE
     /**

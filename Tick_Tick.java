@@ -47,7 +47,7 @@ public class Tick_Tick extends Tick_Element{
     String tick_name;
     
     String done_label = "NOT DONE";
-    
+    boolean internal_fail = false;
     
     // main constructor
     Tick_Tick(){
@@ -69,6 +69,7 @@ public class Tick_Tick extends Tick_Element{
     // constructor with tick brick functionality
     Tick_Tick(ArrayList<Tick_Brick> to_add){
         super("Tick_Tick");
+        try{
         tick_id = to_add.get(0).i_get();
         owner_id = to_add.get(1).i_get();
         place_id = to_add.get(2).i_get();
@@ -80,6 +81,20 @@ public class Tick_Tick extends Tick_Element{
         tick_done_end = to_add.get(8).s_get();
         tick_name = to_add.get(9).s_get();
         super.put_elements(wall_updater());
+        }catch(Exception e){
+            tick_id = -1;
+            owner_id = -1;
+            place_id = 1;
+            category_id = 1;
+            note_id = 1;
+            hashtag_table_id = 1;
+            tick_done_id = 1;
+            tick_done_start = "";
+            tick_done_end = "";
+            tick_name = "";
+            super.put_elements(wall_updater());
+            internal_fail = true;
+        }
     }
     
     /**
