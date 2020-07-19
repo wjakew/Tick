@@ -19,28 +19,27 @@ import java.util.List;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v1.0.1";
+    final String version = "v1.0.2";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
     
     int scene_selected = -1;
     int list_selected = -1;
-    
+    Options options;
     
     boolean run = true;
     Date actual_date = null;
     
-    UI_Tick_Interface ui;
+    UI_Interface ui;
     Database database;
     Share tso;
     
     //  main constructor
     CUI_Tick_Inteface(Database database) throws SQLException{
         this.database = database;
-        ui = new UI_Tick_Interface();
+        ui = new UI_Interface();
         actual_date = new Date();
-        
     }
     
     /**
@@ -58,12 +57,28 @@ public class CUI_Tick_Inteface {
         while ( !login_prompt() );  // in login_prompt method is closing the procedure
         
         // if we are here login was succesful
+        
+        CUI_startup_procedure();
     
         while ( run ){  // main loop of the program
             // showing main menu
             ui.interface_print("------------------------------------------------");
+            options.run();
             String user_input = ui.interface_get();
             CUI_logic(user_input);   
+        }
+    }
+    /**
+     * CUI_Tick_Interface.CUI_startup_procedure()
+     * Function for maintainting things to do on the startup
+     */
+    void CUI_startup_procedure() throws SQLException{
+        ui.interface_print("Loading options data..");
+        if ( options.run() == 1 ){
+            ui.interface_print("Options record made and loaded");
+        }
+        else{
+            ui.interface_print("Options data loaded");
         }
     }
     /**
@@ -125,8 +140,15 @@ public class CUI_Tick_Inteface {
                 CUI_FUN_lists(words);
                 break;
             }
+            // share
             else if (word.equals("share")){
                 CUI_FUN_share(words);
+                break;
+            }
+            // options
+            else if (word.equals("options")){
+                Options_Viewer ov = new Options_Viewer(options);
+                ov.run();
                 break;
             }
             // not supported command
@@ -162,6 +184,8 @@ public class CUI_Tick_Inteface {
         if ( logged_user != null){
             ui.interface_print("Logged!");
             tso = new Share(this.database);
+            options = new Options(this.database);
+            options.update_user_logins(logged_user);
             return true;
         }
         ui.interface_print("Wrong password or login.");
@@ -326,6 +350,9 @@ public class CUI_Tick_Inteface {
             ui.interface_print("share ");
             ui.interface_print("    ( without parameters show share )");
             ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("options ");
+            ui.interface_print("    ( manages main functionalities of the Tick program ) ");
+            ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
             ui.interface_print("    - update ");
@@ -395,6 +422,11 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    -delete /list_id/ ( delete list by given id )");
             ui.interface_print("    -ticka /tick_id/ ( adding one tick to list )");
             ui.interface_print("    -tickd /list_id/ ( deleting tick from list )");
+        }
+        else if ( addons.size() == 2 && addons.contains("options")){
+            ui.interface_print("Help for options ");
+            ui.interface_print("    ( manages main functionalities of the Tick program ) ");
+            ui.interface_print("    More info in the options ");
         }
         else{
             ui.interface_print("Wrong option");

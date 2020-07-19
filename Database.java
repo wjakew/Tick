@@ -54,19 +54,6 @@ public class Database {
         }
     }
     //----------------------------maintanance and optional methods
-    /**
-     * Database.update_user_logins(Tick_User user)
-     * @param user
-     * @throws SQLException 
-     */
-    void update_user_logins(Tick_User user) throws SQLException{
-        String query = "update CONFIGURATION SET sum_entries = sum_entries + 1 WHERE owner_id = ?;";
-        
-        this.log.add("Updating sum_entries value on database...", HEADER);
-        PreparedStatement ppst = con.prepareStatement(query);
-        ppst.setInt(1, user.owner_id);
-        ppst.execute();
-    }
     
     /**
      * Database.check_if_record_exists(int id,String mode)
@@ -769,7 +756,6 @@ public class Database {
             }
             this.log.add("Logged user correctly", HEADER);
             logged = new Tick_User(us_part);
-            update_user_logins(logged);
         }
         return logged;
     }

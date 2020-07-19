@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -21,126 +22,242 @@ import java.util.Scanner;
  * @author jakub
  */
 public class Options {
+    /**
+     *  CREATE TABLE CONFIGURATION
+        (
+        configuration_id INT AUTO_INCREMENT PRIMARY KEY,
+        owner_id INT,
+        sum_entries INT,
+        *       ret codes: ( number of logins )
+        debug INT,          -- setting for log saving
+        *       ret codes: ( 1 - debug is on / 0 - debug is off ) 
+        conf2 VARCHAR(40),  -- welcome screen ( set what user see when logged )
+        *       ret codes: ( scenes/scene_id | ticks | lists/list_id | blank)
+        conf3 INT,          -- auto check of new shares ( 0 / 1)
+        *       ret codes: ( 1 - auto load shares | 0 - opposite )
+        conf4 VARCHAR(40),  -- free
+        conf5 VARCHAR(40),  -- free
+        conf6 VARCHAR(40),  -- free
+        conf7 VARCHAR(40),  -- free
+        CONSTRAINT fk_configuration FOREIGN KEY (owner_id) REFERENCES OWN(owner_id)
+        );
+     */
     
+    final String version = "v1.0.0";
+    final String HEADER = "OPTIONS "+version;
     Database database;
     
     boolean internal_fail;
     
+    // data fields
+    int debug;
+    String welcome_screen;
+    int sum_entries;
+    int auto_shares;
     
-    Options(Database database){
+    Options(Database database) throws SQLException{
         
         this.database = database;
         internal_fail = false;
         
-    }
-    
-    
-    /**
-     * Options.options_show(String to_show)
-     * @param to_show 
-     * Function for showing text data
-     */
-    void options_show(String to_show){
-        System.out.println("OPTIONS INFO: "+to_show);
+        debug = -1;
+        welcome_screen = null;
+        sum_entries = -1;
+        auto_shares = -1;
     }
     
     /**
-     * Options.make_config_record()
-     * Function for making first record
+     * Options.run()
+     * @return int
+     * @throws SQLException 
+     * Main function - prepares object to run
+     * ret codes:
+     * 1 - configuration made and loaded
+     * 0 - configuration loaded
      */
-    boolean make_config_record() throws SQLException{
-        int seed = random_generator();
-        String query = "INSERT INTO CONFIGURATION\n" +
-                       "(owner_id,sum_entries,debug,conf2,conf3,conf4,conf5,conf6,conf7)\n" +
-                       "VALUES\n" +
-                       "(?,1,0,\"NO\",?,\"\",\"\",\"\",\"\",\"\");";
-        PreparedStatement ppst = database.con.prepareStatement(query);
-        if ( database.logged != null){
-            ppst.setInt(1,database.logged.owner_id);
-            ppst.setInt(2,seed);
+    int run() throws SQLException{
+        if ( check_configuration() ){
+            load();
+            return 0;
         }
         else{
-            ppst.setInt(1,1);
-            ppst.setInt(2,seed);
-        }
-        
-        try{
-            ppst.execute();
-            options_show("Made new configuration record");
-            return true;
-        }catch(SQLException e){
-            options_show("Fail! "+e.toString());
-            return false;
+            database.log.add("Configuration for user not found. Making new.",HEADER);
+            make_configuration();
+            load();
+            return 1;
+
         }
     }
     
     /**
-     * Options.update_entries()
+     * Options.check_configuration()
      * @return boolean
-     * @throws SQLException 
-     * Updates sum of entries
+     * @throws SQLException
+     * Function checks if user has configuration
      */
-    boolean update_entries() throws SQLException{
-        String query = "UPDATE CONFIGURATION SET sum_entries = sum_entries + 1 where owner_id = ?;";
+    boolean check_configuration() throws SQLException{
+        String query = "SELECT * from CONFIGURATION where owner_id = ?;";
         PreparedStatement ppst = database.con.prepareStatement(query);
         ppst.setInt(1, database.logged.owner_id);
         
         try{
-            ppst.execute();
-            return true;
+            ResultSet rs = ppst.executeQuery();
+            return rs.next();
         }catch(SQLException e){
+            database.log.add("Failed to check configuration ("+e.toString()+")",HEADER+"E!!!");
             return false;
         }
     }
     
     /**
-     * Options.random_generator()
-     * @return int
-     * Returns random generated int
+     * Options.make_configuration()
+     * @return boolean
+     * @throws SQLException
+     * Functions loads into database main configruation of the program
      */
-    int random_generator(){
-        return 0 + (int)(Math.random() * 10000);
+    boolean make_configuration() throws SQLException{
+        String query = "INSERT INTO CONFIGURATION\n" +
+                       "(owner_id,sum_entries,debug,conf2,conf3,conf4,conf5,conf6,conf7)\n" +
+                       "VALUES\n" +
+                       "(?,?,?,?,?,?,?,?,?);";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        
+        /**
+        sum_entries INT,
+        *       ret codes: ( number of logins )
+        debug INT,          -- setting for log saving
+        *       ret codes: ( 1 - debug is on / 0 - debug is off ) 
+        conf2 VARCHAR(40),  -- welcome screen ( set what user see when logged )
+        *       ret codes: ( scenes/scene_id | ticks | lists/list_id | blank)
+        conf3 INT,          -- auto check of new shares ( 0 / 1)
+        *       ret codes: ( 1 - auto load shares | 0 - opposite )
+        conf4 VARCHAR(40),  -- free
+        conf5 VARCHAR(40),  -- free
+        conf6 VARCHAR(40),  -- free
+        conf7 VARCHAR(40),  -- free
+         */
+        ppst.setInt(1,database.logged.owner_id);
+        ppst.setInt(2, 1);
+        ppst.setInt(3, 1);
+        ppst.setString(4,"blank");
+        ppst.setInt(5,0);
+        ppst.setString(6,"");
+        ppst.setString(7,"");
+        ppst.setString(8,"");
+        ppst.setString(9,"");
+        database.log.add("Query : ("+ppst.toString()+")",HEADER);
+        
+        try{
+            ppst.execute();
+            return true;
+        }catch(SQLException e){
+            database.log.add("Failed to make configuration ("+e.toString()+")",HEADER+"E!!!");
+            return false;
+        }
     }
     
+    
     /**
-     * Options.get_rs_config(int seed)
-     * @param seed
-     * @return ResultSet
+     * Options.load_on_startup()
+     * @return boolean
      * @throws SQLException
-     * Function for returning ResultSet data
+     * Loades on statup data from the database to the object
+     * Function used at initzialization of the object
      */
-    ResultSet get_rs_config(int seed) throws SQLException{
-        if ( database.logged == null){
-            String query = "SELECT * from CONFIGURATION WHERE conf3 = ?";
-            PreparedStatement ppst = database.con.prepareStatement(query);
-            ppst.setInt(1,seed);
-            
+    boolean load() throws SQLException{
+        /**
+        sum_entries INT,
+        *       ret codes: ( number of logins )
+        debug INT,          -- setting for log saving
+        *       ret codes: ( 1 - debug is on / 0 - debug is off ) 
+        conf2 VARCHAR(40),  -- welcome screen ( set what user see when logged )
+        *       ret codes: ( scenes/scene_id | ticks | lists/list_id | blank)
+        conf3 INT,          -- auto check of new shares ( 0 / 1)
+        *       ret codes: ( 1 - auto load shares | 0 - opposite )
+        conf4 VARCHAR(40),  -- free
+        conf5 VARCHAR(40),  -- free
+        conf6 VARCHAR(40),  -- free
+        conf7 VARCHAR(40),  -- free
+         */
+        String query = " SELECT * FROM CONFIGURATION where owner_id = ?";
+        
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1, database.logged.owner_id);
+        
+        try{
             ResultSet rs = ppst.executeQuery();
             
             if ( rs.next() ){
-                return rs;
+                // looping on options in CONFIGURATION table on database
+                
+                debug = rs.getInt("debug");
+                welcome_screen = rs.getString("conf2");
+                sum_entries = rs.getInt("sum_entries");
+                auto_shares = rs.getInt("conf3");
+                
+                // here add more of functionalities stored in the database
+                
+                return true;
             }
             else{
-                return null;
+                internal_fail = true;
+                return false;
             }
-        }
-        else{
-            String query = "SELECT * from CONFIGURATION WHERE owner_id = ?";
-            PreparedStatement ppst = database.con.prepareStatement(query);
-            ppst.setInt(1,database.logged.owner_id);
             
-            return ppst.executeQuery();
-        }
+            
+        }catch(SQLException e){
+            internal_fail = true;
+            database.log.add("Failed load on startup ("+e.toString()+")",HEADER);
+            return false;
+        } 
     }
     
     /**
-     * Options.startup()
-     * @throws SQLException
-     * All instructions for options startup
+     * Options.show_data()
+     * @return ArrayList
+     * Function returns data stored in the object
      */
-    void startup() throws SQLException, IOException{
-
+    ArrayList<String> show_data(){
+        ArrayList<String> to_ret = new ArrayList<>();
         
+        to_ret.add(HEADER);
+        to_ret.add("Actual state of options:");
+        
+        to_ret.add("Debug : "+Integer.toString(debug));
+        if ( debug == 1){
+            to_ret.add("         - logs going to be stored at program src");   
+        }
+        else{
+            to_ret.add("         - logs are not stored");
+        }
+        to_ret.add("Welcome screen: "+welcome_screen);
+        to_ret.add("Number of entries: "+Integer.toString(sum_entries));
+        to_ret.add("Auto share: "+Integer.toString(auto_shares));
+        
+        if ( auto_shares == 1){
+            to_ret.add("        - program is going to auto add shared ticks to your data");
+        }
+        else{
+            to_ret.add("        - program is not gonna add tick to your data without your permission");
+        }
+            
+        return to_ret;
     }
+//---------------------------------------MANAGING DATA ON DATABASE
+     /**
+     * Options.update_user_logins(Tick_User user)
+     * @param user
+     * @throws SQLException 
+     */
+    void update_user_logins(Tick_User user) throws SQLException{
+        String query = "UPDATE CONFIGURATION SET sum_entries = sum_entries + 1 WHERE owner_id = ?;";
+        
+        database.log.add("Updating sum_entries value on database...", HEADER);
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1, user.owner_id);
+        ppst.execute();
+    }
+    
     
 }

@@ -16,11 +16,11 @@ public class Tick_Element {
     String tick_Element_Name;                       // name of the overriding element ( name of the class )
     ArrayList<Tick_Brick> tick_Element_Elements;    // collection of the elements to add
     int tick_Element_size;
-    UI_Tick_Interface inter;
+    UI_Interface inter;
     
     
     Tick_Element(String object_name){
-        inter = new UI_Tick_Interface();
+        inter = new UI_Interface();
         tick_Element_Name = object_name;
         tick_Element_Elements = new ArrayList<>();
         tick_Element_size = 0;

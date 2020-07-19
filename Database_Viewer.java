@@ -34,7 +34,7 @@ public class Database_Viewer {
     // storage for main object info
     Tick_User logged;
     Database database;
-    UI_Tick_Interface i;
+    UI_Interface i;
     
     //
     String mode;
@@ -44,7 +44,7 @@ public class Database_Viewer {
         this.database = database;
         this.logged = logged;
         this.mode = mode;
-        i = new UI_Tick_Interface();
+        i = new UI_Interface();
         custom_query = null;
     }
     /**
