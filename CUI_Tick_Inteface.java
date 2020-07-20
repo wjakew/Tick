@@ -79,6 +79,24 @@ public class CUI_Tick_Inteface {
         }
         else{
             ui.interface_print("Options data loaded");
+            ui.interface_print("------------------------------------------------");
+            if ( options.welcome_screen.equals("tick")){
+                Database_Viewer dv = new Database_Viewer(database,database.logged,"tick");
+                show_arraylist(dv.make_view());
+                
+            }
+            else if ( options.welcome_screen.equals("scene")){
+                Database_Viewer dv = new Database_Viewer(database,database.logged,"scene");
+                show_arraylist(dv.make_view());
+            }
+            else if ( options.welcome_screen.equals("list")){
+                Database_Viewer dv = new Database_Viewer(database,database.logged,"list");
+                show_arraylist(dv.make_view());
+            }
+            else{
+                ui.interface_print("No welcome screen set");
+            }
+            ui.interface_print("------------------------------------------------");
         }
     }
     /**

@@ -28,6 +28,7 @@ public class Options_Viewer {
             add("2. Me");
             add("3. General view options");
             add("4. Information");
+            add("5. Debug options");
             add("exit.");
             }};
     
@@ -36,6 +37,12 @@ public class Options_Viewer {
             add("2. Link address");
             }};
     
+    ArrayList<String> main_menu_gvo = new ArrayList<String>(){{
+            add("1.Tick view");
+            add("2.Scenes view");
+            add("3.List view");
+            add("4.blank");
+            }};
 
     // main constructor
     Options_Viewer(Options options){
@@ -84,9 +91,15 @@ public class Options_Viewer {
             if ( user_input.equals("1")){
                 CUI_OPT_FUN_status(words);
             }
+            // me
             else if ( user_input.equals("2")){
                 CUI_OPT_FUN_me(words);
             }
+            // general view options
+            else if ( user_input.equals("3")){
+                CUI_OPT_FUN_gvo(words);
+            }
+            // exit
             else if (user_input.equals("exit")){
                 run = false;
             }
@@ -133,7 +146,7 @@ public class Options_Viewer {
      * @param addons 
      * Function for showing status of the options
      */
-    void CUI_OPT_FUN_status(List<String> addons){
+    void CUI_OPT_FUN_status(List<String> addons) throws SQLException{
         if ( options.internal_fail ){
             ui.interface_print("Internal fail of options");
         }
@@ -154,6 +167,12 @@ public class Options_Viewer {
         return choose.equals("y");
     }
     
+    /**
+     * Options_Viewer.CUI_OPT_FUN_me(List<String> addons)
+     * @param addons
+     * @throws SQLException 
+     * Function implements me functionality
+     */
     void CUI_OPT_FUN_me(List<String> addons) throws SQLException{
         if ( !options.internal_fail ){
             
@@ -223,6 +242,44 @@ public class Options_Viewer {
         else{
             ui.interface_print("Failed to run option 'me'");
         }
+    }
+    
+    /**
+     * Options_Viewer.CUI_OPT_FUN_gvo(List<String> words)
+     * @param words 
+     * Function implements general view options
+     */
+    void CUI_OPT_FUN_gvo(List<String> addons) throws SQLException{
+        
+        _viewer(main_menu_gvo,2);
+        
+        ui.interface_print("Actual view: "+options.get_view_option());
+        
+        ui.interface_get();
+        
+        if ( ui.last_input >= 1 && ui.last_input <= 4 ){
+            switch(ui.last_input){
+                case 1:
+                    options.update_view_option("tick");
+                    break;
+                case 2:
+                    options.update_view_option("scene");
+                    break;
+                case 3:
+                    options.update_view_option("list");
+                    break;
+                case 4:
+                    options.update_view_option("blank");
+                    break;
+                default:
+                    ui.interface_print("Error.");
+                    break;
+            }
+        }
+        else{
+            ui.interface_print("Wrong input");
+        }
+        
     }
     
 }

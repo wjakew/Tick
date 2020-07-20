@@ -241,7 +241,8 @@ public class Options {
      * @return ArrayList
      * Function returns data stored in the object
      */
-    ArrayList<String> show_data(){
+    ArrayList<String> show_data() throws SQLException{
+        load();
         ArrayList<String> to_ret = new ArrayList<>();
         
         to_ret.add(HEADER);
@@ -282,5 +283,57 @@ public class Options {
         ppst.execute();
     }
     
+    
+    /**
+     * Options.get_view_option()
+     * @return String
+     * @throws SQLException
+     * Returns value of conf2 row in database
+     */
+    String get_view_option() throws SQLException{
+        String query = " SELECT conf2 from CONFIGURATION where owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1,database.logged.owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            if ( rs.next() ){
+                database.log.add("conf2 returning",HEADER);
+                return rs.getString("conf2");
+            }
+            database.log.add("conf2 data not found",HEADER+"E!!!");
+            return null;
+        }catch(SQLException e){
+            database.log.add("Failed to reach data ("+e.toString()+")",HEADER+"E!!!");
+            return null;
+        }   
+    }
+    
+    /**
+     * Options.update_view_option(String option)
+     * @param option
+     * @return boolean
+     * @throws SQLException
+     * Function updates view data in database
+     */
+    boolean update_view_option(String option) throws SQLException{
+        
+        String query = "UPDATE CONFIGURATION SET conf2 = ? where owner_id = ?;";
+        
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setString(1, option);
+        ppst.setInt(2,database.logged.owner_id); 
+        
+        try{
+            ppst.execute();
+            database.log.add("Updated view option = "+option,HEADER);
+            return true;
+        }catch(SQLException e){
+            database.log.add("Failed to update view option ("+e.toString()+")",HEADER+"E!!!");
+            return false;
+        }
+    }
     
 }

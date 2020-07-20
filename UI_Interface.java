@@ -16,7 +16,7 @@ import java.util.Scanner;
  * @author jakub
  */
 public class UI_Interface {
-    final String version = "v1.1.0";
+    final String version = "v1.1.1";
     
     Scanner sc;                     // main object for scanning 
     ArrayList<String> history;      // main log of the input,output
@@ -30,6 +30,7 @@ public class UI_Interface {
     boolean int_flag = false;       // variable used to flag if number found in input
     boolean blank = true;           // variable set if input is blank
     int last_input;
+    String last_string;
     
     ArrayList<Integer> numbers; // collection for found 
                                 // numbers in user input
@@ -60,6 +61,7 @@ public class UI_Interface {
      * @return String 
      */
     String interface_get(){
+        last_string = "";
         numbers.clear();
         System.out.print(tab+PROMPT);
         String input = sc.nextLine();
@@ -69,6 +71,7 @@ public class UI_Interface {
         if ( !input.isBlank() || !input.isEmpty() ){
             blank = false;
         }
+        last_string = input;
         return input;
     }
     /**
@@ -180,6 +183,13 @@ public class UI_Interface {
         return null;
     }
     
+    /**
+     * UI_Interface.check_existance(List<String> user_input,String [] keys)
+     * @param user_input
+     * @param keys
+     * @return String 
+     * Function for checking if list has at least one common object with array
+     */
     String check_existance(List<String> user_input, String [] keys){
         List<String> given_keys = new ArrayList<String>(Arrays.asList(keys));
         for ( String word : user_input ){
@@ -188,6 +198,28 @@ public class UI_Interface {
             }
         }
         return null;
+    }
+    
+    /**
+     * UI_Interface.check_in_array(String to_check,String[] source)
+     * @param to_check
+     * @param source
+     * @return boolean
+     * Function check if string is in array
+     */
+    boolean check_in_array(String to_check,String[] source){
+        List<String> ch = Arrays.asList(source);
+        return ch.contains(to_check);
+    }
+    
+    /**
+     * UI_Interface.fast_check_in_array(String [] source)
+     * @param source
+     * @return boolean
+     * Function returns if last user input is in source array
+     */
+    boolean fast_check_in_array(String [] source){
+        return check_in_array(last_string,source);
     }
     
     /**
