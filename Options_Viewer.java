@@ -5,6 +5,7 @@ all rights reserved
  */
 package tick;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public class Options_Viewer {
     
-    final String version = "v0.0.1";
+    final String version = "v1.0.0";
     Options options;
     UI_Interface ui;
     boolean run = true;
@@ -73,7 +74,7 @@ public class Options_Viewer {
         ui.tab = "";
     }
     
-    void CUI_OPT_logic(String user_input, String mode){
+    void CUI_OPT_logic(String user_input, String mode) throws SQLException{
         
         List<String> words = Arrays.asList(user_input.split(" ")); 
         // main menu set
@@ -99,7 +100,7 @@ public class Options_Viewer {
      * Options_Viewer.run()
      * Function for running main code and show menus
      */
-    void run(){
+    void run() throws SQLException{
         CUI_OPT_welcomescreen();
         while(run){
             CUI_OPT_mainloop();
@@ -119,7 +120,7 @@ public class Options_Viewer {
      * Options_Viewer.CUI_OPT_mainloop()
      * Function for showing main menu
      */
-    void CUI_OPT_mainloop(){
+    void CUI_OPT_mainloop() throws SQLException{
         _viewer(main_menu_list,0);
         String ans = user_input("Your option:");
         CUI_OPT_logic(ans,"main_menu");
@@ -141,7 +142,19 @@ public class Options_Viewer {
         } 
     }
     
-    void CUI_OPT_FUN_me(List<String> addons){
+    /**
+     * Options_Viewer.approval_window(String item_name)
+     * @param item_name
+     * @return boolean
+     * Function returns prompt to approve action
+     */
+    boolean approval_window(String item_name){
+        ui.interface_print("Are you sure to change data in "+item_name+"? ( y/n )");
+        String choose = ui.interface_get();
+        return choose.equals("y");
+    }
+    
+    void CUI_OPT_FUN_me(List<String> addons) throws SQLException{
         if ( !options.internal_fail ){
             
             _viewer(main_menu_me,5);
@@ -151,10 +164,56 @@ public class Options_Viewer {
                 case 1:
                     // update password
                     ui.interface_print("Updating password");
+                    ui.interface_print("Type actual password: ");
+                    String old_password = ui.get_password();
+                    ui.interface_print("Type new password:");
+                    String new_password = ui.get_password();
+                    ui.interface_print("Type new password again:");
+                    String new_password2 = ui.get_password();
+                    if ( new_password2.equals(new_password)){
+                        if ( approval_window("password")){
+                            int ret_code = options.update_password(old_password, new_password2);
+                            switch (ret_code) {
+                                case 1:
+                                    ui.interface_print("Password updated");
+                                    break;
+                                case -1:
+                                    ui.interface_print("Database faliure");
+                                    break;
+                                default:
+                                    ui.interface_print("Wrong actual password");
+                                    break;
+                            }
+                        }
+                        else{
+                            ui.interface_print("Cancelled");
+                        }
+                    }
+                    else{
+                        ui.interface_print("Passwords doesn't match");
+                    }
                     break;
                 case 2:
                     // link address
                     ui.interface_print("Link address");
+                    Database_Link dl = new Database_Link(options.database);
+                    Database_Viewer dv = new Database_Viewer(options.database,options.database.logged,"address");
+                    _viewer(dv.make_view(),2);
+                    ui.interface_print("Choose address to link: ");
+                    ui.interface_get();
+                    if ( options.database.check_if_record_exists(ui.last_input, "address")){
+                        Tick_Address ta = new Tick_Address(options.database.return_TB_collection(options.database.logged, "address", ui.last_input));
+                        if ( dl.link_user_address(options.database.logged, ta)){
+                            ui.interface_print("Address linked");
+                        }
+                        else{
+                            ui.interface_print("Failed to link address");
+                        }
+                    }
+                    else{
+                        ui.interface_print("Address record with that id doesn't exist");
+                    }
+
                     break;
                 default:
                     ui.interface_print("Wrong option");

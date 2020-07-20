@@ -815,6 +815,28 @@ public class Database {
             log.add("Failed to change user password",HEADER);
             return false;
         }
+    }
+    /**
+     * Database.check_password(Tick_User logged,String password)
+     * @param logged
+     * @param password
+     * @return boolean
+     * @throws SQLException
+     * Function returns true if password is correct.
+     */
+    boolean check_password(Tick_User logged,String password) throws SQLException{
+        String query = "SELECT owner_id from OWN where owner_id = ? and owner_password = ?; ";
+        PreparedStatement ppst = con.prepareStatement(query);
+        
+        ppst.setInt(1,logged.owner_id);
+        ppst.setString(2,password);
+        try{
+            return ppst.executeQuery().next();
+        }catch(SQLException e){
+            log.add("Failed to check password ("+e.toString()+")",HEADER);
+            return false;
+        }
+        
         
     }
     //----------------------------FUNCTIONS FOR PLACE

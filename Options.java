@@ -43,7 +43,7 @@ public class Options {
         );
      */
     
-    final String version = "v1.0.0";
+    final String version = "v1.0.1";
     final String HEADER = "OPTIONS "+version;
     Database database;
     
@@ -155,6 +155,29 @@ public class Options {
             database.log.add("Failed to make configuration ("+e.toString()+")",HEADER+"E!!!");
             return false;
         }
+    }
+    
+    /**
+     * Options.update_password(String old_password, String new_password)
+     * @param old_password
+     * @param new_password
+     * @return int
+     * @throws SQLException 
+     * Function for updating user password
+     * ret codes:
+     * 1 - password updated
+     * 0 - old password failed to check
+     * -1 - database problem
+     */
+    int update_password(String old_password, String new_password) throws SQLException{
+        
+        if ( database.check_password(database.logged, old_password)){
+            if(database.change_password(database.logged, new_password)){
+                return 1;
+            }
+            return -1;
+        }
+        return 0;
     }
     
     

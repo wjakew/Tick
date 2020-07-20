@@ -19,7 +19,7 @@ import java.util.List;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v1.0.2";
+    final String version = "v1.0.3";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -355,9 +355,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("me ");
             ui.interface_print(" ( without parameters shows account )"); 
-            ui.interface_print("    - update ");
-            ui.interface_print("        address | password ");
-            ui.interface_print("                                to be deleted in next betas");
+            ui.interface_print(" ( more functionality moved to options )");
             ui.interface_print("-----------------------------------------------------------");
         }
         // help add
@@ -369,8 +367,7 @@ public class CUI_Tick_Inteface {
         else if (addons.size() == 2 && addons.contains("me")){
             ui.interface_print("Help for me ");
             ui.interface_print(" ( without parameters shows account )"); 
-            ui.interface_print("    - update ");
-            ui.interface_print("        address | password ");
+            ui.interface_print(" ( more functionality moved to options )");
         }
         // help show
         else if (addons.size() == 2 && addons.contains("show")){
@@ -549,30 +546,6 @@ public class CUI_Tick_Inteface {
                 ui.interface_print("Linked address:");
                 Tick_Address to_show = dl.get_object_address(logged_user.address_id);
                 show_arraylist(to_show.get_lines_to_show());
-            }
-        }
-        // me update password 'content'
-        else if ( addons.size() == 4 && addons.contains("password")){
-            run = !database.change_password(logged_user, addons.get(3));
-            ui.interface_print("Password change, please log again.");
-        }
-        // me update address
-        else if ( addons.size() == 3 && addons.contains("address")){
-            Database_Viewer usr_addr_viewer = new Database_Viewer(database,logged_user,"address");
-            show_arraylist(usr_addr_viewer.make_view());
-            ui.interface_print("Choose address to link: ");
-            ui.interface_get();
-            if(ui.int_flag){
-                logged_user.address_id = ui.last_input;
-                logged_user.wall_updater();
-                Tick_Address usr_adr = new Tick_Address(database.return_TB_collection(logged_user, "address"));
-                Database_Link linker = new Database_Link(database);
-                if ( linker.link_user_address(logged_user, usr_adr) ){
-                    ui.interface_print("Address linked");
-                }
-            }
-            else{
-                ui.interface_print("Wrong option");
             }
         }
         else{

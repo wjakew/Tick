@@ -45,6 +45,17 @@ public class UI_Interface {
     }
     
     /**
+     * UI_Interface.interface_get_w_prompt(String prompt)
+     * @param prompt
+     * @return String
+     * Function for getting user input with prompt
+     */
+    String interface_get_w_prompt(String prompt){
+        interface_print(prompt);
+        return interface_get();
+    }
+    
+    /**
      * UI_Tick_Interface.interface_get()
      * @return String 
      */
