@@ -35,7 +35,8 @@ public class Options {
         *       ret codes: ( scenes/scene_id | ticks | lists/list_id | blank)
         conf3 INT,          -- auto check of new shares ( 0 / 1)
         *       ret codes: ( 1 - auto load shares | 0 - opposite )
-        conf4 VARCHAR(40),  -- free
+        conf4 VARCHAR(40),  -- fast login
+        *       ret codes: ( x - user login | 'blank' - fast login not configured )
         conf5 VARCHAR(40),  -- free
         conf6 VARCHAR(40),  -- free
         conf7 VARCHAR(40),  -- free
@@ -43,7 +44,7 @@ public class Options {
         );
      */
     
-    final String version = "v1.0.1";
+    final String version = "v1.0.2";
     final String HEADER = "OPTIONS "+version;
     Database database;
     
@@ -54,6 +55,7 @@ public class Options {
     String welcome_screen;
     int sum_entries;
     int auto_shares;
+    String auto_login;
     
     Options(Database database) throws SQLException{
         
@@ -62,6 +64,7 @@ public class Options {
         
         debug = -1;
         welcome_screen = null;
+        auto_login = "";
         sum_entries = -1;
         auto_shares = -1;
     }
@@ -77,6 +80,7 @@ public class Options {
      */
     int run() throws SQLException{
         if ( check_configuration() ){
+            update_fast_login();
             load();
             return 0;
         }
@@ -132,7 +136,8 @@ public class Options {
         *       ret codes: ( scenes/scene_id | ticks | lists/list_id | blank)
         conf3 INT,          -- auto check of new shares ( 0 / 1)
         *       ret codes: ( 1 - auto load shares | 0 - opposite )
-        conf4 VARCHAR(40),  -- free
+        conf4 VARCHAR(40),  -- fast login
+        *       ret codes: ( x - user login | 'blank' - fast login not configured )
         conf5 VARCHAR(40),  -- free
         conf6 VARCHAR(40),  -- free
         conf7 VARCHAR(40),  -- free
@@ -198,7 +203,8 @@ public class Options {
         *       ret codes: ( scenes/scene_id | ticks | lists/list_id | blank)
         conf3 INT,          -- auto check of new shares ( 0 / 1)
         *       ret codes: ( 1 - auto load shares | 0 - opposite )
-        conf4 VARCHAR(40),  -- free
+        conf4 VARCHAR(40),  -- fast login
+        *       ret codes: ( x - user login | 'blank' - fast login not configured )
         conf5 VARCHAR(40),  -- free
         conf6 VARCHAR(40),  -- free
         conf7 VARCHAR(40),  -- free
@@ -218,6 +224,7 @@ public class Options {
                 welcome_screen = rs.getString("conf2");
                 sum_entries = rs.getInt("sum_entries");
                 auto_shares = rs.getInt("conf3");
+                auto_login = rs.getString("conf4");
                 
                 // here add more of functionalities stored in the database
                 
@@ -264,6 +271,12 @@ public class Options {
         }
         else{
             to_ret.add("        - program is not gonna add tick to your data without your permission");
+        }
+        if ( auto_login.equals("blank") ){
+            to_ret.add("Fast login not configured");
+        }
+        else{
+            to_ret.add("Fast login set ( "+auto_login+")");
         }
             
         return to_ret;
@@ -336,4 +349,115 @@ public class Options {
         }
     }
     
+    /**
+     * Options.get_debug()
+     * @return int
+     * @throws SQLException
+     * Function returns debug info from database
+     */
+    int get_debug() throws SQLException{
+        
+        String query = "SELECT debug from CONFIGURATION where owner_id = ?;";
+        
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setInt(1,database.logged.owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            if ( rs.next() ){
+                return rs.getInt("debug");
+            }
+            database.log.add("Failed to get debug info from user configuration ",HEADER+"E!!!");
+            return -1;
+        }catch(SQLException e){
+            database.log.add("Failed to read debug info from database",HEADER+"E!!!");
+            return -2;
+        }
+        
+        
+    }
+    
+    /**
+     * Options.update_debug(int debug)
+     * @param debug
+     * @return boolean
+     * @throws SQLException 
+     * Function for updating debug info
+     */
+    boolean update_debug(int debug) throws SQLException{
+        String query = "UPDATE CONFIGURATION SET debug = ? where owner_id = ?";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1,debug);
+        ppst.setInt(2,database.logged.owner_id);
+        
+        try{
+            return ppst.execute();
+        }catch(SQLException e){
+            database.log.add("Failed to update debug info ("+e.toString()+")",HEADER+"E!!!");
+            return false;
+        } 
+    }
+    
+    /**
+     * Options.get_fast_login()
+     * @return String
+     * @throws SQLException
+     * Function returns fast login data
+     */
+    String get_fast_login() throws SQLException{
+        String query = "SELECT conf4 from CONFIGURATION where owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1,database.logged.owner_id);
+        
+        try{
+            ResultSet act_rs = ppst.executeQuery();
+            
+            if ( act_rs.next() ){
+                return act_rs.getString("conf4");
+            }
+            return null;
+            
+        }catch(SQLException e){
+            database.log.add("Failed to get conf4 ( fast login data ) ("+e.toString()+")",HEADER+"E!!!");
+            return null;
+        }
+    }
+    
+    /**
+     * Options.update_fast_login(String data)
+     * @param data
+     * @return boolean
+     * @throws SQLException
+     * Function for updating fast login data
+     */
+    boolean update_fast_login() throws SQLException{
+        String query = "UPDATE CONFIGURATION SET conf4 = ? where owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setString(1,database.logged.owner_login);
+        ppst.setInt(2,database.logged.owner_id);
+        
+        try{
+            ppst.execute();
+            return true;
+        }catch(SQLException e){
+            database.log.add("Failed to update fast login data ("+e.toString()+")",HEADER+"E!!!");
+            return false;
+        }
+    }
+    boolean clear_fast_login() throws SQLException{
+        String query = "UPDATE CONFIGURATION SET conf4 = 'blank' where owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+
+        ppst.setInt(1,database.logged.owner_id);
+        
+        try{
+            return ppst.execute();
+        }catch(SQLException e){
+            database.log.add("Failed to update fast login data ("+e.toString()+")",HEADER+"E!!!");
+            return false;
+        }
+    }
 }

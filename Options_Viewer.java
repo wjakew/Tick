@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class Options_Viewer {
     
-    final String version = "v1.0.0";
+    final String version = "v1.0.1";
     Options options;
     UI_Interface ui;
     boolean run = true;
@@ -29,6 +29,8 @@ public class Options_Viewer {
             add("3. General view options");
             add("4. Information");
             add("5. Debug options");
+            add("6. Fast login settings");
+            add("7. Input data history");
             add("exit.");
             }};
     
@@ -43,6 +45,26 @@ public class Options_Viewer {
             add("3.List view");
             add("4.blank");
             }};
+    
+    ArrayList<String> main_menu_debug = new ArrayList<String>(){{
+            add("1. Debug on");
+            add("2. Debug off");
+            }};
+    
+    ArrayList<String> main_menu_info = new ArrayList<String>(){{
+            add("TICK GSD Program");
+            add("made by Jakub Wawak");
+            add("all rights reserved 2020");
+            add("");
+            add("All questions and bugs You can send to:");
+            add("kubawawak@gmail.com");
+            }};
+    
+    ArrayList<String> main_menu_fastlogin = new ArrayList<String>(){{
+            add("Fast login option:");
+            add("1.Set");
+            add("2.Clear");
+    }};
 
     // main constructor
     Options_Viewer(Options options){
@@ -70,15 +92,20 @@ public class Options_Viewer {
      * Function for showing menu items in console
      */
     void _viewer(ArrayList<String> menu,int indent_mark){
-        for(int i = 0 ; i < indent_mark ; i++){
+        if ( menu == null){
+            ui.interface_print("Nothing to show ( null ) ");
+        }
+        else{
+            for(int i = 0 ; i < indent_mark ; i++){
             ui.tab = ui.tab + "   ";
+            }
+            ui.interface_print("----");
+            for (String line : menu){
+                ui.interface_print(line);
+            }
+            ui.interface_print("----");
+            ui.tab = "";
         }
-        ui.interface_print("----");
-        for (String line : menu){
-            ui.interface_print(line);
-        }
-        ui.interface_print("----");
-        ui.tab = "";
     }
     
     void CUI_OPT_logic(String user_input, String mode) throws SQLException{
@@ -98,6 +125,22 @@ public class Options_Viewer {
             // general view options
             else if ( user_input.equals("3")){
                 CUI_OPT_FUN_gvo(words);
+            }
+            // information
+            else if (user_input.equals("4")){
+                CUI_OPT_FUN_info(words);
+            }
+            // debug
+            else if (user_input.equals("5")){
+                CUI_OPT_FUN_debug(words);
+            }
+            // fast login options
+            else if (user_input.equals("6")){
+                CUI_OPT_FUN_fastlogin(words);
+            }
+            //user input info
+            else if (user_input.equals("7")){
+                CUI_OPT_FUN_input_data_h(words);
             }
             // exit
             else if (user_input.equals("exit")){
@@ -279,7 +322,70 @@ public class Options_Viewer {
         else{
             ui.interface_print("Wrong input");
         }
+    }
+    
+    /**
+     * Options_viewer.CUI_OPT_FUN_debug(List<String> addons)
+     * @param addons 
+     * Function implements debug settings functionality
+     */
+    void CUI_OPT_FUN_debug(List<String> addons) throws SQLException{
         
+        _viewer(main_menu_debug,2);
+        ui.interface_get();
+        
+        if ( ui.last_input == 1){
+            options.update_debug(1);
+            ui.interface_print("Value updated");
+        }
+        else if ( ui.last_input == 2){
+            options.update_debug(0);
+            ui.interface_print("Value updated");
+        }
+        else{
+            ui.interface_print("Wrong input");
+        }
+    }
+    
+    /**
+     * Options_Viewer.CUI_OPT_FUN_info(List<String> addons)
+     * @param addons
+     * @throws SQLException
+     * Function implements info functionality of the options
+     */
+    void CUI_OPT_FUN_info(List<String> addons) throws SQLException{
+        _viewer(options.database.stats(),2);
+        _viewer(main_menu_info,2);
+    }
+    
+    /**
+     * Options_Viewer.CUI_OPT_FUN_fastlogin(List<String> addons)
+     * @param addons
+     * @throws SQLException 
+     * Function implements fast login options
+     */
+    void CUI_OPT_FUN_fastlogin(List<String> addons) throws SQLException{
+        _viewer(main_menu_fastlogin,2);
+        ui.interface_get();
+        
+        if ( ui.last_input == 1){
+            options.update_fast_login();
+                ui.interface_print("Value updated");
+        }
+        else if ( ui.last_input == 2){
+            options.clear_fast_login();
+            ui.interface_print("Value updated");
+        }
+    }
+    
+    /**
+     * Options_Viewer.CUI_OPT_FUN_input_data_h(List<String> addons)
+     * @param addons 
+     * Function for implements input data history
+     */
+    void CUI_OPT_FUN_input_data_h(List<String> addons){
+        ui.interface_print("Input history:");
+        _viewer(ui.history,2);
     }
     
 }

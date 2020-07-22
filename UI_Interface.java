@@ -5,6 +5,9 @@ all rights reserved
  */
 package tick;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.Console;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,11 +19,14 @@ import java.util.Scanner;
  * @author jakub
  */
 public class UI_Interface {
-    final String version = "v1.1.1";
+    final String version = "v1.1.3";
     
     Scanner sc;                     // main object for scanning 
     ArrayList<String> history;      // main log of the input,output
     Console console;
+    
+    String[] not_get = new String[] {"clip","again","clip again"};
+    List<String> avoid;
     
     
     final String PROMPT = ">";
@@ -31,6 +37,7 @@ public class UI_Interface {
     boolean blank = true;           // variable set if input is blank
     int last_input;
     String last_string;
+    String raw_input;
     
     ArrayList<Integer> numbers; // collection for found 
                                 // numbers in user input
@@ -43,6 +50,10 @@ public class UI_Interface {
         history = new ArrayList<>();
         numbers = new ArrayList<>();
         last_und = -1;
+        avoid = Arrays.asList(not_get);
+        last_string = "";
+        raw_input = "";
+        
     }
     
     /**
@@ -57,22 +68,55 @@ public class UI_Interface {
     }
     
     /**
+     * UI_Interface.avoid_function()
+     * @return boolean
+     * 
+     */
+    boolean avoid_function(){
+        if ( raw_input !=null) {
+            List<String> words_input = Arrays.asList(raw_input.split(" "));
+        
+            for(String word : words_input){
+                if ( avoid.contains(word) ){
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+    
+    /**
      * UI_Tick_Interface.interface_get()
      * @return String 
      */
     String interface_get(){
-        last_string = "";
         numbers.clear();
         System.out.print(tab+PROMPT);
         String input = sc.nextLine();
         history.add("UI - > USER INPUT : "+input+"\n");
         last_und = understand(input);
         get_numbers(input);
-        if ( !input.isBlank() || !input.isEmpty() ){
+        if ( avoid_function() || !input.isEmpty() ){
             blank = false;
         }
-        last_string = input;
+        if ( !avoid.contains(input)){
+            last_string = input;
+        }
+        raw_input = input;
         return input;
+    }
+    
+    /**
+     * UI_Interface.copy_to_clipboard()
+     * @return boolean
+     * Function copies last input to clipboard
+     */
+    boolean copy_to_clipboard(){
+        StringSelection data = new StringSelection(last_string);
+        Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+        cb.setContents(data, data);
+        return true;
     }
     /**
      * UI_Tick_Interface.get_password()
@@ -99,8 +143,23 @@ public class UI_Interface {
         history.add("UI - > USER OUTPUT: "+text+"\n");
         System.out.println(tab+text);
     }
+    /**
+     * UI_Tick_Interface.interface_print()
+     * Function for printing blank 
+     */
     void interface_print(){
         System.out.println("");
+    }
+    
+    /**
+     * UI_Tick_Interface.array_print(ArrayList<String> to_show)
+     * @param to_show 
+     * Function for printing data from ArrayList
+     */
+    void array_print(ArrayList<String> to_show){
+        for(String line : to_show){
+            interface_print(line);
+        }
     }
     
     /**

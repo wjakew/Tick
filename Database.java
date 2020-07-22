@@ -836,8 +836,6 @@ public class Database {
             log.add("Failed to check password ("+e.toString()+")",HEADER);
             return false;
         }
-        
-        
     }
     //----------------------------FUNCTIONS FOR PLACE
     /**
@@ -1080,5 +1078,42 @@ public class Database {
             log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
             return false;
         }
+    }
+    
+    /**
+     * Database.stats()
+     * @return ArrayList
+     * @throws SQLException
+     * Function returns lines to show of stats from database
+     * like number of items etc.
+     */
+    ArrayList<String> stats() throws SQLException{
+        ArrayList<String> to_ret = new ArrayList<>();
+        
+        to_ret.add("Logged user: "+ logged.owner_login);
+        to_ret.add("User id: "+ Integer.toString(logged.owner_id));
+        
+        String[] names = new String[] {"TICK","PLACE","ADDRESS","CATEGORY","HASHTAG_TABLE","TAG","SCENE"};
+        
+        for(String name : names){
+            String query = "SELECT COUNT(*) FROM ";
+            query = query + name + ";";
+            PreparedStatement ppst = con.prepareStatement(query);
+            
+            try{
+                ResultSet act_rs = ppst.executeQuery();
+                
+                if ( act_rs.next() ){
+                    to_ret.add(name + " -> "+Integer.toString(act_rs.getInt("COUNT(*)")));
+                }
+
+            }catch(SQLException e){
+                log.add("Failed to get stats ("+e.toString(),HEADER+"E!!!");
+                System.out.println(ppst.toString());
+                System.out.println(e.toString());
+                return null;
+            }
+        }
+        return to_ret;
     }
 }

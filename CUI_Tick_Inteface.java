@@ -19,7 +19,7 @@ import java.util.List;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v1.0.3";
+    final String version = "v1.0.4";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -169,6 +169,11 @@ public class CUI_Tick_Inteface {
                 ov.run();
                 break;
             }
+            // clip
+            else if (word.equals("clip")){
+                CUI_FUN_clip(words);
+                break;
+            }
             // not supported command
             else{
                 ui.interface_print("Wrong command");
@@ -216,6 +221,7 @@ public class CUI_Tick_Inteface {
      */
     void echo_CUI_interface(String input){
         ui.interface_print("echo: "+input);
+        ui.interface_print("last string: "+ui.last_string);
         ui.interface_print("len: "+ Integer.toString(input.split(" ").length));
     }
     /**
@@ -316,6 +322,9 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - clip ( copies content of tick to clipboard )");
             ui.interface_print("");
             ui.interface_print("                                          /eg. tick clip 1/");
+            ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("again");
+            ui.interface_print("    ( loads latest input to the user console ) ");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("share");
             ui.interface_print("    ( without arguments shows active shares to load )");
@@ -1397,6 +1406,23 @@ public class CUI_Tick_Inteface {
             else{
                 ui.interface_print("Cancelled");
             }
+        }
+    }
+    
+    void CUI_FUN_clip(List<String> addons) throws SQLException{
+        // clip
+        if ( addons.size() == 1 && addons.contains("clip")){
+            ui.interface_print("Last input: "+ui.last_string);
+        }
+        // clip again
+        else if ( addons.size() == 2 && addons.contains("again")){
+            ui.interface_print("Using : "+ui.last_string);
+            CUI_logic(ui.last_string);
+        }
+        // clip copy
+        else if (addons.size() == 2 && addons.contains("copy")){
+            ui.copy_to_clipboard();
+            ui.interface_print("Copied last input to clipboard");
         }
     }
 }
