@@ -36,8 +36,10 @@ public class UI_Interface {
     boolean int_flag = false;       // variable used to flag if number found in input
     boolean blank = true;           // variable set if input is blank
     int last_input;
+    
     String last_string;
     String raw_input;
+    int size;
     
     ArrayList<Integer> numbers; // collection for found 
                                 // numbers in user input
@@ -53,7 +55,18 @@ public class UI_Interface {
         avoid = Arrays.asList(not_get);
         last_string = "";
         raw_input = "";
+        size = 0;
         
+    }
+    
+    /**
+     * UI_Interface.count()
+     * Functionf for 
+     */
+    void count(){
+        for ( String word : raw_input.split(" ")){
+            size++;
+        }
     }
     
     /**
@@ -91,6 +104,7 @@ public class UI_Interface {
      * @return String 
      */
     String interface_get(){
+        size = 0;
         numbers.clear();
         System.out.print(tab+PROMPT);
         String input = sc.nextLine();
@@ -104,6 +118,7 @@ public class UI_Interface {
             last_string = input;
         }
         raw_input = input;
+        count();
         return input;
     }
     
@@ -282,7 +297,7 @@ public class UI_Interface {
     }
     
     /**
-     * UI_Tick_Interface.check_existance_int( List<String> user_input )
+     * UI_Interface.check_existance_int( List<String> user_input )
      * @param user_input
      * @return int
      * Returns first found integer, if not found returns -1
@@ -296,5 +311,19 @@ public class UI_Interface {
             }
         }
         return -1;
+    }
+    
+    /**
+     * UI_Interface.convert_array(ArrayList<String> to_convert)
+     * @param to_convert
+     * @return String
+     * Converting array to string
+     */
+    String convert_array(ArrayList<String> to_convert){
+        String to_ret = "";
+        for(String line: to_convert){
+            to_ret = to_ret + line + "\n";
+        }
+        return to_ret;
     }
 }

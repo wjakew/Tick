@@ -265,10 +265,64 @@ public class Database {
             ResultSet rs = ppst.executeQuery();
             
             while ( rs.next() ){
+                if ( table_name.equals("LISTS")){
+                    field = "list_id";
+                }
                 index = rs.getInt(field);
             }
-        }catch(SQLException e){}
+        }catch(SQLException e){
+            log.add("Failed to get last_id ("+e.toString()+")",HEADER+"E!!!");
+        }
         return index;
+    }
+    
+    /**
+     * Database.get_all_id(String mode)
+     * @param mode
+     * @return int[]
+     * @throws SQLException
+     * Function for getting all ids from table
+     */
+    int[] get_all_id(String mode) throws SQLException{
+        int[] ids = {};
+        String query = "";
+        if (mode.equals("address")){
+            query = "SELECT * FROM ADDRESS;";
+        }
+        else if (mode.equals("category")){
+            query = "SELECT * FROM CATEGORY where owner_id = ?;";
+        }
+        else if (mode.equals("hashtag table")){
+            query = "SELECT * FROM HASHTAG_TABLE where owner_id = ?;";
+        }
+        else if (mode.equals("note")){
+            query = "SELECT * FROM NOTE where owner_id = ?;";
+        }
+        else if (mode.equals("place")){
+            query = "SELECT * FROM PLACE where owner_id = ?;";
+        }
+        else if (mode.equals("tag")){
+            query = "SELECT * FROM TAG where owner_id = ?;";
+        }
+        else if (mode.equals("list")){
+            query = "SELECT * FROM LISTS where owner_id = ?";
+        }
+        PreparedStatement ppst = con.prepareStatement(query);
+        if ( !mode.equals("address") ){
+            ppst.setInt(1,logged.owner_id);
+        }
+        int i = 0;
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            while(rs.next()){
+                ids[i] = rs.getInt("mode"+"_id");
+            }
+        }catch(SQLException e){
+            log.add("Failed to get all ids from table ("+e.toString(),HEADER);
+            return null;
+        }
+        return ids;
     }
     
     /**
@@ -760,6 +814,36 @@ public class Database {
         return logged;
     }
     //----------------------------FUNCTIONS FOR USER
+    /**
+     * Database.check_debug()
+     * @return data about checking debug
+     * @throws SQLException 
+     */
+    boolean check_debug() throws SQLException{
+        String query = " SELECT debug from CONFIGURATION where owner_id = ?;";
+        
+        PreparedStatement ppst = con.prepareStatement(query);
+        
+        ppst.setInt(1,logged.owner_id);
+        
+        try{
+            ResultSet act_rs = ppst.executeQuery();
+            
+           if (act_rs.next()){
+               if (act_rs.getInt("debug") == 1){
+                   return true;
+               }
+               else{
+                   return false;
+               }
+           }
+        
+        }catch(SQLException e){
+            this.log.add("Failed to check debug info ("+e.toString()+")",HEADER+"E!!!");
+            return false;
+        }
+        return false;
+    }
     /**
      * Database.register_user(Tick_User to_add)
      * @param to_add

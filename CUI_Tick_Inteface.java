@@ -8,11 +8,13 @@ package tick;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import javax.mail.MessagingException;
 
 /**
  *Console interface
@@ -47,7 +49,7 @@ public class CUI_Tick_Inteface {
      * @throws SQLException 
      * Main run function of the interface
      */
-    void run() throws SQLException{
+    void run() throws SQLException, MessagingException, IOException{
         welcome_screen();
         
         // welcome prompt
@@ -105,7 +107,7 @@ public class CUI_Tick_Inteface {
      * @throws SQLException 
      * Main logic of the program
      */
-    void CUI_logic(String user_input) throws SQLException{
+    void CUI_logic(String user_input) throws SQLException, MessagingException, IOException{
         List<String> words = Arrays.asList(user_input.split(" ")); 
         
         for (String word : words){
@@ -309,8 +311,9 @@ public class CUI_Tick_Inteface {
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("tick");
             ui.interface_print("    ( without arguments shows active ticks )");
-            ui.interface_print("    - add ( add simple tick reminder )");
             ui.interface_print("    - arch ( shows archived ticks )");
+            ui.interface_print("    - listview ( shows ticks categorized by lists )");
+            ui.interface_print("    - add ( add simple tick reminder )");
             ui.interface_print("tick option /tick_id/");
             ui.interface_print("    - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ ");
             ui.interface_print("          ( links tick to the choosen object ) ");
@@ -361,6 +364,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - delete ( delete scene by id )");
             ui.interface_print("    -/scene_id/ select ( shows tick in scene )");
             ui.interface_print("    -/scene_id/ copy ( copies ticks to clipboard )");
+            ui.interface_print("    -/scene_id/ mail ( sends scene via e-mail ) ");
             ui.interface_print("");
             ui.interface_print("                                     /eg. scene 1 select/");
             ui.interface_print("-----------------------------------------------------------");
@@ -369,7 +373,8 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    -/list_id/ delete ( delete list by given id )");
             ui.interface_print("    -/tick_id/ ticka ( adding one tick to list )");
             ui.interface_print("    -/list_id/ tickd ( deleting tick from list )");
-            ui.interface_print("    -/list_id/ det ( shows details of list )");
+            ui.interface_print("    -/list_id/ ( shows details of lists )");
+            ui.interface_print("    -/list_id/ mail ( sends list with details of tick ) ");
             ui.interface_print("");
             ui.interface_print("                                           /eg. lists 1 ticka/");
             ui.interface_print("-----------------------------------------------------------");
@@ -446,7 +451,10 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    -delete /list_id/ ( delete list by given id )");
             ui.interface_print("    -ticka /tick_id/ ( adding one tick to list )");
             ui.interface_print("    -tickd /list_id/ ( deleting tick from list )");
+            ui.interface_print("    -/list_id/ ( shows details of lists )");
+            ui.interface_print("    -/list_id/ mail ( sends list with details of tick ) ");
         }
+        // help options
         else if ( addons.size() == 2 && addons.contains("options")){
             ui.interface_print("Help for options ");
             ui.interface_print("    ( manages main functionalities of the Tick program ) ");
@@ -713,7 +721,7 @@ public class CUI_Tick_Inteface {
      * @param addons 
      * Adding functionality of scene
      */
-    void CUI_FUN_scene(List<String> addons) throws SQLException{
+    void CUI_FUN_scene(List<String> addons) throws SQLException, MessagingException, IOException{
         // scene
         if (addons.size() == 1){
             ui.interface_print("Currently active scenes:");
@@ -813,7 +821,7 @@ public class CUI_Tick_Inteface {
             }
         }
         
-        // scene select /scene_id/
+        // scene /scene_id/ select
         else if ( addons.size() == 3 && addons.contains("select") && ui.check_existance_int(addons)!= -1 ){
             int scene_id = ui.last_input;
             scene_selected = scene_id;
@@ -839,7 +847,7 @@ public class CUI_Tick_Inteface {
             }
         }
         
-        // scene copy /scene_id/
+        // scene /scene_id/ copy
         else if( addons.size() == 3 && addons.contains("copy") && ui.check_existance_int(addons)!= -1 ){
             int scene_id = ui.last_input;
             
@@ -869,6 +877,40 @@ public class CUI_Tick_Inteface {
             }
             else{
                 ui.interface_print("Wrong scene id");
+            }
+        }
+        
+        // scene /scene_id/ mail
+        else if( addons.size() == 3 && addons.contains("mail") && ui.check_existance_int(addons)!= -1 ){
+            int scene_id = ui.last_input;
+            if ( database.check_if_record_exists(scene_id, "scene")){
+                // found scene
+                ArrayList<Tick_Brick> tb = database.return_TB_collection(database.logged, "scene", scene_id);
+                // loading Tick_Brick to make object
+                
+                if ( tb != null){ // checking if Tick_Brick collection isn't empty
+                    Tick_Scene ts = new Tick_Scene(tb);
+                    Database_Viewer dv = new Database_Viewer(database,database.logged,"tick");
+                    
+                    dv.custom_query = ts.query_creator();
+                    ArrayList<String> lines = dv.make_view();
+                    String content = "";
+                    for(String line : lines){
+                        content = content + line+"\n";  
+                    }
+                    
+                    // content now contains scene details
+                    
+                    ui.interface_get_w_prompt("Input reciver e-mail address:");
+                    
+                    if ( ui.last_string.contains("@") && ui.size == 1){
+                        MailSender ms = new MailSender("New things to do from "+database.logged.owner_login,content,ui.raw_input);
+                        ms.run();
+                    }
+                    else{
+                        ui.interface_print("Wrong e-mail address");
+                    }
+                }
             }
         }
 
@@ -917,6 +959,13 @@ public class CUI_Tick_Inteface {
             else{
                 ui.interface_print("Error adding tick");
             }
+        }
+        // tick listview
+        else if ( addons.size() == 2 && addons.contains("listview")){
+            Database_Viewer dv = new Database_Viewer(database,database.logged,"lists");
+            dv = new Database_Viewer(database,database.logged,"list view");
+            ui.interface_print("Detailed view of lists: ");
+            show_arraylist(dv.make_view());
         }
         // tick arch
         else if ( addons.size() == 2 && addons.contains("arch")){
@@ -1191,7 +1240,7 @@ public class CUI_Tick_Inteface {
      * @throws SQLException 
      * Implements functionality of lists
      */
-    void CUI_FUN_lists(List<String> addons) throws SQLException{
+    void CUI_FUN_lists(List<String> addons) throws SQLException, MessagingException, IOException{
         Database_Viewer dv = new Database_Viewer(database,database.logged,"lists");
         Database_List dl = new Database_List(database);
         // lists
@@ -1205,7 +1254,8 @@ public class CUI_Tick_Inteface {
             to_add.init_CUI();
             
             if ( dl.add_list(to_add) ){
-                ui.interface_print("List add");
+                ui.interface_print("List added");
+                ui.interface_print("List id: "+database.get_last_id("LISTS"));
             }
             else{
                 ui.interface_print("Failed to add list");
@@ -1295,12 +1345,32 @@ public class CUI_Tick_Inteface {
                 ui.interface_print("Wrong list id");
             }
         }
-        // lists det /list_id/
+        // lists det
         else if (addons.size() == 3 && addons.contains("det") && ui.check_existance_int(addons) != -1){
-            if ( database.check_if_record_exists(ui.last_input, "list")){
-                dv = new Database_Viewer(database,database.logged,"list view");
-                ui.interface_print("Detailed view of lists: ");
-                show_arraylist(dv.make_view());
+            dv = new Database_Viewer(database,database.logged,"list view");
+            ui.interface_print("Detailed view of lists: ");
+            show_arraylist(dv.make_view());
+            
+        }
+        // lists mail /list_id/
+        else if (addons.size() == 3 && addons.contains("mail") && ui.check_existance_int(addons) != -1){
+            if ( database.check_if_record_exists(ui.last_input,"lists")){
+                
+                String email = ui.interface_get_w_prompt("Input e-mail address:");
+                if ( email.contains("@")){
+                    dv = new Database_Viewer(database,database.logged,"list view");
+                    MailSender ms = new MailSender("List of things to do!",ui.convert_array(dv.make_view()),email);
+                    
+                    ms.run();
+                    
+                    ui.interface_print("List send");
+                }
+                else{
+                    ui.interface_print("Wrong e-mail address");
+                }
+            }
+            else{
+                ui.interface_print("Wrong list id");
             }
         }
         else{
@@ -1409,7 +1479,7 @@ public class CUI_Tick_Inteface {
         }
     }
     
-    void CUI_FUN_clip(List<String> addons) throws SQLException{
+    void CUI_FUN_clip(List<String> addons) throws SQLException, MessagingException, IOException{
         // clip
         if ( addons.size() == 1 && addons.contains("clip")){
             ui.interface_print("Last input: "+ui.last_string);

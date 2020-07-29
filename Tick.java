@@ -7,6 +7,7 @@ package tick;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import javax.mail.MessagingException;
 
 /**
  *Main program
@@ -14,7 +15,7 @@ import java.sql.SQLException;
  */
 public class Tick {
 
-    static final String version = "v1.0.0B2";
+    static final String version = "v1.0.0B4";
     
     static Tick_Log session_log;
     static Database database;
@@ -22,7 +23,7 @@ public class Tick {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) throws IOException, SQLException, MessagingException {
         System.out.println("TICK "+version);
         
 // initialization of the modules
@@ -38,7 +39,9 @@ public class Tick {
             System.out.println("Failed to connect to the database. Check log file.");
             session_log.add("Failed to connect to the database",  "TICK "+version);
         }
+
         session_log.save();
+        
     }
     
 }
