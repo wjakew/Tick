@@ -2,9 +2,10 @@
 programmer Jakub Wawak
 all rights reserved
 kubawawak@gmail.com
-version (from schema) v1.2.0
+version (from schema) v1.2.1
 sql script drops tables from tick database
 */
+drop table if exists GENERAL_INFO;
 drop table if exists SHARE_QUEUE;
 drop table if exists TICK;
 drop table if exists LISTS;
@@ -16,7 +17,9 @@ drop table if exists TAG;
 drop table if exists HASHTAG_TABLE;
 drop table if exists PLACE;
 drop table if exists TICK_DONE;
+drop table if exists LOG;
 drop table if exists OWN;
 drop table if exists ADDRESS;
+
 
 -- end of file

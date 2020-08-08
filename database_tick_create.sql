@@ -2,9 +2,21 @@
 programmer Jakub Wawak
 all rights reserved
 kubawawak@gmail.com
-version (from schema) v1.2.0
+version (from schema) v1.2.1
 sql script makes tables for tick database
 */	
+-- table for storing general data (0)
+CREATE TABLE GENERAL_INFO
+(
+gi_version VARCHAR(20),
+gi_data VARCHAR(100),
+gi_overview VARCHAR(200),
+gi_build_id VARCHAR(100)
+);
+INSERT INTO GENERAL_INFO
+(gi_version,gi_data,gi_overview,gi_build_id)
+VALUES
+("v1.2.1","09/08/2020","main database relase","12109082020");
 -- table address for storing addresses of places and owners (1.5)
 CREATE TABLE ADDRESS
 (
@@ -163,4 +175,14 @@ CONSTRAINT fk_share1 FOREIGN KEY (owner_id) REFERENCES OWN(owner_id),
 CONSTRAINT fk_share2 FOREIGN KEY (owner_to) REFERENCES OWN(owner_id),
 CONSTRAINT fk_share3 FOREIGN KEY (tick_id) REFERENCES TICK(tick_id)
 );
+-- table for storing log data from user (12)
+CREATE TABLE LOG
+(
+log_id INT AUTO_INCREMENT PRIMARY KEY,
+owner_id INT,
+log_string VARCHAR(300),
+log_date VARCHAR(50),
+CONSTRAINT fk_log FOREIGN KEY (owner_id) REFERENCES OWN(owner_id)
+);
+
 -- end of the file
