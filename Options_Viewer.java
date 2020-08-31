@@ -16,9 +16,10 @@ import java.util.List;
  */
 public class Options_Viewer {
     
-    final String version = "v1.0.1";
+    final String version = "v1.0.2";
     Options options;
     UI_Interface ui;
+    UI_Interface old;
     boolean run = true;
     
     // menus to show
@@ -31,6 +32,8 @@ public class Options_Viewer {
             add("5. Debug options");
             add("6. Fast login settings");
             add("7. Input data history");
+            add("8. User Interface debug");
+            add("9. Input history");
             add("exit.");
             }};
     
@@ -67,11 +70,11 @@ public class Options_Viewer {
     }};
 
     // main constructor
-    Options_Viewer(Options options){
+    Options_Viewer(Options options,UI_Interface old){
         
         this.options = options;
         ui = new UI_Interface();
-    
+        this.old = old;
     }
     
     /**
@@ -108,6 +111,13 @@ public class Options_Viewer {
         }
     }
     
+    /**
+     * Options_Viewer.CUI_OPT_logic(String user_input, String mode)
+     * @param user_input
+     * @param mode
+     * @throws SQLException 
+     * Function for logic maintaining
+     */
     void CUI_OPT_logic(String user_input, String mode) throws SQLException{
         
         List<String> words = Arrays.asList(user_input.split(" ")); 
@@ -140,6 +150,13 @@ public class Options_Viewer {
             }
             //user input info
             else if (user_input.equals("7")){
+                CUI_OPT_FUN_input_data_h(words);
+            }
+            //user interface debug
+            else if (user_input.equals("8")){
+                CUI_OPT_FUN_debug_user_interface(words);
+            }
+            else if (user_input.equals("9")){
                 CUI_OPT_FUN_input_data_h(words);
             }
             // exit
@@ -385,7 +402,25 @@ public class Options_Viewer {
      */
     void CUI_OPT_FUN_input_data_h(List<String> addons){
         ui.interface_print("Input history:");
-        _viewer(ui.history,2);
+        _viewer(old.history,2);
     }
-    
+    /**
+     * Options_Viewer.CUI_OPT_FUN_debug_user_interface(List<String> addons)
+     * @param addons 
+     * Function implements debug for user interface
+     */
+    void CUI_OPT_FUN_debug_user_interface(List<String> addons){
+        ui.interface_print("Starting data:");
+        ui.data_print();
+        boolean exit = true;
+        
+        while (exit){
+          ui.interface_get_w_prompt("Input something:");
+          
+          if ( ui.raw_input.equals("exit")){
+              exit = false;
+          }
+          ui.data_print();
+        }
+    }
 }

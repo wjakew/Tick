@@ -61,7 +61,7 @@ public class UI_Interface {
     
     /**
      * UI_Interface.count()
-     * Functionf for 
+     * Function for counting words in raw input 
      */
     void count(){
         for ( String word : raw_input.split(" ")){
@@ -158,6 +158,10 @@ public class UI_Interface {
         history.add("UI - > USER OUTPUT: "+text+"\n");
         System.out.println(tab+text);
     }
+    void interface_print(int number){
+        history.add("UI -> USER OUTPUT: "+Integer.toString(number)+"\n");
+        System.out.println(tab + Integer.toString(number));
+    }
     /**
      * UI_Tick_Interface.interface_print()
      * Function for printing blank 
@@ -165,7 +169,36 @@ public class UI_Interface {
     void interface_print(){
         System.out.println("");
     }
-    
+    /**
+     * UI_Tick_Interface.data_print()
+     * Function for printing data from fields - for debug
+     */
+    void data_print(){
+        interface_print("Data (UI_Interface version "+this.version + ")");
+        interface_print("last_und:"+Integer.toString(this.last_und));
+        interface_print("last_input:"+Integer.toString(this.last_input));
+        interface_print("last_string:" + this.last_string);
+        interface_print("numbers (array):");
+        numbers.forEach(i -> {
+            interface_print(i);
+        });
+        interface_print("raw_input: "+this.raw_input);
+        interface_print("size: "+Integer.toString(this.size));
+        interface_print("last_string: "+this.last_string);
+        interface_print();
+        interface_print("blank_flag: "+Boolean.toString(this.blank));
+        interface_print("int_flag: "+Boolean.toString(this.int_flag));  
+    }
+    /**
+     * UI_Interface.history_print()
+     * Function for printing history 
+     */
+    void history_print(){
+        interface_print("User interface history:");
+        history.forEach(data -> {
+            interface_print(data);
+        });
+    }
     /**
      * UI_Tick_Interface.array_print(ArrayList<String> to_show)
      * @param to_show 

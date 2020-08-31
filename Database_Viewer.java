@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class Database_Viewer {
     
-    final String version = "v1.0.6";
+    final String version = "v1.0.7";
     final String HEADER = "DATABASE_VIEWER ("+version+")"; 
     public String custom_query;
     /**
@@ -229,7 +229,7 @@ public class Database_Viewer {
              */
             index = new int[] {1,2,3,4,5};
         }
-        else if (mode.equals("tick")){
+        else if (mode.equals("tick") || mode.equals("tick_done")){
             /**
              *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
                 owner_id INT,
@@ -241,8 +241,9 @@ public class Database_Viewer {
                 tick_done_start VARCHAR(60),
                 tick_date_end VARCHAR(60),
                 tick_name VARCHAR(60),
+                tick_priority INT,
              */
-            index = new int[] {1,2,3,4,5,6,7};
+            index = new int[] {1,2,3,4,5,6,7,11};
         }
         else if (mode.equals("lists")){
                 /**

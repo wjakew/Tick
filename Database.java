@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class Database {
     
-    final String version = "v1.0.0";
+    final String version = "v1.0.1";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -484,8 +484,9 @@ public class Database {
                 tick_done_start VARCHAR(60),
                 tick_date_end VARCHAR(60),
                 tick_name VARCHAR(60),
+                tick_priority INT
              */
-            index = new int[] {1,2,3,4,5,6,7};
+            index = new int[] {1,2,3,4,5,6,7,11};
         }
         else if (mode.equals("scene")){
             /**
@@ -523,7 +524,7 @@ public class Database {
             log.add("RS DATA: "+rs.toString(), HEADER);
         }
         else{
-            log.add("RS size is probably 0.",HEADER+"E!!!");
+            log.add("RS size is probably 0.("+rs.toString()+")",HEADER+"E!!!");
             log.add("Failed to reach RS",HEADER+"E!!!");
         }
 
@@ -662,7 +663,7 @@ public class Database {
             log.add("RS DATA: "+rs.toString(), HEADER);
         }
         else{
-            log.add("RS size is probably 0.",HEADER+"E!!!");
+            log.add("RS size is probably 0. Mode ("+mode+")",HEADER+"E!!!");
             log.add("Failed to reach RS",HEADER+"E!!!");
         }
 

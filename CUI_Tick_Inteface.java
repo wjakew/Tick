@@ -167,7 +167,7 @@ public class CUI_Tick_Inteface {
             }
             // options
             else if (word.equals("options")){
-                Options_Viewer ov = new Options_Viewer(options);
+                Options_Viewer ov = new Options_Viewer(options,ui);
                 ov.run();
                 break;
             }
@@ -323,6 +323,9 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - det ( shows details of the tick ) ");
             ui.interface_print("    - def  ( clearing links, setting default )");
             ui.interface_print("    - clip ( copies content of tick to clipboard )");
+            ui.interface_print("    - serial ( shows serialized tick data )");
+            ui.interface_print("    - unarch ( allows to 'undone' tick )");
+            ui.interface_print("    - piro ( sets priority )");
             ui.interface_print("");
             ui.interface_print("                                          /eg. tick clip 1/");
             ui.interface_print("-----------------------------------------------------------");
@@ -425,18 +428,24 @@ public class CUI_Tick_Inteface {
         // help tick
         else if ( addons.size() == 2 && addons.contains("tick")){
             ui.interface_print("Help for tick");
-            ui.interface_print("    ( without parameters show active ticks )");
-            ui.interface_print("    - add ( add simple tick reminder )");
+            ui.interface_print("    ( without arguments shows active ticks )");
             ui.interface_print("    - arch ( shows archived ticks )");
-            ui.interface_print("tick /tick_id/");
+            ui.interface_print("    - listview ( shows ticks categorized by lists )");
+            ui.interface_print("    - add ( add simple tick reminder )");
+            ui.interface_print("tick option /tick_id/");
             ui.interface_print("    - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ ");
             ui.interface_print("          ( links tick to the choosen object ) ");
-            ui.interface_print("    - mark | /done/ | or -done");
+            ui.interface_print("    - mark | /done/ | or - done");
             ui.interface_print("          ( marks tick and gives it new atribute )");
             ui.interface_print("    - delete ( delete tick ) ");
             ui.interface_print("    - det ( shows details of the tick ) ");
             ui.interface_print("    - def  ( clearing links, setting default )");
             ui.interface_print("    - clip ( copies content of tick to clipboard )");
+            ui.interface_print("    - serial ( shows serialized tick data )");
+            ui.interface_print("    - unarch ( allows to 'undone' tick )");
+            ui.interface_print("    - piro ( sets priority )");
+            ui.interface_print("");
+            ui.interface_print("                                          /eg. tick clip 1/");
         }
         // help delete
         else if ( addons.size() == 2 && addons.contains("delete")){
@@ -973,7 +982,48 @@ public class CUI_Tick_Inteface {
             Database_Viewer dv = new Database_Viewer(database,database.logged,"tick_done");
             show_arraylist(dv.make_view());
         }
-        // tick /tick_id/ link
+        // tick /tick_id/ unarch
+        else if ( addons.size() == 3 && addons.contains("unarch") && ui.check_existance_int(addons)!= -1){
+            ui.interface_print("You trying to unarchive tick and making it not done again");
+            if ( approval_window("tick done")){
+                Database_Tick handler = new Database_Tick(database);
+                if(handler.unmark_done(ui.last_input)){
+                    ui.interface_print("Done");
+                }
+                else{
+                    ui.interface_print("Failed to 'undone' tick, check log");
+                }
+            }
+            else{
+                ui.interface_print("Cancelled");
+            }
+        }
+        // tick /tick_id/ piro
+        else if ( addons.size() == 3 && addons.contains("piro") && ui.check_existance_int(addons)!= -1){
+            int tick_id = ui.last_input;
+            ui.interface_print("Set tick priority on scale from 1 to 10:");
+            ui.interface_get();
+            
+            if ( ui.last_input >= 1 && ui.last_input <= 10){
+                Database_Tick dt = new Database_Tick(database);
+                
+                if ( dt.check_if_exists(tick_id) ){
+                    if ( dt.update_data(ui.last_input, tick_id, "tick_priority") ) {
+                        ui.interface_print("Priority updated");
+                    }
+                    else{
+                        ui.interface_print("Failed to update priority");
+                    }
+                }
+                else{
+                    ui.interface_print("Wrong tick id");
+                }
+            }
+            else{
+                ui.interface_print("Wrong number from scale");
+            }
+        }
+        // tick /tick_id/ link /eg. place/
         else if ( addons.size() == 4 && addons.contains("link") && ui.check_existance_int(addons)!= -1){
             int tick_id = ui.last_input;
             Database_Tick linker = new Database_Tick(database);
@@ -1012,6 +1062,12 @@ public class CUI_Tick_Inteface {
             else{
                 ui.interface_print("No tick with given id");
             }
+        }
+        // tick /tick_id/ serial
+        else if ( addons.size() == 3 && addons.contains("serial") && ui.check_existance_int(addons)!= -1){
+            ui.interface_print("Data for tick_id:"+Integer.toString(ui.last_input));
+            Database_Tick handler = new Database_Tick(database);
+            ui.interface_print(handler.get_serialization(ui.last_input));
         }
         // tick /tick_id/ det
         else if ( addons.size() == 3 && addons.contains("det") && ui.check_existance_int(addons)!= -1){

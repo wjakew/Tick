@@ -34,9 +34,9 @@ public class Database_Tick {
      */
     boolean add_tick(Tick_Tick to_add) throws SQLException{
         String query = "INSERT INTO TICK\n" +
-                       "(owner_id,place_id,category_id,note_id,hashtag_table_id,tick_done_id,tick_done_start,tick_date_end,tick_name)\n" +
+                       "(owner_id,place_id,category_id,note_id,hashtag_table_id,tick_done_id,tick_done_start,tick_date_end,tick_name,tick_priority)\n" +
                        "VALUES\n" +
-                       "(?,?,?,?,?,?,?,?,?);";
+                       "(?,?,?,?,?,?,?,?,?,?);";
         
         PreparedStatement ppst = database.con.prepareStatement(query);
         
@@ -49,7 +49,7 @@ public class Database_Tick {
         ppst.setString(7, to_add.tick_done_start);
         ppst.setString(8, to_add.tick_done_end);
         ppst.setString(9, to_add.tick_name);
-        
+        ppst.setInt(10,to_add.tick_priority);
         try{
             ppst.execute();
             return true;
@@ -92,6 +92,10 @@ public class Database_Tick {
      */
     boolean update_data(int data_id,int tick_id,String mode) throws SQLException{
         String query = "UPDATE TICK SET "+mode+"_id = ? where tick_id = ? and owner_id = ?;";
+        if ( mode.equals("tick_priority") ){
+            query = "UPDATE TICK SET "+mode+"= ? where tick_id = ? and owner_id = ?;";
+        }
+        
         PreparedStatement ppst = database.con.prepareStatement(query);
       
         ppst.setInt(1,data_id);
@@ -168,7 +172,7 @@ public class Database_Tick {
      * @param note
      * @return boolean
      * @throws SQLException 
-     * Function for adding 
+     * Function for marking tick done
      */
     boolean mark_done(String note, int tick_id) throws SQLException{
         Date actual = new Date();
@@ -189,8 +193,67 @@ public class Database_Tick {
         }catch(SQLException e ){
             database.log.add("FAILED TO MARK DONE ( "+e.toString()+")",HEADER);
             return false;
+        }        
+    }
+    
+    /**
+     * Database_Tick.unmark_done(int tick_id)
+     * @param tick_id
+     * @return boolean
+     * @throws SQLException 
+     * Function for unmarking tick
+     */
+    boolean unmark_done(int tick_id) throws SQLException{
+        String query = " SELECT tick_done_id FROM TICK where tick_id = ?";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1,database.logged.owner_id);
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            if (rs.next()){
+                
+                query = "UPDATE TICK SET tick_done_id = 1 and owner_id = ?";
+                ppst = database.con.prepareStatement(query);
+                ppst.setInt(1,database.logged.owner_id);
+                ppst.execute();
+                return true;
+            }
+            else{
+                database.log.add("Can't find tick with id : "+Integer.toString(tick_id),HEADER+" E!!!");
+                return false;
+            }
+        }catch(SQLException e){
+                database.log.add("Failed to unmark done tick ("+e.toString()+")",HEADER+" E!!!");
+                return false;
         }
-                       
+
+    }
+    /**
+     * Database_Tick.get_serialization(int tick_id)
+     * @param tick_id
+     * @return String 
+     * @throws SQLException 
+     * Returns serialized data of tick
+     */
+    String get_serialization(int tick_id) throws SQLException{
+        String query = "SELECT * FROM TICK where tick_id = ? and owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1,tick_id);
+        ppst.setInt(2,database.logged.owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            if ( rs.next() ){
+                Tick_Tick to_show = new Tick_Tick(database.return_one_tick_brick(rs, "tick"));
+                return to_show.serialise();
+            }
+            return null;
+        }catch(SQLException e){
+            database.log.add("Failed to gather serialised data for tick ("+e.toString()+")",HEADER);
+            return null;
+        }
+        
     }
     
     /**
@@ -229,6 +292,8 @@ public class Database_Tick {
             Tick_Tick to_show = new Tick_Tick(database.return_tick_brick(rs, "tick"));
             
             to_ret_lines.add(to_show.simple_show());
+            // setting priority
+            to_ret_lines.add(tab + "Priority: "+Integer.toString(to_show.tick_priority));
             if ( to_show.tick_done_id == 1){
                 to_ret_lines.add(tab + "TICK NOT DONE");
                 to_ret_lines.add("---");
@@ -237,6 +302,7 @@ public class Database_Tick {
                 to_ret_lines.add(tab + "TICK DONE");
                 to_ret_lines.add("---");
             }
+            
             // setting categories
             if ( to_show.category_id != 1){
                 to_ret_lines.add("Category linked:");

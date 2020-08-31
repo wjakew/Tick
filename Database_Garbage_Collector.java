@@ -15,7 +15,7 @@ import java.sql.SQLException;
  */
 public class Database_Garbage_Collector {
     
-    final String version = "v0.0.2";
+    final String version = "v0.0.3";
     Database database;
     
     // main constructor
@@ -101,8 +101,9 @@ public class Database_Garbage_Collector {
             ppst.execute();
             return true;
         }catch(SQLException e){
-            System.out.println("Delete failed "+e.toString());
+            System.out.println("Delete failed ("+e.toString()+")");
             database.log.add("Failed to delete object. ("+e.toString()+")","DATABASE GARBAGE COLLECTOR E!!!");
+            database.log.add("Failed query : "+ppst.toString(),"DATABASE GARBAGE COLLECTOR E!!!");
             return false;
         }
     }
