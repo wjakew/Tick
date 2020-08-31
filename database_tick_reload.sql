@@ -2,7 +2,7 @@
 programmer Jakub Wawak
 all rights reserved
 kubawawak@gmail.com
-version (from schema) v1.2.1
+version (from schema) v1.2.2
 sql script reloades tables for tick database
 */
 drop table if exists GENERAL_INFO;
@@ -160,6 +160,7 @@ tick_done_id INT,
 tick_done_start VARCHAR(60),
 tick_date_end VARCHAR(60),
 tick_name VARCHAR(60),
+tick_priority INT,
 CONSTRAINT fk_tick FOREIGN KEY (owner_id) REFERENCES OWN(owner_id),
 CONSTRAINT fk_tick1 FOREIGN KEY (place_id) REFERENCES PLACE(place_id),
 CONSTRAINT fk_tick2 FOREIGN KEY (category_id) REFERENCES CATEGORY(category_id),
