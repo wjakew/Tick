@@ -21,7 +21,7 @@ import javax.mail.MessagingException;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v1.0.4";
+    final String version = "v1.0.5";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -326,6 +326,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - serial ( shows serialized tick data )");
             ui.interface_print("    - unarch ( allows to 'undone' tick )");
             ui.interface_print("    - piro ( sets priority )");
+            ui.interface_print("    - date ( sets date of tick execution )");
             ui.interface_print("");
             ui.interface_print("                                          /eg. tick clip 1/");
             ui.interface_print("-----------------------------------------------------------");
@@ -444,6 +445,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - serial ( shows serialized tick data )");
             ui.interface_print("    - unarch ( allows to 'undone' tick )");
             ui.interface_print("    - piro ( sets priority )");
+            ui.interface_print("    - date ( sets date of tick execution )");
             ui.interface_print("");
             ui.interface_print("                                          /eg. tick clip 1/");
         }
@@ -997,6 +999,37 @@ public class CUI_Tick_Inteface {
             else{
                 ui.interface_print("Cancelled");
             }
+        }
+        // tick /tick_id/ date
+        else if ( addons.size() == 3 && addons.contains("date") && ui.check_existance_int(addons)!= -1){
+            ui.interface_print("You are adding date of execution for tick: ");
+            Database_Tick dt = new Database_Tick(database);
+            if (dt.check_if_exists(ui.last_input)){
+                dt.view_tick(ui.last_input);
+                ui.interface_get_date();
+
+                MDate_Parser date_parser = new MDate_Parser(ui.last_string);
+                
+                MDate_Object date_obj = date_parser.ret_date_object();
+                
+                if (  date_obj != null ){
+                    // now we have right date
+                    if ( dt.set_end_date(date_obj.parse_object().toString(), ui.last_input) ){
+                        ui.interface_print("End date updated");
+                    }
+                    else{
+                        ui.interface_print("Failed to update data, check log");
+                    }
+                }
+                else{
+                    ui.interface_print("Failed to parse data");
+                }
+            }
+            else{
+                ui.interface_print("Tick didn't exist");
+            }
+            
+            
         }
         // tick /tick_id/ piro
         else if ( addons.size() == 3 && addons.contains("piro") && ui.check_existance_int(addons)!= -1){

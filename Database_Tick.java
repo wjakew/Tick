@@ -109,6 +109,28 @@ public class Database_Tick {
             return false;
         }
     }
+    /**
+     * Database_Tick.set_end_date(String data,int tick_id)
+     * @param data
+     * @param tick_id
+     * @return boolean
+     * @throws SQLException 
+     */
+    boolean set_end_date(String data,int tick_id) throws SQLException{
+        String query = "UPDATE TICK SET tick_date_end = ? where tick_id = ? and owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setString(1,data);
+        ppst.setInt(2, tick_id);
+        ppst.setInt(3,database.logged.owner_id);
+        
+        try{
+            ppst.execute();
+            return true;
+        }catch(SQLException e){
+            database.log.add("FAILED TO SET END DATE ("+e.toString()+")",HEADER+" E!!!");
+            return false;
+        }
+    }
     
     /**
      * Database_Tick.make_default(int tick_id)
@@ -296,6 +318,13 @@ public class Database_Tick {
             to_ret_lines.add(tab + "Priority: "+Integer.toString(to_show.tick_priority));
             if ( to_show.tick_done_id == 1){
                 to_ret_lines.add(tab + "TICK NOT DONE");
+                if ( to_show.tick_done_end.equals("")){
+                    to_ret_lines.add(tab+tab+"End date not set");
+                }
+                else{
+                    to_ret_lines.add(tab+tab+"End date is set to: "+to_show.tick_done_end);
+                }
+                
                 to_ret_lines.add("---");
             }
             else{

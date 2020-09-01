@@ -19,7 +19,7 @@ import java.util.Scanner;
  * @author jakub
  */
 public class UI_Interface {
-    final String version = "v1.1.3";
+    final String version = "v1.1.4";
     
     Scanner sc;                     // main object for scanning 
     ArrayList<String> history;      // main log of the input,output
@@ -81,6 +81,19 @@ public class UI_Interface {
     }
     
     /**
+     * UI_Interface.interface_get_date()
+     * @return String
+     * Function for getting date from user
+     */
+    String interface_get_date(){
+        interface_print("Accepted formats:");
+        interface_print("DD/MM/YYYY");
+        interface_print("or");
+        interface_print("DD/MM/YYYY HH:MM:SS");
+        return interface_get();
+    }
+    
+    /**
      * UI_Interface.avoid_function()
      * @return boolean
      * 
@@ -98,6 +111,7 @@ public class UI_Interface {
         }
         return false;
     }
+
     
     /**
      * UI_Tick_Interface.interface_get()
