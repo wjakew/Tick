@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class Database {
     
-    final String version = "v1.0.1";
+    final String version = "v1.0.2";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -54,6 +54,51 @@ public class Database {
         }
     }
     //----------------------------maintanance and optional methods
+    
+    /**
+     * Database.check_database_version()
+     * @return String
+     * @throws SQLException
+     * Function for showing database version
+     */
+    String check_database_version() throws SQLException{
+        String query = "SELECT * FROM GENERAL_INFO";
+        PreparedStatement ppst = con.prepareStatement(query);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            if ( rs.next() ){
+                return rs.getString("gi_version");
+            }
+            return null;
+        
+        }catch(SQLException e){
+            log.add("Failed to gather database information ("+e.toString()+")",HEADER+"E!!!");
+            return null;
+        }
+    }
+    /**
+     * Database.get_buildnumber()
+     * @return String
+     * @throws SQLException
+     * Function for getting build number from database
+     */
+    String get_buildnumber() throws SQLException{
+        String query = "SELECT * FROM GENERAL_INFO";
+        PreparedStatement ppst = con.prepareStatement(query);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            if ( rs.next() ){
+                return rs.getString("gi_build_id");
+            }
+            return null;
+        
+        }catch(SQLException e){
+            log.add("Failed to gather database information ("+e.toString()+")",HEADER+"E!!!");
+            return null;
+        }
+    }
     
     /**
      * Database.check_if_record_exists(int id,String mode)
@@ -139,6 +184,37 @@ public class Database {
         connected = false;
         logged = null;
         this.log.add("Database connection ended", HEADER);
+    }
+    /**
+     * Database.dump_log()
+     * Function for dumping log
+     */
+    void dump_log() throws SQLException{
+        String query = "INSERT INTO LOG\n" +
+                        "(owner_id,log_string,log_date,error_code)\n" +
+                        "VALUES\n" +
+                        "(?,?,?,?);";
+        
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1,logged.owner_id);
+        ppst.setString(3,log.actual_date.toString());
+        
+        for(String line : log.log_lines){
+            ppst.setString(2,line);
+            
+            if ( line.contains("E!!!")){
+                ppst.setInt(4,1);
+            }
+            else{
+                ppst.setInt(4, 0);
+            }
+            
+            try{
+                ppst.execute();
+            }catch(SQLException e){
+                log.add("Failed to dump log to database (" + e.toString() + ")",HEADER);
+            }
+        }
     }
     /**
      * Database.make_first_configuration(Tick_User user)

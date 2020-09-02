@@ -15,13 +15,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.mail.MessagingException;
-
+ 
 /**
  *Console interface
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v1.0.5";
+    final String version = "v1.0.6";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -99,6 +99,20 @@ public class CUI_Tick_Inteface {
                 ui.interface_print("No welcome screen set");
             }
             ui.interface_print("------------------------------------------------");
+            // checking expiration dates of tick
+            Database_Watcher dw = new Database_Watcher(database);
+            
+            if(dw.check_tick_expiration_date().size() > 0){
+                List<Integer> tick_ids = dw.check_tick_expiration_date();
+                Database_Tick dt = new Database_Tick(database);
+                ui.interface_print("Found expired Ticks!");
+                for (int index : tick_ids){
+                    show_arraylist(dt.view_tick(index));
+                }
+            }
+            else{
+                ui.interface_print("No new expired ticks");
+            }
         }
     }
     /**
@@ -167,13 +181,21 @@ public class CUI_Tick_Inteface {
             }
             // options
             else if (word.equals("options")){
-                Options_Viewer ov = new Options_Viewer(options,ui);
+                Options_Viewer ov = new Options_Viewer(options,ui,database);
                 ov.run();
                 break;
             }
             // clip
             else if (word.equals("clip")){
                 CUI_FUN_clip(words);
+                break;
+            }
+            else if (word.equals("gui")){
+                new GUI_main_window(database);
+            }
+            else if (word.equals("again")){
+                ui.interface_print("Executing : "+ui.last_string);
+                CUI_logic(ui.last_string);
                 break;
             }
             // not supported command
@@ -314,6 +336,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - arch ( shows archived ticks )");
             ui.interface_print("    - listview ( shows ticks categorized by lists )");
             ui.interface_print("    - add ( add simple tick reminder )");
+            ui.interface_print("    - expired ( shows expired tick)");
             ui.interface_print("tick option /tick_id/");
             ui.interface_print("    - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ ");
             ui.interface_print("          ( links tick to the choosen object ) ");
@@ -329,6 +352,9 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - date ( sets date of tick execution )");
             ui.interface_print("");
             ui.interface_print("                                          /eg. tick clip 1/");
+            ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("gui");
+            ui.interface_print("    ( without arguments starts graphical interface )");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("again");
             ui.interface_print("    ( loads latest input to the user console ) ");
@@ -433,6 +459,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - arch ( shows archived ticks )");
             ui.interface_print("    - listview ( shows ticks categorized by lists )");
             ui.interface_print("    - add ( add simple tick reminder )");
+            ui.interface_print("    - expired ( shows expired tick)");
             ui.interface_print("tick option /tick_id/");
             ui.interface_print("    - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ ");
             ui.interface_print("          ( links tick to the choosen object ) ");
@@ -448,6 +475,11 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - date ( sets date of tick execution )");
             ui.interface_print("");
             ui.interface_print("                                          /eg. tick clip 1/");
+        }
+        //help gui
+        else if ( addons.size() == 2 && addons.contains("gui")){
+            ui.interface_print("    ( without arguments starts graphical interface )");
+            ui.interface_print(" WARNING early alpha - not all features ready and stable ");
         }
         // help delete
         else if ( addons.size() == 2 && addons.contains("delete")){
@@ -983,6 +1015,22 @@ public class CUI_Tick_Inteface {
             ui.interface_print("Showing inactive ticks: ");
             Database_Viewer dv = new Database_Viewer(database,database.logged,"tick_done");
             show_arraylist(dv.make_view());
+        }
+        // tick expired
+        else if ( addons.size() == 2 && addons.contains("expired")){
+            Database_Watcher dw = new Database_Watcher(database);
+            
+            if(dw.check_tick_expiration_date().size() > 0){
+                List<Integer> tick_ids = dw.check_tick_expiration_date();
+                Database_Tick dt = new Database_Tick(database);
+                ui.interface_print("Found expired Ticks!");
+                for (int index : tick_ids){
+                    show_arraylist(dt.view_tick(index));
+                }
+            }
+            else{
+                ui.interface_print("No new expired ticks");
+            }
         }
         // tick /tick_id/ unarch
         else if ( addons.size() == 3 && addons.contains("unarch") && ui.check_existance_int(addons)!= -1){

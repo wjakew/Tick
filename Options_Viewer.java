@@ -16,11 +16,12 @@ import java.util.List;
  */
 public class Options_Viewer {
     
-    final String version = "v1.0.2";
+    final String version = "v1.1.0";
     Options options;
     UI_Interface ui;
     UI_Interface old;
     boolean run = true;
+    Database database;
     
     // menus to show
     
@@ -34,6 +35,7 @@ public class Options_Viewer {
             add("7. Input data history");
             add("8. User Interface debug");
             add("9. Input history");
+            add("10. Dump log");
             add("exit.");
             }};
     
@@ -70,11 +72,12 @@ public class Options_Viewer {
     }};
 
     // main constructor
-    Options_Viewer(Options options,UI_Interface old){
+    Options_Viewer(Options options,UI_Interface old,Database database){
         
         this.options = options;
         ui = new UI_Interface();
         this.old = old;
+        this.database = database;
     }
     
     /**
@@ -159,6 +162,9 @@ public class Options_Viewer {
             else if (user_input.equals("9")){
                 CUI_OPT_FUN_input_data_h(words);
             }
+            else if (user_input.equals("10")){
+                CUI_OPT_FUN_dump_log(words);
+            }
             // exit
             else if (user_input.equals("exit")){
                 run = false;
@@ -213,6 +219,25 @@ public class Options_Viewer {
         else{
             _viewer(options.show_data(),5);
         } 
+    }
+    
+    void CUI_OPT_FUN_dump_log(List<String> addons) throws SQLException{
+        if ( options.internal_fail){
+            ui.interface_print("Internal fail of options");
+        }
+        else{
+            ui.interface_print("You are starting to dump log...");
+            ui.interface_print("Type database dump log password: ");
+            ui.interface_get();
+            
+            if ( ui.last_string.equals(database.get_buildnumber()) ){
+                database.dump_log();
+                ui.interface_print("Log dumped");
+            }
+            else{
+                ui.interface_print("Wrong password");
+            }
+        }
     }
     
     /**

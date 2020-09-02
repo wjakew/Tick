@@ -100,6 +100,21 @@ public class MDate_Parser {
         raw_hour_part = raw_date_parts[3];
         raw_date_part = raw_date_parts[2]+"/"+raw_date_parts[1]+"/"+raw_date_parts[5];
     }
+    /**
+     * Parser constructor for Date.toString object
+     * egTue Aug 25 15:34:02 CEST 2020
+     * @param datetoString
+     * @param distinguishingfeature 
+     * NOTE: distinguishingfeature can be anything
+     */
+    MDate_Parser(String datetoString,int distinguishingfeature){
+        mode = 2;
+        raw_date = datetoString;
+        raw_date_parts = raw_date.split(" ");
+        hour_format = true;
+        raw_hour_part = raw_date_parts[3];
+        raw_date_part = raw_date_parts[2]+"/"+raw_date_parts[1]+"/"+raw_date_parts[5];
+    }
     
     /**
      * Function for showing arrays 

@@ -7,7 +7,11 @@ package tick;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -17,7 +21,7 @@ import java.util.List;
  * @author jakubwawak
  */
 public class MDate_Object {
-    String version = "v0.0.2";
+    String version = "v0.0.3";
     
     String[] month_data = new String[] {"January","February","March",
                             "April","May","June","July","August","September",
@@ -115,6 +119,31 @@ public class MDate_Object {
     }
     
     /**
+     * Function for counting days between dates
+     * @param compare_to
+     * @return long
+     */
+    long count_days_to(MDate_Object compare_to){
+        LocalDate date_obj = LocalDate.of(year, return_month_obj(), day_number);
+        LocalDate compare_obj = LocalDate.of(compare_to.year, compare_to.return_month_obj(), compare_to.day_number);
+        return ChronoUnit.DAYS.between(date_obj, compare_obj);
+    }
+    
+    /**
+     * Function returning date of the next day
+     * @return MDate_Object
+     */
+    MDate_Object next_date(){
+        final SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+        //final Date date = format.parse(curDate);
+        final Date date = this.parse_object();
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        return new MDate_Parser(calendar.getTime()).ret_date_object();
+    }
+    
+    /**
      * Function for translating month to correspondent number
      * @return int
      */
@@ -132,6 +161,10 @@ public class MDate_Object {
             }
             return 0;
         }
+    }
+    
+    Month return_month_obj(){
+        return Month.of(this.month_number);
     }
     /**
      * Function for addinfg leading 0 to number

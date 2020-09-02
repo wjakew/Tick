@@ -234,9 +234,10 @@ public class Database_Tick {
             
             if (rs.next()){
                 
-                query = "UPDATE TICK SET tick_done_id = 1 and owner_id = ?";
+                query = "UPDATE TICK SET tick_done_id = 1 where tick_id = ? and owner_id = ?";
                 ppst = database.con.prepareStatement(query);
-                ppst.setInt(1,database.logged.owner_id);
+                ppst.setInt(1,tick_id);
+                ppst.setInt(2,database.logged.owner_id);
                 ppst.execute();
                 return true;
             }
