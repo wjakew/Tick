@@ -2,7 +2,7 @@
 programmer Jakub Wawak
 all rights reserved
 kubawawak@gmail.com
-version (from schema) v1.2.2
+version (from schema) v1.2.3
 sql script reloades tables for tick database
 */
 drop table if exists GENERAL_INFO;
@@ -196,8 +196,15 @@ log_id INT AUTO_INCREMENT PRIMARY KEY,
 owner_id INT,
 log_string VARCHAR(300),
 log_date VARCHAR(50),
+error_code INT,
 CONSTRAINT fk_log FOREIGN KEY (owner_id) REFERENCES OWN(owner_id)
 );
+
+REPLACE INTO GENERAL_INFO
+(gi_version,gi_data,gi_overview,gi_build_id)
+VALUES
+("v1.2.3","02/09/2020","main database relase","12302092020");
+
 INSERT INTO ADDRESS
 (address_city,address_street,address_house_number,address_flat_number,address_postal,
 address_country)
