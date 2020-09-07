@@ -6,6 +6,8 @@ all rights reserved
 package tick;
 
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -13,17 +15,28 @@ import java.sql.SQLException;
  */
 public class GUI_main_window extends javax.swing.JFrame {
     
-    final String GUI_version = "v.0.0.1";
-    Database database;
+    final String GUI_version = "v0.0.2";
+    public Database database;
+    GUI_Window_Manager window_manager;
+    public int actual_panel_index;     // index of a tabbed panel
+    public int actual_choosen_element_index; // index of an element in list
+    public String actual_choosen_element_string;
 
     /**
      * Creates new form GUI_main_window
      */
     public GUI_main_window(Database database) throws SQLException {
         this.database = database;
+        window_manager = new GUI_Window_Manager(this);
+        actual_choosen_element_index = -1;
+        actual_panel_index = 0;
+        
         initComponents();
-        Tick_LABEL_version.setText("Database handler "+database.version);
-        Tick_LABEL_database_v.setText("Database "+database.check_database_version());
+        
+        Tick_LABEL_tick_version.setText(GUI_version);
+        window_manager.reload_default_scene_tick();
+        
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -36,126 +49,174 @@ public class GUI_main_window extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel1 = new javax.swing.JPanel();
+        tabbed_panel = new javax.swing.JTabbedPane();
+        tick_panel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        TICK_list_ticklist = new javax.swing.JList<>();
+        TICK_button_addnewtick = new javax.swing.JButton();
+        TICK_button_active_ticks = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
+        TICK_textarea_tickdetails = new javax.swing.JTextArea();
+        TICK_button_edittick = new javax.swing.JButton();
+        TICK_button_sharetick = new javax.swing.JButton();
+        TICK_button_toclipboard = new javax.swing.JButton();
+        TICK_button_markdone = new javax.swing.JButton();
+        TICK_button_unarchive = new javax.swing.JButton();
+        TICK_button_link = new javax.swing.JButton();
+        TICK_button_delete = new javax.swing.JButton();
+        list_panel = new javax.swing.JPanel();
+        scenes_panel = new javax.swing.JPanel();
         Tick_LABEL_tick_version = new javax.swing.JLabel();
-        Tick_LABEL_version = new javax.swing.JLabel();
-        Tick_LABEL_gui_version = new javax.swing.JLabel();
-        Tick_LABEL_database_v = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTabbedPane1.setToolTipText("Tick GUI");
+        tabbed_panel.setToolTipText("Tick GUI");
+        tabbed_panel.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tabbed_panelStateChanged(evt);
+            }
+        });
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+        TICK_list_ticklist.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane1.setViewportView(jList1);
+        TICK_list_ticklist.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TICK_list_ticklistMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(TICK_list_ticklist);
 
-        jButton1.setText("Add new tick");
+        TICK_button_addnewtick.setText("Add new tick");
+        TICK_button_addnewtick.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TICK_button_addnewtickActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Active Ticks");
+        TICK_button_active_ticks.setText("Active Ticks");
+        TICK_button_active_ticks.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TICK_button_active_ticksActionPerformed(evt);
+            }
+        });
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane2.setViewportView(jTextArea1);
+        TICK_textarea_tickdetails.setColumns(20);
+        TICK_textarea_tickdetails.setRows(5);
+        jScrollPane2.setViewportView(TICK_textarea_tickdetails);
 
-        jButton3.setText("Edit Tick");
+        TICK_button_edittick.setText("Edit Tick");
 
-        jButton4.setText("Share Tick");
+        TICK_button_sharetick.setText("Share Tick");
 
-        jButton5.setText("To Clipboard");
+        TICK_button_toclipboard.setText("To Clipboard");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        TICK_button_markdone.setText("Mark done");
+        TICK_button_markdone.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TICK_button_markdoneActionPerformed(evt);
+            }
+        });
+
+        TICK_button_unarchive.setText("Unarchive");
+
+        TICK_button_link.setText("Link");
+
+        TICK_button_delete.setBackground(new java.awt.Color(255, 0, 51));
+        TICK_button_delete.setText("Delete");
+        TICK_button_delete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TICK_button_deleteActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout tick_panelLayout = new javax.swing.GroupLayout(tick_panel);
+        tick_panel.setLayout(tick_panelLayout);
+        tick_panelLayout.setHorizontalGroup(
+            tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tick_panelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(88, 88, 88)
-                        .addComponent(jButton2)))
+                .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(TICK_button_markdone, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(TICK_button_active_ticks, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))
                 .addGap(59, 59, 59)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-                        .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jButton5))
-                .addContainerGap(271, Short.MAX_VALUE))
+                .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+                                    .addComponent(TICK_button_edittick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(TICK_button_sharetick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(TICK_button_addnewtick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(TICK_button_toclipboard, javax.swing.GroupLayout.Alignment.TRAILING))
+                            .addComponent(TICK_button_unarchive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(TICK_button_link, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(TICK_button_delete))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        tick_panelLayout.setVerticalGroup(
+            tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tick_panelLayout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton5))
+                .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(TICK_button_active_ticks)
+                    .addComponent(TICK_button_toclipboard))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tick_panelLayout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 458, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TICK_button_markdone, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(tick_panelLayout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton4)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
-                .addContainerGap(20, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TICK_button_addnewtick)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TICK_button_sharetick)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TICK_button_edittick)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TICK_button_unarchive)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TICK_button_link)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(TICK_button_delete)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Tick", jPanel1);
+        tabbed_panel.addTab("Tick", tick_panel);
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 918, Short.MAX_VALUE)
+        javax.swing.GroupLayout list_panelLayout = new javax.swing.GroupLayout(list_panel);
+        list_panel.setLayout(list_panelLayout);
+        list_panelLayout.setHorizontalGroup(
+            list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 762, Short.MAX_VALUE)
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        list_panelLayout.setVerticalGroup(
+            list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 584, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab("List", jPanel2);
+        tabbed_panel.addTab("List", list_panel);
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 918, Short.MAX_VALUE)
+        javax.swing.GroupLayout scenes_panelLayout = new javax.swing.GroupLayout(scenes_panel);
+        scenes_panel.setLayout(scenes_panelLayout);
+        scenes_panelLayout.setHorizontalGroup(
+            scenes_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 762, Short.MAX_VALUE)
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        scenes_panelLayout.setVerticalGroup(
+            scenes_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 584, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab("Scenes", jPanel3);
+        tabbed_panel.addTab("Scenes", scenes_panel);
 
-        Tick_LABEL_tick_version.setText("Tick version 1.0.0B8");
-
-        Tick_LABEL_version.setText("text");
-
-        Tick_LABEL_gui_version.setText("GUI version 0.0.1");
-
-        Tick_LABEL_database_v.setText("Tick_LABEL_database_v");
+        Tick_LABEL_tick_version.setText("Tick version 1.0.0B9");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -164,55 +225,128 @@ public class GUI_main_window extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTabbedPane1)
+                    .addComponent(tabbed_panel)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(Tick_LABEL_version)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(Tick_LABEL_tick_version))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(Tick_LABEL_database_v)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(Tick_LABEL_gui_version)))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(Tick_LABEL_tick_version)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 610, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(tabbed_panel, javax.swing.GroupLayout.PREFERRED_SIZE, 610, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Tick_LABEL_tick_version)
-                    .addComponent(Tick_LABEL_version))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Tick_LABEL_gui_version, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Tick_LABEL_database_v))
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addComponent(Tick_LABEL_tick_version)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Function for letting know program which panel are focused on in the right moment
+     * @param evt 
+     */
+    private void tabbed_panelStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabbed_panelStateChanged
+        actual_panel_index = tabbed_panel.getSelectedIndex();
+        
+        switch (actual_panel_index) {
+            case 0:
+            {
+                try {
+                    window_manager.reload_default_scene_tick();
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+                break;
+
+            case 1:
+                System.out.println("Lists");
+                break;
+            case 2:
+                System.out.println("Scenes");
+                break;
+            default:
+                break;
+        }
+    }//GEN-LAST:event_tabbed_panelStateChanged
+
+    private void TICK_list_ticklistMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TICK_list_ticklistMouseClicked
+        //actual_choosen_element_index = TICK_list_ticklist.getSelectedIndex();
+        actual_choosen_element_string = TICK_list_ticklist.getSelectedValue();
+        String[] parts = actual_choosen_element_string.split(":");
+        //System.out.println(parts[0]);
+        actual_choosen_element_index = Integer.parseInt(parts[0]);
+        try {
+            window_manager.tick_list_clicked();
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_TICK_list_ticklistMouseClicked
+
+    private void TICK_button_active_ticksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_active_ticksActionPerformed
+        if( TICK_button_active_ticks.getText().equals("Active Ticks")){
+            try {
+                window_manager.reload_archived_scene_tick();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        else{
+            try {
+                window_manager.reload_default_scene_tick();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_TICK_button_active_ticksActionPerformed
+
+    private void TICK_button_addnewtickActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_addnewtickActionPerformed
+        try {
+            window_manager.buttonaction_addtick();
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_TICK_button_addnewtickActionPerformed
+
+    private void TICK_button_markdoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_markdoneActionPerformed
+        try {
+            window_manager.buttonaction_markdone();
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_TICK_button_markdoneActionPerformed
+
+    private void TICK_button_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_deleteActionPerformed
+        try {
+            window_manager.button_action_delete();
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_TICK_button_deleteActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel Tick_LABEL_database_v;
-    private javax.swing.JLabel Tick_LABEL_gui_version;
+    public javax.swing.JButton TICK_button_active_ticks;
+    public javax.swing.JButton TICK_button_addnewtick;
+    public javax.swing.JButton TICK_button_delete;
+    public javax.swing.JButton TICK_button_edittick;
+    public javax.swing.JButton TICK_button_link;
+    public javax.swing.JButton TICK_button_markdone;
+    public javax.swing.JButton TICK_button_sharetick;
+    private javax.swing.JButton TICK_button_toclipboard;
+    public javax.swing.JButton TICK_button_unarchive;
+    public javax.swing.JList<String> TICK_list_ticklist;
+    public javax.swing.JTextArea TICK_textarea_tickdetails;
     private javax.swing.JLabel Tick_LABEL_tick_version;
-    private javax.swing.JLabel Tick_LABEL_version;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JList<String> jList1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JPanel list_panel;
+    private javax.swing.JPanel scenes_panel;
+    private javax.swing.JTabbedPane tabbed_panel;
+    private javax.swing.JPanel tick_panel;
     // End of variables declaration//GEN-END:variables
 }

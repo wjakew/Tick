@@ -15,7 +15,7 @@ import javax.mail.MessagingException;
  */
 public class Tick {
 
-    static final String version = "v1.0.0B8";
+    static final String version = "v1.0.0B9";
     
     static Tick_Log session_log;
     static Database database;

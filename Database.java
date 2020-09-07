@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class Database {
     
-    final String version = "v1.0.2";
+    final String version = "v1.0.3";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -769,33 +769,32 @@ public class Database {
             query = "SELECT * FROM ADDRESS where address_id = ?;";
         }
         else if (mode.equals("category")){
-            query = "SELECT * FROM CATEGORY where owner_id = ? and category_id = ?;";
+            query = "SELECT * FROM CATEGORY where category_id = ?;";
         }
         else if (mode.equals("hashtag table")){
-            query = "SELECT * FROM HASHTAG_TABLE where owner_id = ? and hashtag_table_id = ?;";
+            query = "SELECT * FROM HASHTAG_TABLE where hashtag_table_id = ?;";
         }
         else if (mode.equals("note")){
-            query = "SELECT * FROM NOTE where owner_id = ? and note_id = ?;";
+            query = "SELECT * FROM NOTE where note_id = ?;";
         }
         else if (mode.equals("place")){
-            query = "SELECT * FROM PLACE where owner_id = ? and place_id = ?;";
+            query = "SELECT * FROM PLACE where place_id = ?;";
         }
         else if (mode.equals("tag")){
-            query = "SELECT * FROM TAG where owner_id = ? and tag_id = ?;";
+            query = "SELECT * FROM TAG where tag_id = ?;";
         }
         else if (mode.equals("scene")){
-            query = "SELECT * FROM SCENE where owner_id = ? and scene_id = ?;";
+            query = "SELECT * FROM SCENE where scene_id = ?;";
         }
         else if (mode.equals("tick")){
-            query = "SELECT * FROM TICK where owner_id = ? and tick_id = ?;";
+            query = "SELECT * FROM TICK where tick_id = ?;";
         }
         else if (mode.equals("list")){
-            query = "SELECT * FROM LISTS where owner_id = ? and list_id =?;";
+            query = "SELECT * FROM LISTS where ist_id =?;";
         }
         
         PreparedStatement ppst = con.prepareStatement(query);
-        ppst.setInt(1,logged_user.owner_id);
-        ppst.setInt(2,object_id);
+        ppst.setInt(1,object_id);
         
         ResultSet result = ppst.executeQuery();
         

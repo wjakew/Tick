@@ -21,7 +21,7 @@ import javax.mail.MessagingException;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v1.0.6";
+    final String version = "v1.0.7";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -191,7 +191,9 @@ public class CUI_Tick_Inteface {
                 break;
             }
             else if (word.equals("gui")){
+                ui.interface_print("Graphical user interface is starting...");
                 new GUI_main_window(database);
+                break;
             }
             else if (word.equals("again")){
                 ui.interface_print("Executing : "+ui.last_string);

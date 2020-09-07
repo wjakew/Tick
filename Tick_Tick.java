@@ -5,6 +5,7 @@ all rights reserved
  */
 package tick;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -67,7 +68,6 @@ public class Tick_Tick extends Tick_Element{
         super.put_elements(wall_updater());
         
     }
-    
     // constructor with tick brick functionality
     Tick_Tick(ArrayList<Tick_Brick> to_add){
         super("Tick_Tick");
@@ -182,5 +182,39 @@ public class Tick_Tick extends Tick_Element{
         ArrayList<String> to_ret = new ArrayList<>();
         to_ret.add(simple_show());
         return to_ret;
+    }
+    
+    
+    /**
+     * Tick_Tick.get_detailed_data
+     * @return ArrayList
+     * Function returns detailed data from database
+     */
+    ArrayList<String> get_detailed_data(Database database) throws SQLException{
+        ArrayList<String> data_toRet = new ArrayList<>();
+        
+        data_toRet.add("Detailed view for tick named: "+tick_name);
+        data_toRet.add("Date of creation: "+ tick_done_start);
+        
+        Tick_Category tc = new Tick_Category(database.return_TB_collection(database.logged, "category", category_id));
+        data_toRet.add("Category : "+tc.category_name);
+        
+        Tick_Place tp = new Tick_Place(database.return_TB_collection(database.logged, "place", place_id));    
+        data_toRet.add("Place : "+tp.place_name);
+        
+        Tick_Note tn = new Tick_Note(database.return_TB_collection(database.logged, "note", note_id)); 
+        data_toRet.add("Note : \n"+tn.note_content);
+        
+        Tick_HashtagT th = new Tick_HashtagT(database.return_TB_collection(database.logged, "hashtag table", hashtag_table_id)); 
+        data_toRet.add("Hashtag table : "+th.hashtag_table_name);
+        
+        data_toRet.add("Priority : "+Integer.toString(tick_priority));
+        if ( tick_done_end.equals("")){
+            data_toRet.add("Date of end: not set");
+        }
+        else{
+            data_toRet.add("Date of end: "+tick_done_end);
+        }
+        return data_toRet;
     }
 }

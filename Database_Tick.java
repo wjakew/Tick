@@ -16,6 +16,7 @@ import java.util.Date;
  * @author jakub
  */
 public class Database_Tick {
+    final String version = "v2.0.0";
     final String HEADER = "DATABASE_TICK";
     Database database;
     
@@ -273,10 +274,45 @@ public class Database_Tick {
             }
             return null;
         }catch(SQLException e){
-            database.log.add("Failed to gather serialised data for tick ("+e.toString()+")",HEADER);
+            database.log.add("Failed to gather serialised data for tick ("+e.toString()+")",HEADER+" E!!!");
             return null;
         }
+    }
+    
+    /**
+     * Database_Tick.view_simpleviews()
+     * @return ArrayList
+     * @throws SQLException
+     * Function for loading simple views from database
+     * modes:
+     * 0 - not done ticks
+     * 1 - done ticks
+     */
+    ArrayList<String> view_simpleviews(int mode) throws SQLException{
+        ArrayList<String> headers = new ArrayList<>();
+        String query = "SELECT * FROM TICK WHERE owner_id = ? and tick_done_id = 1;";
+        if ( mode == 1){
+            query = "SELECT * FROM TICK WHERE owner_id = ? and tick_done_id != 1;";
+        }
+        PreparedStatement ppst = database.con.prepareStatement(query);
         
+        ppst.setInt(1,database.logged.owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            while ( rs.next() ){
+                
+                Tick_Tick loop_act = new Tick_Tick(database.return_one_tick_brick(rs, "tick"));
+                headers.add(loop_act.simple_show());
+                
+            }
+            return headers;
+        
+        }catch(SQLException e){
+            database.log.add("Failed to load simple views from database ("+e.toString()+")",HEADER+" E!!!");
+            return null;
+        }
     }
     
     /**
