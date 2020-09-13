@@ -15,7 +15,7 @@ import java.sql.SQLException;
  */
 public class Database_Garbage_Collector {
     
-    final String version = "v0.0.3";
+    final String version = "v0.0.4";
     Database database;
     
     // main constructor
@@ -96,6 +96,15 @@ public class Database_Garbage_Collector {
         String query = "DELETE FROM "+table_name+" where "+field_name+" = ?;";
         PreparedStatement ppst = database.con.prepareStatement(query);
         ppst.setInt(1,object_id);
+        
+        if( table_name.equals("CATEGORY") && object_id == 1){
+            database.log.add("Cannot delete default data","DATABASE GARBAGE COLLECTOR W!!!");
+            return false;
+        }
+        else if ( table_name.equals("PLACE") && object_id == 1){
+           database.log.add("Cannot delete default data","DATABASE GARBAGE COLLECTOR W!!!");
+            return false;
+        }
         
         try{
             ppst.execute();

@@ -21,7 +21,7 @@ import javax.mail.MessagingException;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v1.0.7";
+    final String version = "v1.0.9";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -193,6 +193,7 @@ public class CUI_Tick_Inteface {
             else if (word.equals("gui")){
                 ui.interface_print("Graphical user interface is starting...");
                 new GUI_main_window(database);
+                ui.interface_print("User interface started.");
                 break;
             }
             else if (word.equals("again")){
@@ -352,6 +353,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - unarch ( allows to 'undone' tick )");
             ui.interface_print("    - piro ( sets priority )");
             ui.interface_print("    - date ( sets date of tick execution )");
+            ui.interface_print("    - note ( adds note to tick )");
             ui.interface_print("");
             ui.interface_print("                                          /eg. tick clip 1/");
             ui.interface_print("-----------------------------------------------------------");
@@ -475,6 +477,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - unarch ( allows to 'undone' tick )");
             ui.interface_print("    - piro ( sets priority )");
             ui.interface_print("    - date ( sets date of tick execution )");
+            ui.interface_print("    - note ( adds note to tick )");
             ui.interface_print("");
             ui.interface_print("                                          /eg. tick clip 1/");
         }
@@ -1049,6 +1052,44 @@ public class CUI_Tick_Inteface {
             else{
                 ui.interface_print("Cancelled");
             }
+        }
+        // tick /tick_id/ note
+        else if ( addons.size() == 3 && addons.contains("note") && ui.check_existance_int(addons)!= -1){
+            Database_Tick dt = new Database_Tick(database);
+            int tick_id = ui.last_input;
+            if ( dt.check_if_exists(tick_id)){
+                
+                Tick_Note tn = new Tick_Note();
+                Tick_Tick tt;
+                
+                tn.init_CUI();
+                tn.owner_id = database.logged.owner_id;
+                tn.wall_updater();
+                
+                if ( database.add_note(tn) ){
+                    ui.interface_print("Note added");
+                    ui.interface_print("Note id: "+Integer.toString(database.get_last_id("NOTE")));
+                    tn = new Tick_Note(database.return_TB_collection(database.logged, "note", database.get_last_id("NOTE")));
+                    tt = new Tick_Tick(database.return_TB_collection(database.logged, "tick", tick_id));
+                    
+                    Database_Link dl = new Database_Link(database);
+                    
+                    if ( dl.link_tick_note(tt, tn) ){
+                        ui.interface_print("Note linked");
+                    }
+                    else{
+                        ui.interface_print("Failed to link note, check log");
+                    }
+                }
+                
+                else{
+                    ui.interface_print("Failed to add note");
+                }
+            }
+            else{
+                ui.interface_print("Wrong id");
+            }
+            
         }
         // tick /tick_id/ date
         else if ( addons.size() == 3 && addons.contains("date") && ui.check_existance_int(addons)!= -1){

@@ -21,6 +21,7 @@ public class GUI_addtick_window extends javax.swing.JDialog {
      */
     Database database;
     Tick_Tick to_add;
+    boolean history = false;
     
     public GUI_addtick_window(java.awt.Frame parent, boolean modal,Database database) {
         super(parent, modal);
@@ -121,7 +122,10 @@ public class GUI_addtick_window extends javax.swing.JDialog {
     }//GEN-LAST:event_button_addActionPerformed
 
     private void textfield_tickdataFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textfield_tickdataFocusGained
-        textfield_tickdata.setText("");
+        if (!history){
+            textfield_tickdata.setText("");
+        }
+        
     }//GEN-LAST:event_textfield_tickdataFocusGained
 
     private void button_moreoptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_moreoptionsActionPerformed
@@ -133,6 +137,9 @@ public class GUI_addtick_window extends javax.swing.JDialog {
             to_add.wall_updater();
             try {
                 new GUI_moreoptions_addtick_window(this,true,to_add,database);
+                history = true;
+                textfield_tickdata.setText(to_add.tick_name);
+                button_moreoptions.setEnabled(false);
             } catch (SQLException ex) {
                 Logger.getLogger(GUI_addtick_window.class.getName()).log(Level.SEVERE, null, ex);
             }

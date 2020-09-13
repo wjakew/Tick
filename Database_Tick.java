@@ -278,6 +278,42 @@ public class Database_Tick {
             return null;
         }
     }
+    /**
+     * Database_Tick.get_note(int tick_id)
+     * @param tick_id
+     * @return String
+     * @throws SQLException
+     * Function for returning note content by given tick id
+     */
+    String get_note(int tick_id) throws SQLException{
+        String query = "SELECT note_id from TICK where tick_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            if ( rs.next() ){
+                int note_id = rs.getInt("note_id");
+                
+                query = "SELECT note_content from NOTE where note_id = ?";
+                
+                ppst = database.con.prepareStatement(query);
+                ppst.setInt(1,note_id);
+                
+                rs = ppst.executeQuery();
+                
+                if ( rs.next() ){
+                    return rs.getString("note_content");
+                }
+                return null;
+            }
+            return null;
+        
+        }catch(SQLException e){
+            database.log.add("Failed to load note data ("+e.toString()+")",HEADER+" E!!!");
+            return null;
+        }
+    }
     
     /**
      * Database_Tick.view_simpleviews()

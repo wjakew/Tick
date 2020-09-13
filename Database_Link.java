@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * @author jakub
  */
 public class Database_Link {
-    final String version = "v1.0.0";
+    final String version = "v1.0.1";
     final String HEADER = "DATABASE_LINK ("+version+")";
     
     /**
@@ -50,7 +50,7 @@ public class Database_Link {
             database.log.add("QUERY: "+ppst.toString(),HEADER);
             return true;
         }catch(SQLException e){
-            database.log.add("Cannot link user to address", HEADER);
+            database.log.add("Cannot link user to address ("+e.toString()+")", HEADER+" E!!!");
             return false;
         }
     }
@@ -73,7 +73,7 @@ public class Database_Link {
             database.log.add("QUERY: "+ppst.toString(),HEADER);
             return true;
         }catch(SQLException e){
-            database.log.add("Cannot link place to address", HEADER);
+            database.log.add("Cannot link place to address ( "+e.toString()+")", HEADER+" E!!!");
             return false;
         }
     }
@@ -96,7 +96,30 @@ public class Database_Link {
             database.log.add("QUERY: "+ppst.toString(),HEADER);
             return true;
         }catch(SQLException e){
-            database.log.add("Cannot link place to address", HEADER);
+            database.log.add("Cannot link place to address ("+e.toString()+")", HEADER+ " E!!!");
+            return false;
+        }
+    }
+    /**
+     * Database_Link.link_tick_note(Tick_Tick tick_obj,Tick_Note,note_obj)
+     * @param tick_obj
+     * @param note_obj
+     * @return boolean
+     * @throws SQLException
+     * Function for linking note to tick
+     */
+    boolean link_tick_note(Tick_Tick tick_obj, Tick_Note note_obj) throws SQLException{
+        database.log.add("Trying to link note to tick",HEADER);
+        String query = "UPDATE TICK set note_id = ? where tick_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1,note_obj.note_id);
+        ppst.setInt(2, tick_obj.tick_id);
+        try{
+            ppst.execute();
+            database.log.add("QUERY : "+ppst.toString(),HEADER);
+            return true;
+        }catch(SQLException e){
+            database.log.add("Failed to link note to tick ("+e.toString()+")",HEADER + " E!!!");
             return false;
         }
     }

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class Database {
     
-    final String version = "v1.0.3";
+    final String version = "v1.0.4";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -350,6 +350,55 @@ public class Database {
             log.add("Failed to get last_id ("+e.toString()+")",HEADER+"E!!!");
         }
         return index;
+    }
+    /**
+     * Database.get_element_name(String mode)
+     * @param mode
+     * @return ArrayList
+     * @throws SQLException
+     * modes:
+     * category - returns name of elements in CATEGORY table
+     * place - returns name of elements in PLACE table
+     * hashtag table - returns name of elements in HASHTAG_TABLE table
+     */
+    ArrayList<String> get_element_name(String mode) throws SQLException{
+        ArrayList<String> data_toRet = new ArrayList<>();
+        String query = "",element_name = "";
+        String addon = "Manage...";
+        switch (mode) {
+            case "category":
+                query = "SELECT * from CATEGORY;";
+                element_name = "category_name";
+                break;
+            case "place":
+                query = "SELECT * from PLACE;";
+                element_name = "place_name";
+                break;
+            case "hashtag table":
+                query = "SELECT * from HASHTAG_TABLE";
+                element_name = "hashtag_table_name";
+                break;
+            default:
+                break;
+        }
+        PreparedStatement ppst = con.prepareStatement(query);
+        //ppst.setInt(1,logged.owner_id);
+        try{
+            ResultSet rs  = ppst.executeQuery();
+            
+            while ( rs.next() ){
+                data_toRet.add(rs.getString(element_name));
+            }
+            
+            if ( data_toRet.size() == 0 ){
+                data_toRet.add("-");
+            }
+            data_toRet.add(addon);
+        }catch(SQLException e){
+            log.add("Failed to load element names...",HEADER + " E!!!");
+            return null;
+        }
+        return data_toRet;
     }
     
     /**
@@ -745,7 +794,152 @@ public class Database {
 
         return to_ret;
     }
-    //----------------------------tick brick function
+    //----------------------------tick brick functions
+    /**
+     * Database.prepare_tick_brick(ResultSet rs)
+     * @param rs
+     * @return ArrayList
+     * Function returns collection of Tick_Brick
+     */
+    ArrayList<Tick_Brick> prepare_tick_brick(ResultSet rs,String mode) throws SQLException{
+        // metadata for number of columns
+        ResultSetMetaData meta   = (ResultSetMetaData) rs.getMetaData();
+        
+        ArrayList<Tick_Brick> to_ret = new ArrayList<>();  // tick_brick to ret
+        
+        int index[] = {};                // array of int indexes
+        
+        if (mode.equals("address")){
+            /**
+             *  address_id INT AUTO_INCREMENT PRIMARY KEY,
+                address_city VARCHAR(30),
+                address_street VARCHAR (30),
+                address_house_number INT,
+                address_flat_number INT,
+                address_postal VARCHAR(15),
+                address_country VARCHAR(30)
+             */
+            index = new int[] {1,4,5};
+            
+        }
+        else if (mode.equals("category")){
+            /**
+             *  category_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                category_name VARCHAR(45),
+                category_note VARCHAR(100),
+             */
+            index = new int[] {1,2};
+            
+        }
+        else if (mode.equals("hashtag table")){
+            /**
+             *  hashtag_table_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                hashtag_table_name VARCHAR(45),
+                hashtag_table_note VARCHAR(100),
+                * 
+             */
+            index = new int[] {1,2};
+        }
+        else if (mode.equals("note")){
+            /**
+             *  note_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                note_content VARCHAR(100),
+                setting1 VARCHAR(40),
+                setting2 VARCHAR(40),
+                setting3 VARCHAR(40),
+             */
+            index = new int[] {1,2};
+        }
+        else if (mode.equals("place")){
+            /**
+             *  place_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                place_name VARCHAR(30),
+                address_id INT,
+             */
+            index = new int[] {1,2,4};
+            
+        }
+        else if (mode.equals("tag")){
+            /**
+             *  tag_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                hashtag_table_id INT,
+                tag_name VARCHAR(45),
+                tag_note VARCHAR(100),
+             */
+            index = new int[] {1,2,3};
+        }
+        else if (mode.equals("scene")){
+            /**
+             *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
+                hashtag_table_id INT,
+                place_id INT,
+                owner_id INT,
+                category_id INT,
+                scene_name VARCHAR(30),
+                scene_note VARCHAR(100),
+             */
+            index = new int[] {1,2,3,4,5};
+        }
+        else if (mode.equals("tick") || mode.equals("tick_done")){
+            /**
+             *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
+                owner_id INT,
+                place_id INT,
+                category_id INT,
+                note_id INT,
+                hashtag_table_id INT,
+                tick_done_id INT,
+                tick_done_start VARCHAR(60),
+                tick_date_end VARCHAR(60),
+                tick_name VARCHAR(60),
+                tick_priority INT,
+             */
+            index = new int[] {1,2,3,4,5,6,7,11};
+        }
+        else if (mode.equals("lists")){
+                /**
+                *  list_id INT AUTO_INCREMENT PRIMARY KEY,
+                   owner_id INT,
+                   tick_list_id VARCHAR(100),
+                   list_name VARCHAR(50),
+                   list_date VARCHAR(50),
+                */
+            index = new int[] {1,2};
+        }
+        // coping array to collection
+        List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
+        int colmax = meta.getColumnCount();
+        
+        if ( rs != null ){
+            // looping on all database records returned by ResultSet
+            while( rs.next() ){
+                // looping on one record
+                
+                for ( int i = 1 ; i <= colmax; i++){
+                    if ( int_index.contains(i)){
+                        to_ret.add(new Tick_Brick(rs.getInt(meta.getColumnName(i))));
+                    }
+                    else{
+                        to_ret.add(new Tick_Brick(rs.getString(meta.getColumnName(i))));
+                    }
+                }
+                // flagging end of the object
+                Tick_Brick brake = new Tick_Brick();
+                brake.STOP = true;
+                to_ret.add(brake);
+            } 
+            log.add("Tick_Brick Collection returns succesfully", HEADER); 
+        }
+        else{
+            log.add("Tick_Brick Collection failed", HEADER);
+        }
+        return to_ret;
+    }
     /**
      * Database.return_collection(Tick_User logged_user, String mode)
      * @param logged_user
@@ -769,7 +963,7 @@ public class Database {
             query = "SELECT * FROM ADDRESS where address_id = ?;";
         }
         else if (mode.equals("category")){
-            query = "SELECT * FROM CATEGORY where category_id = ?;";
+            query = "SELECT * FROM CATEGORY where category_id = ? ;";
         }
         else if (mode.equals("hashtag table")){
             query = "SELECT * FROM HASHTAG_TABLE where hashtag_table_id = ?;";

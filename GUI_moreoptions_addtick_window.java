@@ -7,6 +7,9 @@ package tick;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
 
 /**
  *
@@ -19,14 +22,19 @@ public class GUI_moreoptions_addtick_window extends javax.swing.JDialog {
      */
     Tick_Tick tick_to_extend;
     Database database;
+    String[] data_priority;
+    // data from the components
+    String choosen_category = "" ,choosen_place = "",choosen_priority,choosen_hashtag_table;
     public GUI_moreoptions_addtick_window(javax.swing.JDialog parent, boolean modal,Tick_Tick to_handle,Database database) throws SQLException {
         super(parent, modal);
+         data_priority= new String[] {"1","2","3","4","5","6","7","8","9","10"};
+        
         tick_to_extend = to_handle;
         this.database = database;
         initComponents();
         
         textarea_tickdata.setEditable(false);
-        update_textarea_actual_data();
+        reload_window();
         
         setLocationRelativeTo(null);
         setVisible(true);
@@ -46,7 +54,7 @@ public class GUI_moreoptions_addtick_window extends javax.swing.JDialog {
         textarea_notes = new javax.swing.JTextArea();
         combobox_category = new javax.swing.JComboBox<>();
         combobox_place = new javax.swing.JComboBox<>();
-        comobox_hashtagtable = new javax.swing.JComboBox<>();
+        combobox_hashtagtable = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
         button_done = new javax.swing.JButton();
         combobox_priority = new javax.swing.JComboBox<>();
@@ -62,16 +70,41 @@ public class GUI_moreoptions_addtick_window extends javax.swing.JDialog {
         jScrollPane1.setViewportView(textarea_notes);
 
         combobox_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        combobox_category.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                combobox_categoryActionPerformed(evt);
+            }
+        });
 
         combobox_place.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        combobox_place.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                combobox_placeActionPerformed(evt);
+            }
+        });
 
-        comobox_hashtagtable.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        combobox_hashtagtable.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        combobox_hashtagtable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                combobox_hashtagtableActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Your actual Tick data:");
 
         button_done.setText("Done");
+        button_done.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button_doneActionPerformed(evt);
+            }
+        });
 
         combobox_priority.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        combobox_priority.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                combobox_priorityActionPerformed(evt);
+            }
+        });
 
         textarea_tickdata.setColumns(20);
         textarea_tickdata.setRows(5);
@@ -90,19 +123,17 @@ public class GUI_moreoptions_addtick_window extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(combobox_category, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(26, 26, 26)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(combobox_place, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                                .addComponent(comobox_hashtagtable, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(combobox_place, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                        .addComponent(combobox_hashtagtable, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(combobox_priority, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(button_done)))
+                        .addComponent(button_done))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -116,7 +147,7 @@ public class GUI_moreoptions_addtick_window extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(combobox_category, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(combobox_place, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(comobox_hashtagtable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(combobox_hashtagtable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -131,7 +162,117 @@ public class GUI_moreoptions_addtick_window extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // action functions
+    /**
+     * Function for handling data from components ( category combobox )
+     * @param evt 
+     */
+    private void combobox_categoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combobox_categoryActionPerformed
+        choosen_category = combobox_category.getSelectedItem().toString();
+        if ( choosen_category.equals("Manage...")){
+            try {
+                new GUI_dataadd_universal_window(this,true,database,"category");
+                combobox_category.setModel(update_combobox("category"));
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_moreoptions_addtick_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_combobox_categoryActionPerformed
+
+    private void combobox_placeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combobox_placeActionPerformed
+        choosen_place = combobox_place.getSelectedItem().toString();
+        if ( choosen_place.equals("Manage...")){
+            try {
+                new GUI_dataadd_universal_window(this,true,database,"place");
+                combobox_place.setModel(update_combobox("place"));
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_moreoptions_addtick_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_combobox_placeActionPerformed
+
+    private void combobox_hashtagtableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combobox_hashtagtableActionPerformed
+        choosen_hashtag_table = combobox_hashtagtable.getSelectedItem().toString();
+        if ( choosen_hashtag_table.equals("Manage...")){
+            try {
+                new GUI_dataadd_universal_window(this,true,database,"hashtag table");
+                combobox_hashtagtable.setModel(update_combobox("hashtag table"));
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_moreoptions_addtick_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_combobox_hashtagtableActionPerformed
+
+    private void combobox_priorityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combobox_priorityActionPerformed
+        choosen_priority = combobox_priority.getSelectedItem().toString();
+        System.out.println(choosen_priority);
+    }//GEN-LAST:event_combobox_priorityActionPerformed
+
+    private void button_doneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_doneActionPerformed
+        // updating data
+        tick_to_extend.tick_name = textfield_tickname.getText();
+        // updating note
+        Tick_Note tn = new Tick_Note();
+        tn.note_content = textarea_notes.getText();
+        tn.owner_id = database.logged.owner_id;
+        tn.wall_updater();
+        try {
+            database.add_note(tn);
+            tick_to_extend.note_id = database.get_last_id("NOTE");
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_moreoptions_addtick_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        // updating categories
+        if ( combobox_category.getSelectedItem().toString().equals("Manage...") ){
+            tick_to_extend.category_id = 1;
+        }
+        else{
+            tick_to_extend.category_id = combobox_category.getSelectedIndex()+1;
+        }
+        // updating place
+        if ( combobox_place.getSelectedItem().toString().equals("Manage...")){
+            tick_to_extend.place_id = 1;
+        }
+        else{
+            tick_to_extend.place_id = combobox_place.getSelectedIndex()+1;
+        }
+        // updating hashtagtable
+        if ( combobox_hashtagtable.getSelectedItem().toString().equals("Manage...")){
+            tick_to_extend.hashtag_table_id = 1;
+        }
+        else{
+            tick_to_extend.hashtag_table_id = combobox_hashtagtable.getSelectedIndex()+1;
+        }
+        // updating priority
+        tick_to_extend.tick_priority = Integer.parseInt(combobox_priority.getSelectedItem().toString());
+        
+        // wrapping tick
+        tick_to_extend.wall_updater();
+        try {
+            update_textarea_actual_data();
+            dispose();
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_moreoptions_addtick_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_button_doneActionPerformed
+    /**
+     * Function for updating model of jComboBox object
+     * @param mode
+     * @return DefaultComboBoxModel
+     * modes:
+     * category - returns name of elements in CATEGORY table
+     * places - returns name of elements in PLACE table
+     * hashtag - returns name of elements in HASHTAG_TABLE table
+     */
+    DefaultComboBoxModel update_combobox(String mode) throws SQLException{
+        ArrayList<String> data_tofill = database.get_element_name(mode);
+        return new DefaultComboBoxModel(data_tofill.toArray());
+    }
     
+    /**
+     * Function for updating data on textarea used to show tick data
+     * @throws SQLException 
+     */
     void update_textarea_actual_data() throws SQLException{
         String to_fill = "";
         ArrayList<String> to_show = tick_to_extend.get_detailed_data(database);
@@ -142,14 +283,26 @@ public class GUI_moreoptions_addtick_window extends javax.swing.JDialog {
         
         textarea_tickdata.setText(to_fill);
     }
+    
+    /**
+     * Function for reloading all window content
+     */
+    void reload_window() throws SQLException{
+        textfield_tickname.setText(tick_to_extend.tick_name);
+        combobox_category.setModel(update_combobox("category"));
+        combobox_place.setModel(update_combobox("place"));
+        combobox_hashtagtable.setModel(update_combobox("hashtag table"));
+        combobox_priority.setModel(new DefaultComboBoxModel(data_priority));
+        update_textarea_actual_data();
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton button_done;
     private javax.swing.JComboBox<String> combobox_category;
+    private javax.swing.JComboBox<String> combobox_hashtagtable;
     private javax.swing.JComboBox<String> combobox_place;
     private javax.swing.JComboBox<String> combobox_priority;
-    private javax.swing.JComboBox<String> comobox_hashtagtable;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

@@ -6,6 +6,8 @@ all rights reserved
 package tick;
 
 import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *Object for storing Place info
@@ -35,6 +37,17 @@ public class Tick_Place extends Tick_Element{
         owner_id = -1;
         place_name = "";
         address_id = 1;
+        
+        super.put_elements(wall_updater());
+    }
+    // constructor with data from database
+    // optional
+    Tick_Place(ResultSet rs) throws SQLException{
+        super("Tick_Place");
+        place_id = rs.getInt("place_id");
+        owner_id = rs.getInt("owner_id");
+        place_name = rs.getString("place_name");
+        address_id = rs.getInt("address_id");
         
         super.put_elements(wall_updater());
     }
@@ -85,6 +98,15 @@ public class Tick_Place extends Tick_Element{
         to_ret.add("id: "+Integer.toString(place_id));
         to_ret.add("Place name: "+place_name);
         return to_ret;
+    }
+    
+    /**
+     * Tick_Place.simple_view()
+     * @return String
+     * Function for returing simple data about object
+     */
+    String simple_view(){
+        return Integer.toString(place_id)+ ": "+place_name;
     }
 
     

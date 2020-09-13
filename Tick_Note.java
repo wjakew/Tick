@@ -67,7 +67,7 @@ public class Tick_Note extends Tick_Element{
         to_ret.add(new Tick_Brick(setting1));
         to_ret.add(new Tick_Brick(setting2));
         to_ret.add(new Tick_Brick(setting3));
-        
+        super.put_elements(to_ret);
         return to_ret;
     }
     

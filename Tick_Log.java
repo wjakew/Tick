@@ -31,7 +31,9 @@ public class Tick_Log {
     Tick_Log(){
         log_lines = new ArrayList<>();
         actual_date = new Date();
-        LOG_SRC = LOG_SRC + "log from "+actual_date.toString()+".txt";
+        String actual_date_text = actual_date.toString().replaceAll(":","");
+        LOG_SRC = LOG_SRC + actual_date_text +".txt";
+        LOG_SRC = LOG_SRC.replaceAll("\\s", "");
         init();
     }
     

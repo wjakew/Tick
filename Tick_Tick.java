@@ -145,6 +145,7 @@ public class Tick_Tick extends Tick_Element{
         if ( tick_done_id != 1 ){
             done_label = "DONE";
         }
+        super.put_elements(to_ret);
         return to_ret;
     }
     

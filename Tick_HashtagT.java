@@ -6,6 +6,9 @@ all rights reserved
 package tick;
 
 import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 
 /**
  *Object for storing tables of tags
@@ -35,6 +38,16 @@ public class Tick_HashtagT extends Tick_Element{
         owner_id = -1;
         hashtag_table_name = "";
         hashtag_table_note = "";
+        super.put_elements(wall_updater());
+    }
+    // constructor with data from database
+    // optional
+    Tick_HashtagT(ResultSet rs) throws SQLException{
+        super("Tick_HashtagT");
+        hashtag_table_id = rs.getInt("hashtag_table_id");
+        owner_id = rs.getInt("owner_id");
+        hashtag_table_name = rs.getString("hashtag_table_name");
+        hashtag_table_note = rs.getString("hashtag_table_note");
         super.put_elements(wall_updater());
     }
     
@@ -89,6 +102,15 @@ public class Tick_HashtagT extends Tick_Element{
         to_ret.add("Hashtag Table Name: "+hashtag_table_name);
         to_ret.add("Hashtag Table Note:\n"+hashtag_table_note);
         return to_ret;
+    }
+    
+    /**
+     * Tick_HashtagT.simple_view()
+     * @return String
+     * Function for returning simple view of the object
+     */
+    String simple_view(){
+        return Integer.toString(hashtag_table_id)+": "+hashtag_table_name;
     }
     
 }

@@ -6,6 +6,8 @@ all rights reserved
 package tick;
 
 import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *Object for storing category data.
@@ -34,6 +36,17 @@ public class Tick_Category extends Tick_Element{
         owner_id = -1;
         category_name = "";
         category_note = "";
+        super.put_elements(wall_updater());
+    }
+    
+    // costructor with using data from database
+    // optional
+    Tick_Category(ResultSet rs) throws SQLException{
+        super("Tick_Cateory");
+        category_id = rs.getInt("category_id");
+        owner_id = rs.getInt("owner_id");
+        category_name = rs.getString("category_name");
+        category_note = rs.getString("category_note");
         super.put_elements(wall_updater());
     }
     
@@ -88,8 +101,15 @@ public class Tick_Category extends Tick_Element{
         to_ret.add("id: "+Integer.toString(category_id));
         to_ret.add("Category name: "+category_name);
         to_ret.add("Note:\n"+category_note);
-        
         return to_ret;
+    }
+    /**
+     * Tick_Category.simple_view()
+     * @return String
+     * Function for returning simple view information about objects
+     */
+    String simple_view(){
+        return Integer.toString(category_id)+": "+category_name;
     }
     
 }
