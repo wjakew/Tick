@@ -23,11 +23,17 @@ public class GUI_addtick_window extends javax.swing.JDialog {
     Tick_Tick to_add;
     boolean history = false;
     
-    public GUI_addtick_window(java.awt.Frame parent, boolean modal,Database database) {
+    public GUI_addtick_window(java.awt.Frame parent, boolean modal,Database database,Tick_Tick to_edit) {
         super(parent, modal);
         this.database = database;
-        to_add = new Tick_Tick();
+        if ( to_edit != null){
+            to_add = to_edit;
+        }
+        else{
+            to_add = new Tick_Tick();
+        }
         initComponents();
+        load_components();
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -48,11 +54,6 @@ public class GUI_addtick_window extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         textfield_tickdata.setText("Name your task here");
-        textfield_tickdata.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                textfield_tickdataFocusGained(evt);
-            }
-        });
 
         button_add.setText("Add");
         button_add.addActionListener(new java.awt.event.ActionListener() {
@@ -111,6 +112,11 @@ public class GUI_addtick_window extends javax.swing.JDialog {
                     textfield_tickdata.setEditable(false);
                     button_add.setEnabled(false);
                     button_moreoptions.setEnabled(false);
+                    if ( to_add.tick_id != -1 ){    // that means that we have tick to edit
+                        // deleting old tick
+                        Database_Garbage_Collector dgc = new Database_Garbage_Collector(database);
+                        dgc.delete_tick(to_add.tick_id);
+                    }
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(GUI_addtick_window.class.getName()).log(Level.SEVERE, null, ex);
@@ -121,22 +127,14 @@ public class GUI_addtick_window extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_button_addActionPerformed
 
-    private void textfield_tickdataFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textfield_tickdataFocusGained
-        if (!history){
-            textfield_tickdata.setText("");
-        }
-        
-    }//GEN-LAST:event_textfield_tickdataFocusGained
-
     private void button_moreoptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_moreoptionsActionPerformed
         if (!textfield_tickdata.getText().equals("") || !textfield_tickdata.getText().equals("Name your task here") ){
-            Database_Tick dt = new Database_Tick(database);
             to_add.owner_id = database.logged.owner_id;
             to_add.tick_name = textfield_tickdata.getText();
             to_add.tick_done_start = new Date().toString();
             to_add.wall_updater();
             try {
-                new GUI_moreoptions_addtick_window(this,true,to_add,database);
+                new GUI_addtick_moreoptions_window(this,true,to_add,database);
                 history = true;
                 textfield_tickdata.setText(to_add.tick_name);
                 button_moreoptions.setEnabled(false);
@@ -149,7 +147,13 @@ public class GUI_addtick_window extends javax.swing.JDialog {
         }
            
     }//GEN-LAST:event_button_moreoptionsActionPerformed
-
+    
+    /**
+     * Function for loading components
+     */
+    void load_components(){
+        textfield_tickdata.setText(to_add.tick_name);
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton button_add;
     private javax.swing.JButton button_moreoptions;

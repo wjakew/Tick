@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  */
 public class GUI_main_window extends javax.swing.JFrame {
     
-    final String GUI_version = "v0.0.2";
+    final String GUI_version = "v0.0.5";
     public Database database;
     GUI_Window_Manager window_manager;
     public int actual_panel_index;     // index of a tabbed panel
@@ -67,8 +67,14 @@ public class GUI_main_window extends javax.swing.JFrame {
         list_panel = new javax.swing.JPanel();
         scenes_panel = new javax.swing.JPanel();
         Tick_LABEL_tick_version = new javax.swing.JLabel();
+        TICK_button_reload = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         tabbed_panel.setToolTipText("Tick GUI");
         tabbed_panel.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -108,10 +114,25 @@ public class GUI_main_window extends javax.swing.JFrame {
         jScrollPane2.setViewportView(TICK_textarea_tickdetails);
 
         TICK_button_edittick.setText("Edit Tick");
+        TICK_button_edittick.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TICK_button_edittickActionPerformed(evt);
+            }
+        });
 
         TICK_button_sharetick.setText("Share Tick");
+        TICK_button_sharetick.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TICK_button_sharetickActionPerformed(evt);
+            }
+        });
 
         TICK_button_toclipboard.setText("To Clipboard");
+        TICK_button_toclipboard.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TICK_button_toclipboardActionPerformed(evt);
+            }
+        });
 
         TICK_button_markdone.setText("Mark done");
         TICK_button_markdone.addActionListener(new java.awt.event.ActionListener() {
@@ -146,12 +167,11 @@ public class GUI_main_window extends javax.swing.JFrame {
                 .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
-                                    .addComponent(TICK_button_edittick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(TICK_button_sharetick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(TICK_button_addnewtick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+                                .addComponent(TICK_button_edittick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(TICK_button_sharetick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(TICK_button_addnewtick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(TICK_button_toclipboard, javax.swing.GroupLayout.Alignment.TRAILING))
                             .addComponent(TICK_button_unarchive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addComponent(TICK_button_link, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -185,7 +205,7 @@ public class GUI_main_window extends javax.swing.JFrame {
                         .addComponent(TICK_button_link)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(TICK_button_delete)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         tabbed_panel.addTab("Tick", tick_panel);
@@ -216,7 +236,14 @@ public class GUI_main_window extends javax.swing.JFrame {
 
         tabbed_panel.addTab("Scenes", scenes_panel);
 
-        Tick_LABEL_tick_version.setText("Tick version 1.0.0B9");
+        Tick_LABEL_tick_version.setText("Tick version 1.0.0B11");
+
+        TICK_button_reload.setText("R");
+        TICK_button_reload.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TICK_button_reloadActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -227,7 +254,8 @@ public class GUI_main_window extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tabbed_panel)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(TICK_button_reload)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(Tick_LABEL_tick_version)))
                 .addContainerGap())
         );
@@ -237,7 +265,9 @@ public class GUI_main_window extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(tabbed_panel, javax.swing.GroupLayout.PREFERRED_SIZE, 610, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Tick_LABEL_tick_version)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(TICK_button_reload, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(Tick_LABEL_tick_version, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -274,6 +304,7 @@ public class GUI_main_window extends javax.swing.JFrame {
     }//GEN-LAST:event_tabbed_panelStateChanged
 
     private void TICK_list_ticklistMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TICK_list_ticklistMouseClicked
+        TICK_button_toclipboard.setText("To clipboard");
         //actual_choosen_element_index = TICK_list_ticklist.getSelectedIndex();
         actual_choosen_element_string = TICK_list_ticklist.getSelectedValue();
         String[] parts = actual_choosen_element_string.split(":");
@@ -327,6 +358,47 @@ public class GUI_main_window extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_TICK_button_deleteActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        window_manager.on_close();
+    }//GEN-LAST:event_formWindowClosing
+
+    private void TICK_button_toclipboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_toclipboardActionPerformed
+        try {
+            if ( window_manager.button_action_toclipboard(actual_choosen_element_index)){
+                TICK_button_toclipboard.setText("Copied!");
+            }
+            else{
+                TICK_button_toclipboard.setText("Failed to copy!");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_TICK_button_toclipboardActionPerformed
+
+    private void TICK_button_edittickActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_edittickActionPerformed
+        try {
+            window_manager.buttonaction_edittick(actual_choosen_element_index);
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_TICK_button_edittickActionPerformed
+
+    private void TICK_button_reloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_reloadActionPerformed
+        try {
+            window_manager.reload_default_scene_tick();
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_TICK_button_reloadActionPerformed
+
+    private void TICK_button_sharetickActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_sharetickActionPerformed
+        try {
+            new GUI_share_window(this,true,database,actual_choosen_element_index);
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_TICK_button_sharetickActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -336,6 +408,7 @@ public class GUI_main_window extends javax.swing.JFrame {
     public javax.swing.JButton TICK_button_edittick;
     public javax.swing.JButton TICK_button_link;
     public javax.swing.JButton TICK_button_markdone;
+    private javax.swing.JButton TICK_button_reload;
     public javax.swing.JButton TICK_button_sharetick;
     private javax.swing.JButton TICK_button_toclipboard;
     public javax.swing.JButton TICK_button_unarchive;

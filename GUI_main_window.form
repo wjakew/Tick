@@ -8,6 +8,9 @@
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
     <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
   </SyntheticProperties>
+  <Events>
+    <EventHandler event="windowClosing" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowClosing"/>
+  </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -28,7 +31,8 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="tabbed_panel" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <Component id="TICK_button_reload" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="Tick_LABEL_tick_version" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -42,7 +46,10 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="tabbed_panel" min="-2" pref="610" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="Tick_LABEL_tick_version" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="TICK_button_reload" max="32767" attributes="0"/>
+                  <Component id="Tick_LABEL_tick_version" max="32767" attributes="0"/>
+              </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -82,13 +89,11 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="103" alignment="1" groupAlignment="0" max="-2" attributes="0">
-                                          <Component id="jScrollPane2" pref="379" max="32767" attributes="0"/>
-                                          <Component id="TICK_button_edittick" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="TICK_button_sharetick" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="TICK_button_addnewtick" alignment="0" max="32767" attributes="0"/>
-                                      </Group>
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="jScrollPane2" pref="379" max="32767" attributes="0"/>
+                                      <Component id="TICK_button_edittick" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="TICK_button_sharetick" alignment="0" max="32767" attributes="0"/>
+                                      <Component id="TICK_button_addnewtick" alignment="0" max="32767" attributes="0"/>
                                       <Component id="TICK_button_toclipboard" alignment="1" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="TICK_button_unarchive" alignment="1" min="-2" pref="379" max="-2" attributes="0"/>
@@ -132,7 +137,7 @@
                               <Component id="TICK_button_delete" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="32" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -211,6 +216,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Edit Tick"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="TICK_button_edittickActionPerformed"/>
+              </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
               </AuxValues>
@@ -219,6 +227,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Share Tick"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="TICK_button_sharetickActionPerformed"/>
+              </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
               </AuxValues>
@@ -227,6 +238,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="To Clipboard"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="TICK_button_toclipboardActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="TICK_button_markdone">
               <Properties>
@@ -319,8 +333,16 @@
     </Container>
     <Component class="javax.swing.JLabel" name="Tick_LABEL_tick_version">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Tick version 1.0.0B9"/>
+        <Property name="text" type="java.lang.String" value="Tick version 1.0.0B11"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="TICK_button_reload">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="R"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="TICK_button_reloadActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

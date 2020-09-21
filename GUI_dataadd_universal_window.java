@@ -6,6 +6,8 @@ all rights reserved
 package tick;
 
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -15,25 +17,48 @@ public class GUI_dataadd_universal_window extends javax.swing.JDialog {
 
     /**
      * Creates new form GUI_dataadd_universal_window
+     * modes:
+     * category
+     * place
+     * hashtag table
      */
     Database database;
     Database_ComponentFiller dcf;
     String mode;
-    String data_clicked;
-    
+    String selected_data;
+    String table_name, table_object_name;
+    int obj_index; 
     public GUI_dataadd_universal_window(javax.swing.JDialog parent, boolean modal,Database database,String mode) throws SQLException {
         super(parent, modal);
         
         this.database = database;
         this.mode = mode;
         dcf = new Database_ComponentFiller(this.database);
-        
+        selected_data = "";
+        obj_index = -1;
         initComponents();
         
         load_components();
-        
+        label_deleted.setVisible(false);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+    /**
+     * Function for setting response on components
+     * @param mode 
+     * modes:
+     * 1 - done 
+     * 0 - not done
+     */
+    void set_components_(int mode) throws SQLException{
+        if ( mode == 1){
+            label_deleted.setVisible(true);
+            load_components();
+        }
+        else if ( mode == 0){
+            label_deleted.setText("Failed");
+            load_components();
+        }
     }
     
     /**
@@ -44,6 +69,23 @@ public class GUI_dataadd_universal_window extends javax.swing.JDialog {
         String label_text = "";
         jlist_data.setModel(dcf.translator(dcf.datagather_simpleview(mode)));
         jLabel1.setText(label_text);
+        
+        if ( mode.equals("category") ){
+            table_name = "CATEGORY";
+            table_object_name = "category_id";
+        }
+        else if ( mode.equals("place")){
+            table_name = "PLACE";
+            table_object_name = "place_id";
+        }
+        else if ( mode.equals("hashtag table")){
+            table_name = "HASHTAG_TABLE";
+            table_object_name = "hashtag_table_id";
+        }
+        else{
+            table_name = "";
+            table_object_name = "";
+        }
     }
 
     /**
@@ -61,6 +103,7 @@ public class GUI_dataadd_universal_window extends javax.swing.JDialog {
         button_edit = new javax.swing.JButton();
         button_delete = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        label_deleted = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -84,10 +127,22 @@ public class GUI_dataadd_universal_window extends javax.swing.JDialog {
         });
 
         button_edit.setText("Edit");
+        button_edit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button_editActionPerformed(evt);
+            }
+        });
 
         button_delete.setText("Delete");
+        button_delete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button_deleteActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("jLabel1");
+
+        label_deleted.setText("Deleted");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -101,10 +156,13 @@ public class GUI_dataadd_universal_window extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(button_edit, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 83, Short.MAX_VALUE)
-                        .addComponent(button_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(button_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(label_deleted)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -118,8 +176,10 @@ public class GUI_dataadd_universal_window extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(button_edit)
                     .addComponent(button_delete))
-                .addGap(21, 21, 21)
-                .addComponent(button_add, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(label_deleted)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addComponent(button_add, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -127,14 +187,58 @@ public class GUI_dataadd_universal_window extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jlist_dataMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlist_dataMouseClicked
-        data_clicked = jlist_data.getSelectedValue();
-        int index = Integer.parseInt(data_clicked.split(":")[0]);
-        System.out.println(index);
+        selected_data = jlist_data.getSelectedValue();
+        obj_index = Integer.parseInt(selected_data.split(":")[0]);
+        label_deleted.setVisible(false);
     }//GEN-LAST:event_jlist_dataMouseClicked
 
     private void button_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_addActionPerformed
-        // TODO add your handling code here:
+        try {
+            new GUI_datainput_universal_window(this,true,database,mode,1);
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_dataadd_universal_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            load_components();
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_dataadd_universal_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_button_addActionPerformed
+
+    private void button_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_deleteActionPerformed
+        if ( !selected_data.equals("") ){
+            Database_Garbage_Collector dgc = new Database_Garbage_Collector(database);
+            if ( obj_index!= -1){
+                try {
+                    if (dgc.sec_check(obj_index, table_object_name, table_name) == 1){
+                            dgc.delete(obj_index, table_object_name, table_name);
+                            set_components_(1);
+                        }
+                    else{
+                            set_components_(0);
+                    }
+                    
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI_dataadd_universal_window.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else{
+                try {
+                    set_components_(0);
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI_dataadd_universal_window.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_button_deleteActionPerformed
+
+    private void button_editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_editActionPerformed
+        try {
+            new GUI_datainput_universal_window(this,true,database,mode,obj_index);
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_dataadd_universal_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_button_editActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -144,5 +248,6 @@ public class GUI_dataadd_universal_window extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList<String> jlist_data;
+    private javax.swing.JLabel label_deleted;
     // End of variables declaration//GEN-END:variables
 }

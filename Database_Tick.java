@@ -16,7 +16,7 @@ import java.util.Date;
  * @author jakub
  */
 public class Database_Tick {
-    final String version = "v2.0.0";
+    final String version = "v2.0.1";
     final String HEADER = "DATABASE_TICK";
     Database database;
     
@@ -286,28 +286,25 @@ public class Database_Tick {
      * Function for returning note content by given tick id
      */
     String get_note(int tick_id) throws SQLException{
+        if(tick_id == -1){  // for GUI and clear and new Tick object
+            return "";
+        }
         String query = "SELECT note_id from TICK where tick_id = ?;";
         PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setInt(1,tick_id);
         
         try{
             ResultSet rs = ppst.executeQuery();
             
             if ( rs.next() ){
-                int note_id = rs.getInt("note_id");
-                
-                query = "SELECT note_content from NOTE where note_id = ?";
-                
-                ppst = database.con.prepareStatement(query);
-                ppst.setInt(1,note_id);
-                
-                rs = ppst.executeQuery();
-                
-                if ( rs.next() ){
-                    return rs.getString("note_content");
-                }
+                Tick_Note tn = new Tick_Note(database.return_TB_collection(database.logged, "note", rs.getInt("note_id"))); 
+                return tn.note_content;
+            }
+            else{
                 return null;
             }
-            return null;
+            
         
         }catch(SQLException e){
             database.log.add("Failed to load note data ("+e.toString()+")",HEADER+" E!!!");

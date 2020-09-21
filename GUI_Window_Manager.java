@@ -5,6 +5,9 @@ all rights reserved
  */
 package tick;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
@@ -15,7 +18,7 @@ import javax.swing.JTextArea;
  * @author jakubwawak
  */
 public class GUI_Window_Manager {
-    final String version = "v.0.0.2";
+    final String version = "v.0.0.3";
     
     GUI_main_window window;
     DefaultListModel model_obj; // jList model object
@@ -53,7 +56,17 @@ public class GUI_Window_Manager {
      * 
      */
     void buttonaction_addtick() throws SQLException{
-        new GUI_addtick_window(window,true,window.database);
+        new GUI_addtick_window(window,true,window.database,null);
+        reload_default_scene_tick();
+    }
+    /**
+     * Implements edit of Tick element
+     * @param tick_id
+     * @throws SQLException 
+     */
+    void buttonaction_edittick(int tick_id) throws SQLException{
+        Tick_Tick tt = new Tick_Tick(window.database.return_TB_collection(window.database.logged, "tick", tick_id));
+        new GUI_addtick_window(window,true,window.database,tt);
         reload_default_scene_tick();
     }
     /**
@@ -65,7 +78,7 @@ public class GUI_Window_Manager {
         reload_default_scene_tick();
     }
     /**
-     * Implement delete of Tick element
+     * Implements delete of Tick element
      * @throws SQLException 
      */
     void button_action_delete() throws SQLException{
@@ -77,6 +90,28 @@ public class GUI_Window_Manager {
             reload_default_scene_tick();
         }
     }
+    /**
+     * Implements coping to clipboard Tick data
+     * @param tick_id
+     * @return
+     * @throws SQLException 
+     */
+    boolean button_action_toclipboard(int tick_id) throws SQLException{
+        Database_Tick dt = new Database_Tick(window.database);
+        String to_copy = "";
+        ArrayList<String> data_to_copy = dt.view_tick(tick_id);
+        
+        for(String line: data_to_copy){
+            to_copy = to_copy + line + "\n";
+        }
+        
+        StringSelection data = new StringSelection(to_copy);
+        Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+        cb.setContents(data, data);
+        
+        return !data_to_copy.isEmpty();   
+    }
+
     //--------------------------------------------------------------------
 
     /**
@@ -133,6 +168,14 @@ public class GUI_Window_Manager {
         }
         
         to_fill.setText(data);
+    }
+    
+    /**
+     * Behaviour on the end of the operation
+     */
+    void on_close(){
+        System.out.print("\nWindow closed\n>");
+        log("GUI closed");
     }
     /**
      * Function for loading choosen tick from database

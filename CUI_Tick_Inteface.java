@@ -21,7 +21,7 @@ import javax.mail.MessagingException;
  * @author jakub
  */
 public class CUI_Tick_Inteface {
-    final String version = "v1.0.9";
+    final String version = "v1.1.0";
     final String HEADER  = "CUI";
     boolean logged = false;
     Tick_User logged_user = null;
@@ -190,6 +190,11 @@ public class CUI_Tick_Inteface {
                 CUI_FUN_clip(words);
                 break;
             }
+            // clean
+            else if (word.equals("clean")){
+                CUI_FUN_clean(words);
+                break;
+            }
             else if (word.equals("gui")){
                 ui.interface_print("Graphical user interface is starting...");
                 new GUI_main_window(database);
@@ -340,6 +345,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    - listview ( shows ticks categorized by lists )");
             ui.interface_print("    - add ( add simple tick reminder )");
             ui.interface_print("    - expired ( shows expired tick)");
+            ui.interface_print("    - clean ( deletes archived ticks ) ");
             ui.interface_print("tick option /tick_id/");
             ui.interface_print("    - link |  /place/ | /address/ | /hashtag_table/ | /category/ | /note/ ");
             ui.interface_print("          ( links tick to the choosen object ) ");
@@ -361,7 +367,13 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    ( without arguments starts graphical interface )");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("again");
-            ui.interface_print("    ( loads latest input to the user console ) ");
+            ui.interface_print("    ( without arguments loads latest input to the user console ) ");
+            ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("clip");
+            ui.interface_print("    ( without arguments shows last input )");
+            ui.interface_print("    -again ( executes last user input again )");
+            ui.interface_print("    -copy  ( copies to clipboard last user input ) ");
+            ui.interface_print("                                        /eq. clip again/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("share");
             ui.interface_print("    ( without arguments shows active shares to load )");
@@ -380,6 +392,9 @@ public class CUI_Tick_Inteface {
             ui.interface_print("        ( delete object by given id ) ");
             ui.interface_print("");
             ui.interface_print("                                         /eg. delete place/");
+            ui.interface_print("-----------------------------------------------------------");
+            ui.interface_print("clean ");
+            ui.interface_print("        ( deletes not used data like not linked notes or archived ticks )");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("show ");
             ui.interface_print("    - place | address | hashtable | tag | category | note ");
@@ -484,7 +499,7 @@ public class CUI_Tick_Inteface {
         //help gui
         else if ( addons.size() == 2 && addons.contains("gui")){
             ui.interface_print("    ( without arguments starts graphical interface )");
-            ui.interface_print(" WARNING early alpha - not all features ready and stable ");
+            ui.interface_print(" WARNING early alpha - not all features are ready and stable ");
         }
         // help delete
         else if ( addons.size() == 2 && addons.contains("delete")){
@@ -508,8 +523,37 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    ( manages main functionalities of the Tick program ) ");
             ui.interface_print("    More info in the options ");
         }
+        // help clean
+        else if ( addons.size() == 2 && addons.contains("clean")){
+            ui.interface_print("Help for clean ");
+            ui.interface_print("        ( deletes not used data like not linked notes or archived ticks )");
+        }
+        // help clip
+        else if ( addons.size() == 2 && addons.contains("clean")){
+            ui.interface_print("Help for clip ");
+            ui.interface_print("    ( without arguments shows last input )");
+            ui.interface_print("    -again ( executes last user input again )");
+            ui.interface_print("    -copy  ( copies to clipboard last user input ) ");
+            ui.interface_print("                                        /eq. clip again/");
+        }         
         else{
             ui.interface_print("Wrong option");
+        }
+    }
+    /**
+     * CUI_Tick_Interface.CUI_FUN_clean(List<String> addons)
+     * @param addons 
+     * Function implementing cleaning of the database
+     */
+    void CUI_FUN_clean(List<String> addons) throws SQLException{
+        ui.interface_print("Are you sure to delete not used data? (y/n)");
+        ui.interface_get();
+        if ( ui.last_string.equals("y")){
+            Database_Garbage_Collector dgc = new Database_Garbage_Collector(database);
+            dgc.collect_garbage(1);
+        }
+        else{
+            ui.interface_print("Cancelled");
         }
     }
     /**
@@ -1035,6 +1079,16 @@ public class CUI_Tick_Inteface {
             }
             else{
                 ui.interface_print("No new expired ticks");
+            }
+        }
+        // tick clean
+        else if ( addons.size() == 2 && addons.contains("clean")){
+            Database_Garbage_Collector dgc = new Database_Garbage_Collector(database);
+            if ( approval_window("archived ticks")){
+                dgc.collect_garbage(2);
+            }
+            else{
+                ui.interface_print("Cancelled");
             }
         }
         // tick /tick_id/ unarch
@@ -1658,7 +1712,14 @@ public class CUI_Tick_Inteface {
             }
         }
     }
-    
+    /**
+     * CUI_Tick_Interface.CUI_FUN_clip(List<String> addons)
+     * @param addons
+     * @throws SQLException
+     * @throws MessagingException
+     * @throws IOException 
+     * Implements clip functionality
+     */
     void CUI_FUN_clip(List<String> addons) throws SQLException, MessagingException, IOException{
         // clip
         if ( addons.size() == 1 && addons.contains("clip")){

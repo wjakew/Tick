@@ -15,8 +15,10 @@ import java.sql.SQLException;
  */
 public class Database_Garbage_Collector {
     
-    final String version = "v0.0.4";
+    final String version = "v1.0.0";
+    final String HEADER = "DATABASE GARBAGE COLLECTOR";
     Database database;
+    
     
     // main constructor
     Database_Garbage_Collector(Database database){
@@ -49,11 +51,114 @@ public class Database_Garbage_Collector {
             }
             return 0;
         }catch(SQLException e ){
-            database.log.add("Failed to check given id. ("+e.toString()+")","DATABASE GARBAGE COLLECTOR E!!!");
+            database.log.add("Failed to check given id. ("+e.toString()+")",HEADER+" E!!!");
             return -1;
         }
     }
-    
+    //--------------------------functions for garbage collection
+    /**
+     * Function for clearing notes
+     * @throws SQLException
+     * @return Integer
+     * Returns number of deleted items
+     */
+    int garbage_notes() throws SQLException{
+        int iterator = 0;
+        database.log.add("Started garbage_notes..",HEADER);
+        int note_index;
+        boolean has_it;
+        String query = "SELECT * FROM NOTE where owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        ppst.setInt(1,database.logged.owner_id);
+        try{
+            ResultSet rs = ppst.executeQuery();
+            while(rs.next()){
+                has_it = false;
+                note_index = rs.getInt("note_id");
+                // loading tick data from notes
+                query = "SELECT note_id FROM TICK where owner_id = ?";
+                ppst = database.con.prepareStatement(query);
+                ppst.setInt(1,database.logged.owner_id);
+                
+                ResultSet rs2 = ppst.executeQuery();
+                // looping on data from TICK table
+                while(rs2.next()){
+                    if ( note_index == rs2.getInt("note_id")){
+                        has_it = true;
+                        break;
+                    }
+                }
+                if ( !has_it ){
+                    delete_note(note_index);
+                    iterator++;
+                    database.log.add("Found note, note_id: "+Integer.toString(note_index)+" DELETED",HEADER);
+                }
+            }
+            
+        }catch(SQLException e){
+            database.log.add("Failed to garbage notes ( "+e.toString()+")",HEADER+" E!!!");
+        }
+        return iterator;
+    }
+    /**
+     * Function for clearing archived ticks
+     * @return Integer
+     * Returns number of deleted elements
+     */
+    int garbage_archived_ticks() throws SQLException{
+        int iterator = 0;
+        String query = "SELECT tick_id from TICK where owner_id = ? and tick_done_id != 1;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setInt(1,database.logged.owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            // looping on archived ticks
+            while ( rs.next() ){
+                if ( delete_tick(rs.getInt("tick_id")) ) {
+                    iterator++;
+                    database.log.add("Found archived tick: "+Integer.toString(rs.getInt("tick_id")),HEADER);
+                }
+            } 
+        }catch(SQLException e){
+            database.log.add("Failed to delete archived ticks ( "+e.toString()+" )",HEADER+" E!!!");
+        }
+        return iterator;
+    }
+    /**
+     * Function for collecting user garbage (like not used notes etc)
+     * @parm mode
+     * modes:
+     * 0 - only notes
+     * 1 - all elements
+     * 2 - archived ticks
+     */
+    void collect_garbage(int mode) throws SQLException{
+        System.out.println("Collecting garbage inicialized..");
+        if ( mode == 1){
+            System.out.println("Searching for: notes, archived ticks");
+            int notes_deleted = garbage_notes();
+            int ticks_deleted = garbage_archived_ticks();
+            System.out.println("Status: ");
+            System.out.println("Number of notes deleted: "+Integer.toString(notes_deleted));
+            System.out.println("Number of archived ticks deleted: "+Integer.toString(ticks_deleted));
+        }
+        else if ( mode == 0){
+            System.out.println("Searching for: notes");
+            int notes_deleted = garbage_notes();
+            System.out.println("Status: ");
+            System.out.println("Number of notes deleted: "+Integer.toString(notes_deleted));
+        }
+        else if ( mode == 2 ){
+            System.out.println("Searching for: archived ticks");
+            int ticks_deleted = garbage_archived_ticks();
+            System.out.println("Status: ");
+            System.out.println("Number of archived ticks deleted: "+Integer.toString(ticks_deleted));
+        }
+    }
+    //---------------------------end of functions
     /**
      * Database_Garbage_Collector.update_data(int new_id,int lookup_id,String data_name,String table_name)
      * @param new_id
@@ -76,7 +181,7 @@ public class Database_Garbage_Collector {
             return true;
         }catch(SQLException e){
             System.out.println("Update failed: "+e.toString());
-            database.log.add("Failed to update data. ("+e.toString()+")","DATABASE GARBAGE COLLECTOR E!!!");
+            database.log.add("Failed to update data. ("+e.toString()+")",HEADER+" E!!!");
             return false;
         }
     }
@@ -98,11 +203,11 @@ public class Database_Garbage_Collector {
         ppst.setInt(1,object_id);
         
         if( table_name.equals("CATEGORY") && object_id == 1){
-            database.log.add("Cannot delete default data","DATABASE GARBAGE COLLECTOR W!!!");
+            database.log.add("Cannot delete default data",HEADER+" W!!!");
             return false;
         }
         else if ( table_name.equals("PLACE") && object_id == 1){
-           database.log.add("Cannot delete default data","DATABASE GARBAGE COLLECTOR W!!!");
+           database.log.add("Cannot delete default data",HEADER+" W!!!");
             return false;
         }
         
@@ -111,8 +216,8 @@ public class Database_Garbage_Collector {
             return true;
         }catch(SQLException e){
             System.out.println("Delete failed ("+e.toString()+")");
-            database.log.add("Failed to delete object. ("+e.toString()+")","DATABASE GARBAGE COLLECTOR E!!!");
-            database.log.add("Failed query : "+ppst.toString(),"DATABASE GARBAGE COLLECTOR E!!!");
+            database.log.add("Failed to delete object. ("+e.toString()+")",HEADER+" E!!!");
+            database.log.add("Failed query : "+ppst.toString(),HEADER+" E!!!");
             return false;
         }
     }
@@ -148,7 +253,7 @@ public class Database_Garbage_Collector {
             return true;
         }catch(SQLException e){
             System.out.println("Failed: "+e.toString());
-            database.log.add("Failed to delete address. ("+e.toString()+")","DATABASE GARBAGE COLLECTOR E!!!");
+            database.log.add("Failed to delete address. ("+e.toString()+")",HEADER+" E!!!");
             return false;
         }
     }

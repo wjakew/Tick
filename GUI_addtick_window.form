@@ -57,9 +57,6 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Name your task here"/>
       </Properties>
-      <Events>
-        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="textfield_tickdataFocusGained"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="button_add">
       <Properties>

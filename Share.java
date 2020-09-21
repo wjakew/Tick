@@ -295,9 +295,14 @@ public class Share {
 
        return to_ret;
    }
-   
+   /**
+    * Share.return_my_data_history()
+    * @return ArrayList
+    * @throws SQLException
+    * Function shows details about shares
+    */
    ArrayList<String> return_my_data_history() throws SQLException{
-              ArrayList<String> to_ret = new ArrayList<>();
+       ArrayList<String> to_ret = new ArrayList<>();
        
        to_ret.add("Done shares for your account:");
        

@@ -68,6 +68,8 @@ public class Tick_Tag extends Tick_Element{
         to_ret.add(new Tick_Brick(hashtag_table_id));
         to_ret.add(new Tick_Brick(tag_name));
         to_ret.add(new Tick_Brick(tag_note));
+        
+        super.put_elements(to_ret);
          
         return to_ret;
     }

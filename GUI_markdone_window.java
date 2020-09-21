@@ -27,6 +27,8 @@ public class GUI_markdone_window extends javax.swing.JDialog {
         this.database = database;
         choosen_tick = tick_id;
         initComponents();
+        textarea_notes.setText("Any thoughts about this task?");
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -83,6 +85,9 @@ public class GUI_markdone_window extends javax.swing.JDialog {
     private void button_markdoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_markdoneActionPerformed
         Database_Tick dt = new Database_Tick(database);
         try {
+            if ( textarea_notes.getText().contains("Any thoughts about this task?")){
+                textarea_notes.setText("");
+            }
             if (dt.mark_done(textarea_notes.getText(), choosen_tick)){
                 button_markdone.setText("Marked done");
                 button_markdone.setEnabled(false);

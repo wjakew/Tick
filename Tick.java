@@ -15,17 +15,17 @@ import javax.mail.MessagingException;
  */
 public class Tick {
 
-    static final String version = "v1.0.0B10";
+    static final String version = "v1.0.0B11";
     
     static Tick_Log session_log;
     static Database database;
     
     /**
+     * Main program 
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException, SQLException, MessagingException {
         System.out.println("TICK "+version);
-        
 // initialization of the modules
         // -- Tick_Log
         session_log = new Tick_Log();

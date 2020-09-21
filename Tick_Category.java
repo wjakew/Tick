@@ -72,6 +72,7 @@ public class Tick_Category extends Tick_Element{
         to_ret.add(new Tick_Brick(owner_id));
         to_ret.add(new Tick_Brick(category_name));
         to_ret.add(new Tick_Brick(category_note));
+        super.put_elements(to_ret);
         return to_ret;
     }
     /**
