@@ -11,6 +11,7 @@ import java.awt.datatransfer.StringSelection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JTextArea;
 
 /**
@@ -28,7 +29,52 @@ public class GUI_Window_Manager {
         this.window = window;
         
     }
+    //----------------------- functions for reloading components
+    /**
+     * Function for reloading list
+     * @throws SQLException 
+     */
+    void reload_listlist() throws SQLException{
+        Database_List dl = new Database_List(window.database);
+        ArrayList<String> data_to_show = dl.get_list_names();
+        
+        model_obj = new DefaultListModel();
+        for(String element : data_to_show ) {
+            model_obj.addElement(element);
+        }
+        
+        window.LIST_listlist.setModel(model_obj);
+        log("Model for List list updated");
+    }
     
+    /**
+     * Function for loading data to JList object
+     * @param object_to_load
+     * @param data 
+     */
+    void load_list(JList object_to_load, ArrayList<String> data){
+        DefaultListModel dlm = new DefaultListModel();
+        
+        for(String element: data){
+            dlm.addElement(element);
+        }
+        
+        object_to_load.setModel(dlm);
+    }
+    
+    /**
+     * Function for loading data to JTextArea
+     * @param object_to_load
+     * @param data 
+     */
+    void load_textarea(JTextArea object_to_load, ArrayList<String> data){
+        String content = "";
+        
+        for(String line : data){
+            content = content + line + "\n";
+        }
+        object_to_load.setText(content);
+    }
     /**
      * Function for reloading data in jList ( TICK_list_ticklist )
      * @throws SQLException 
@@ -36,7 +82,7 @@ public class GUI_Window_Manager {
      * 0 - not done ticks
      * 1 - done ticks
      */
-    void reload_ticklist(int mode) throws SQLException{
+    void reload_ticklist(int mode,JList to_update) throws SQLException{
         // setting view handler
         Database_Tick dt = new Database_Tick(window.database);
         
@@ -46,8 +92,18 @@ public class GUI_Window_Manager {
             model_obj.addElement(element);
         }
         
-        window.TICK_list_ticklist.setModel(model_obj);
+        to_update.setModel(model_obj);
         log("Model for Tick list updated");
+    }
+    /**
+     * Function fro reloading blank data to components
+     * @param to_clear 
+     */
+    void reload_blank(JList to_clear){
+        model_obj = new DefaultListModel();
+        to_clear.setModel(model_obj);
+        log("Reload blank object : "+to_clear.getName());
+        
     }
     //------------------------- functions for implementing button presses
     /**
@@ -74,7 +130,7 @@ public class GUI_Window_Manager {
      * @throws SQLException 
      */
     void buttonaction_markdone() throws SQLException{
-        new GUI_markdone_window(window,true,window.database,window.actual_choosen_element_index);
+        new GUI_markdone_window(window,true,window.database,window.TICK_list_selectedvalue);
         reload_default_scene_tick();
     }
     /**
@@ -84,7 +140,7 @@ public class GUI_Window_Manager {
     void button_action_delete() throws SQLException{
         Database_Garbage_Collector dgc = new Database_Garbage_Collector(window.database);
         
-        if(dgc.delete_tick(window.actual_choosen_element_index)){
+        if(dgc.delete_tick(window.TICK_list_selectedvalue)){
             window.TICK_button_delete.setText("Deleted");
             window.TICK_button_delete.setEnabled(false);
             reload_default_scene_tick();
@@ -112,19 +168,51 @@ public class GUI_Window_Manager {
         return !data_to_copy.isEmpty();   
     }
 
-    //--------------------------------------------------------------------
-
+    //----------------------------- functions for reloading window views
+    /**
+     * Functionf for reloading to default scene (LIST)
+     * @throws SQLException 
+     */
+    void reload_default_scene_list() throws SQLException{
+        
+        window.LIST_listitems_selectedvalue = -1;
+        window.LIST_listlist_selectedvalue = -1;
+        window.LIST_listtick_selectedvalue = -1;
+        
+        window.LIST_button_deletelist.setText("Delete");
+        window.LIST_button_sendasemail.setText("Send as email");
+        window.LIST_button_edit.setText("Edit");
+        window.LIST_button_copycontent.setText("Copy content");
+        
+        reload_listlist();
+        window.LIST_button_addnewlist.setText("Add new list");
+        reload_ticklist(0,window.LIST_listtick);
+        reload_blank(window.LIST_listitems);
+        
+        window.LIST_listlist.setEnabled(true);
+        
+        window.LIST_button_addnewlist.setEnabled(true);
+        
+        window.LIST_button_addticktolist.setEnabled(false);
+        window.LIST_button_copycontent.setEnabled(false);
+        window.LIST_button_deletelist.setEnabled(false);
+        window.LIST_button_deleteticklist.setEnabled(false);
+        window.LIST_button_edit.setEnabled(false);
+        window.LIST_button_sendasemail.setEnabled(false);
+        window.LIST_textfield_listname.setVisible(false);
+        window.LIST_textarea_listdet.setEditable(false);
+    }
     /**
      * Function for reloading to default scene (TICK)
      * @throws SQLException 
      */
     void reload_default_scene_tick() throws SQLException{
-        reload_ticklist(0);
+        reload_ticklist(0,window.TICK_list_ticklist);
         window.TICK_button_delete.setText("Delete");
         window.TICK_button_delete.setEnabled(false);
         window.TICK_button_active_ticks.setText("Active Ticks");
         window.TICK_list_ticklist.clearSelection();
-        window.actual_choosen_element_index = -1;
+        window.TICK_list_selectedvalue = -1;
         window.TICK_button_addnewtick.setEnabled(true);
         window.TICK_button_edittick.setEnabled(false);
         window.TICK_button_sharetick.setEnabled(false);
@@ -133,7 +221,6 @@ public class GUI_Window_Manager {
         window.TICK_button_unarchive.setEnabled(false);
         window.TICK_textarea_tickdetails.setText("");
         window.TICK_button_markdone.setEnabled(false);
-        window.TICK_button_link.setEnabled(false);
         log("Tick scene reloaded");
     }
     /**
@@ -141,12 +228,12 @@ public class GUI_Window_Manager {
      * @throws SQLException 
      */
     void reload_archived_scene_tick() throws SQLException{
-        reload_ticklist(1);
+        reload_ticklist(1,window.TICK_list_ticklist);
         window.TICK_button_delete.setEnabled(false);
         window.TICK_button_active_ticks.setText("Archived Ticks");
         window.TICK_button_addnewtick.setEnabled(false);
         window.TICK_list_ticklist.clearSelection();
-        window.actual_choosen_element_index = -1;
+        window.TICK_list_selectedvalue = -1;
         window.TICK_button_edittick.setEnabled(false);
         window.TICK_button_sharetick.setEnabled(false);
         window.TICK_textarea_tickdetails.setEditable(false);
@@ -154,8 +241,10 @@ public class GUI_Window_Manager {
         window.TICK_button_unarchive.setEnabled(false);
         window.TICK_textarea_tickdetails.setText("");
         window.TICK_button_markdone.setEnabled(false);
-        window.TICK_button_link.setEnabled(false);
     }
+    
+    
+    //----------------------- other functions
     /**
      * Function for loading textarea to database
      * @param to_load 
@@ -182,9 +271,9 @@ public class GUI_Window_Manager {
      * @throws SQLException 
      */
     void tick_list_clicked() throws SQLException{
-        if( window.actual_choosen_element_index != -1){
+        if( window.TICK_list_selectedvalue != -1){
             if ( window.TICK_button_active_ticks.getText().equals("Active Ticks")){
-                int tick_id = window.actual_choosen_element_index;
+                int tick_id = window.TICK_list_selectedvalue;
                 Database_Tick dt = new Database_Tick(window.database);
 
                 if ( dt.check_if_exists(tick_id) ){
@@ -195,11 +284,10 @@ public class GUI_Window_Manager {
                     window.TICK_button_edittick.setEnabled(true);
                     window.TICK_button_sharetick.setEnabled(true);
                     window.TICK_button_markdone.setEnabled(true);
-                    window.TICK_button_link.setEnabled(true);
                 }
             }
             else{
-                int tick_id = window.actual_choosen_element_index;
+                int tick_id = window.TICK_list_selectedvalue;
                 Database_Tick dt = new Database_Tick(window.database);
 
                 if ( dt.check_if_exists(tick_id) ){
@@ -211,7 +299,6 @@ public class GUI_Window_Manager {
                     window.TICK_button_markdone.setEnabled(false);
                     window.TICK_button_unarchive.setEnabled(true);
                     window.TICK_button_unarchive.setVisible(true);
-                    window.TICK_button_link.setEnabled(false);
                     window.TICK_button_delete.setEnabled(false);
                 }
             }

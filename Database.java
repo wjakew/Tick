@@ -314,11 +314,82 @@ public class Database {
     int get_last_address_id() throws SQLException{
         String query = "select address_id from ADDRESS ORDER BY id DESC LIMIT 1;";
         PreparedStatement ppst = con.prepareStatement(query);
-        ResultSet rs = ppst.executeQuery();
-        if ( rs.next() ){
-            return rs.getInt("address_id");
+        try{
+            ResultSet rs = ppst.executeQuery();
+            if ( rs.next() ){
+                return rs.getInt("address_id");
+            }
+            return -1;
+        }catch(SQLException e){
+            log.add("Failed to get last address id ( "+e.toString()+")",HEADER);
+            return -2;
         }
-        return -1;
+        
+    }
+    
+    /**
+     * Database.get_category_id_byname(String category_name)
+     * @param category_name
+     * @return
+     * @throws SQLException 
+     * Function gets category id by given name
+     */
+    int get_category_id_byname(String category_name) throws SQLException{
+        String query = "SELECT * FROM CATEGORY WHERE category_name = ? and owner_id = ?";
+        PreparedStatement ppst = con.prepareStatement(query);
+        
+        ppst.setString(1,category_name);
+        ppst.setInt(2,this.logged.owner_id);
+        
+        try{
+            ResultSet rs  = ppst.executeQuery();
+            
+            if ( rs.next() ){
+                return rs.getInt("category_id");
+            }
+            return -1;
+        }catch(SQLException e){
+            log.add("Failed to get category id by name ( "+e.toString()+")",HEADER);
+            return -2;
+        }  
+    }
+    int get_place_id_byname(String place_name) throws SQLException{
+        String query = "SELECT * FROM PLACE where place_name = ? and owner_id = ?;";
+        PreparedStatement ppst = con.prepareStatement(query);
+        
+        ppst.setString(1,place_name);
+        ppst.setInt(2,this.logged.owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            if ( rs.next() ){
+                return rs.getInt("place_id");
+            }
+            return -1;
+        }catch(SQLException e){
+            log.add("Failed to get place id by name ("+e.toString()+")",HEADER);
+            return -2;
+        }
+    }
+    int get_hashtagtable_id_byname(String hashtagtable_name) throws SQLException{
+        String query = "SELECT * from HASHTAG_TABLE where hashtag_table_name = ? and owner_id = ?;";
+        PreparedStatement ppst = con.prepareStatement(query);
+        
+        ppst.setString(1,hashtagtable_name);
+        ppst.setInt(2,this.logged.owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            if ( rs.next() ){
+                return rs.getInt("hashtag_table_id");
+            }
+            return -1;
+        }catch(SQLException e){
+            log.add("Failed to get hashtag table id by name ("+e.toString()+")",HEADER);
+            return -2;
+        }
     }
     
     /**
@@ -984,7 +1055,7 @@ public class Database {
             query = "SELECT * FROM TICK where tick_id = ?;";
         }
         else if (mode.equals("list")){
-            query = "SELECT * FROM LISTS where ist_id =?;";
+            query = "SELECT * FROM LISTS where list_id =?;";
         }
         
         PreparedStatement ppst = con.prepareStatement(query);

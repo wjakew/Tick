@@ -97,6 +97,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="jTextField1"/>
       </Properties>
+      <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="textfield_user_loginFocusGained"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="button_share">
       <Properties>
@@ -120,6 +123,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Confirm"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="button_confirmActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="button_history">
       <Properties>

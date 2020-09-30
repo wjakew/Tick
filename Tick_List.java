@@ -5,8 +5,11 @@ all rights reserved
  */
 package tick;
 
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *Object for storing List
@@ -47,6 +50,17 @@ public class Tick_List extends Tick_Element{
         tick_list_id = to_add.get(2).s_get();
         list_name = to_add.get(3).s_get();
         list_date = to_add.get(4).s_get();
+        super.put_elements(wall_updater());
+    }
+    
+    // optional constructor with use of ResultSet
+    Tick_List(ResultSet to_add) throws SQLException{
+        super("Tick_List");
+        list_id = to_add.getInt("list_id");
+        owner_id = to_add.getInt("owner_id");
+        tick_list_id = to_add.getString("tick_list_id");
+        list_name = to_add.getString("list_name");
+        list_date = to_add.getString("list_date");
         super.put_elements(wall_updater());
     }
     
@@ -112,5 +126,45 @@ public class Tick_List extends Tick_Element{
         ArrayList<String> to_ret = new ArrayList<>();
         to_ret.add(show_glance());
         return to_ret;
+    }
+    
+    /**
+     * Tick_List.get_all_info(Database database)
+     * @param database
+     * @return ArrayList
+     * Function for showing all data of list
+     */
+    ArrayList<String> get_all_info(Database database) throws SQLException{
+        ArrayList<String> data_to_ret = new ArrayList<>();
+        
+        data_to_ret.add(this.list_name+"\n");
+        data_to_ret.add(this.list_date+"\n");
+
+        ArrayList<Integer> tick_ids = understand_id();
+        
+        String query = "SELECT * from TICK where tick_id = ?;";
+        
+        for(int id : tick_ids){
+        
+            PreparedStatement ppst = database.con.prepareStatement(query);
+            
+            ppst.setInt(1,id);
+            
+            try{
+                ResultSet rs = ppst.executeQuery();
+                
+                if ( rs.next() ){
+                    Tick_Tick tt = new Tick_Tick(rs);
+                    
+                    data_to_ret.add(tt.simple_show());
+                    
+                }
+            }catch(SQLException e){
+                database.log.add("Failed to get all info from List ( "+e.toString()+")","TICK LIST E!!!");
+                return null;
+            }
+            
+        }
+        return data_to_ret;
     }
 }

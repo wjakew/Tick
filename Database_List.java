@@ -24,6 +24,97 @@ public class Database_List {
         this.database = database;
     }
     
+    /**
+     * Database_List.get_list_names()
+     * @return ArrayList
+     * @throws SQLException
+     * Function for gathering small data of list
+     */
+    ArrayList<String> get_list_names() throws SQLException{
+        ArrayList<String> data_toRet = new ArrayList<>();
+        String query = "SELECT * from LISTS where owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setInt(1, database.logged.owner_id);
+        
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            while ( rs.next() ){
+                Tick_List tl = new Tick_List(rs);
+                data_toRet.add(tl.show_glance());
+            }
+            return data_toRet;
+        }catch(SQLException e){
+            database.log.add("Failed to load list names ( "+e.toString()+")","TICK LIST E!!!");
+            return null;
+        }
+        
+    }
+    
+    /**
+     * Database_List.get_list(int list_id)
+     * @param list_id
+     * @return Tick_List
+     * @throws SQLException
+     * Function for getting data from list
+     */
+    Tick_List get_list(int list_id) throws SQLException{
+        String query = "SELECT * from LISTS where list_id = ? and owner_id = ?;";
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setInt(1,list_id);
+        ppst.setInt(2, database.logged.owner_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            if ( rs.next () ){
+                return new Tick_List(rs);
+            }
+            return null;
+            
+        }catch(SQLException e){
+            database.log.add("Failed to get List object ("+e.toString()+")","TICK LIST E!!!");
+            return null;
+        }
+    }
+    
+    /**
+     * Database_List.load_tick_data(ArrayList<Integer>)
+     * @param ids
+     * @return ArrayList
+     * @throws SQLException
+     * Function for loading tick data from Arraylist
+     */
+    ArrayList<String> load_tick_data(ArrayList<Integer> ids) throws SQLException{
+        ArrayList<String> data = new ArrayList<>();
+        String query = "SELECT * from TICK where tick_id = ?;";
+        
+        for(Integer tick_id : ids){
+            PreparedStatement ppst = database.con.prepareStatement(query);
+            
+            ppst.setInt(1,tick_id);
+            
+            try{
+                ResultSet rs = ppst.executeQuery();
+                
+                if ( rs.next() ){
+                    Tick_Tick tt = new Tick_Tick(rs);
+                    
+                    tt.simple_show();
+                    
+                    data.add(tt.simple_show());
+                    
+                }
+            }catch(SQLException e){
+                database.log.add("Failed to load tick data from id ("+e.toString()+")","TICK LIST E!!!");
+            }
+        }
+        return data; 
+    }
+    
     
     /**
      * Database_List.add_list(Tick_List to_add)
@@ -66,20 +157,22 @@ public class Database_List {
         String query = "SELECT tick_list_id FROM LISTS where list_id = ?;";
         PreparedStatement ppst = database.con.prepareStatement(query);
         ppst.setInt(1,list_id);
-        
+        System.out.println(ppst.toString());
         try{
             ResultSet rs = ppst.executeQuery();
             
             if(rs.next()){
                 return rs.getString("tick_list_id");
             }
-            return null;
-            
+            else{
+                return null;
+            }  
         }catch(SQLException e ){
             database.log.add("Getting tick list occured problem ("+e.toString()+")","DATABASE LIST E!!!");
             return null;
         }
     }
+
     /**
      * Database_List.add_tick_to_list(int tick_id,int list_id)
      * @param tick_id

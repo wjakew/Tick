@@ -6,6 +6,7 @@ all rights reserved
 package tick;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,10 +21,14 @@ public class GUI_share_window extends javax.swing.JDialog {
      */
     Database database;
     int tick_id;
+    Share tso;
+    
     public GUI_share_window(java.awt.Frame parent, boolean modal,Database database,int tick_id) throws SQLException {
         super(parent, modal);
         this.tick_id = tick_id;
         this.database = database;
+        tso = new Share(database);
+        
         initComponents();
         setLocationRelativeTo(null);
         
@@ -57,6 +62,11 @@ public class GUI_share_window extends javax.swing.JDialog {
         jScrollPane1.setViewportView(textarea_tick_details);
 
         textfield_user_login.setText("jTextField1");
+        textfield_user_login.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                textfield_user_loginFocusGained(evt);
+            }
+        });
 
         button_share.setText("Share");
         button_share.addActionListener(new java.awt.event.ActionListener() {
@@ -70,6 +80,11 @@ public class GUI_share_window extends javax.swing.JDialog {
         label_readytoshare.setText("Ready to share");
 
         button_confirm.setText("Confirm");
+        button_confirm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button_confirmActionPerformed(evt);
+            }
+        });
 
         button_history.setText("History");
         button_history.addActionListener(new java.awt.event.ActionListener() {
@@ -130,7 +145,26 @@ public class GUI_share_window extends javax.swing.JDialog {
 
     private void button_shareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_shareActionPerformed
         if(!textfield_user_login.getText().equals("User login") || !textfield_user_login.getText().equals("")){
-            
+            try {
+                if ( database.ret_owner_id(textfield_user_login.getText()) != -1 ){
+                    // we found user
+                    label_confirm_data.setText("Found data, user login: "+textfield_user_login.getText()
+                            +"("+Integer.toString(database.ret_owner_id(textfield_user_login.getText()))+")");
+                    button_share.setEnabled(false);
+                    textfield_user_login.setEnabled(false);
+                    button_confirm.setEnabled(true);
+                    button_confirm.setVisible(true);
+                    label_readytoshare.setVisible(true);
+                            
+                }
+                else{
+                    textfield_user_login.setText("User login");
+                    label_confirm_data.setText("Failed to find user");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_share_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
         }
         else{
             textfield_user_login.setText("Wrong user login");
@@ -138,9 +172,54 @@ public class GUI_share_window extends javax.swing.JDialog {
     }//GEN-LAST:event_button_shareActionPerformed
 
     private void button_historyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_historyActionPerformed
-
+        if ( button_history.getText().equals("History")){
+            // do history stuff
+            ArrayList<String>  to_show = new ArrayList<>();
+            String content = "";
+            try {
+                to_show = tso.return_data_history();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_share_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if ( to_show.isEmpty() ){
+                content = "Failed";
+            }
+            for(String line : to_show){
+                content = content + line + "\n";
+            }
+            textarea_tick_details.setText(content);
+            button_history.setText("Done");
+            button_confirm.setEnabled(false);
+            button_share.setEnabled(false);
+            textfield_user_login.setEnabled(false);
+        }
+        else{
+            try {
+                load_components();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_share_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }//GEN-LAST:event_button_historyActionPerformed
-    
+
+    private void button_confirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_confirmActionPerformed
+        try {
+            if (tso.share_tick(tick_id, database.ret_owner_id(textfield_user_login.getText())) == 1){
+                button_confirm.setText("Tick shared");
+                button_confirm.setEnabled(false);
+            }
+            else{
+                button_confirm.setText("Failed to share tick, check log");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_share_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_button_confirmActionPerformed
+
+    private void textfield_user_loginFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textfield_user_loginFocusGained
+        textfield_user_login.setText("");
+    }//GEN-LAST:event_textfield_user_loginFocusGained
+
     /**
      * Function for loading components
      */
@@ -152,6 +231,9 @@ public class GUI_share_window extends javax.swing.JDialog {
         }
         textarea_tick_details.setText(filler);
         textfield_user_login.setText("User login");
+        button_confirm.setEnabled(true);
+        button_share.setEnabled(true);
+        textfield_user_login.setEnabled(true);
         
         // setting initial window view
         label_readytoshare.setVisible(false);

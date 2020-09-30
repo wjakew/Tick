@@ -415,7 +415,7 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    -/scene_id/ copy ( copies ticks to clipboard )");
             ui.interface_print("    -/scene_id/ mail ( sends scene via e-mail ) ");
             ui.interface_print("");
-            ui.interface_print("                                     /eg. scene 1 select/");
+            ui.interface_print("                                       /eg. scene 1 select/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("lists ");
             ui.interface_print("    ( without parameters show lists of ticks )");
@@ -425,11 +425,16 @@ public class CUI_Tick_Inteface {
             ui.interface_print("    -/list_id/ ( shows details of lists )");
             ui.interface_print("    -/list_id/ mail ( sends list with details of tick ) ");
             ui.interface_print("");
-            ui.interface_print("                                           /eg. lists 1 ticka/");
+            ui.interface_print("                                        /eg. lists 1 ticka/");
             ui.interface_print("-----------------------------------------------------------");
-            ui.interface_print("lists ");
             ui.interface_print("share ");
             ui.interface_print("    ( without parameters show share )");
+            ui.interface_print("    -his ( shows history of shares ) ");
+            ui.interface_print("    -load ( loads shared ticks )");
+            ui.interface_print("    -check ( checks if there is a new tick to add ) ");
+            ui.interface_print("share tick /tick_id/ ");
+            ui.interface_print("    ( share tick to the other user )");
+            ui.interface_print("                                         /eg. share tick 1/");
             ui.interface_print("-----------------------------------------------------------");
             ui.interface_print("options ");
             ui.interface_print("    ( manages main functionalities of the Tick program ) ");
@@ -522,6 +527,17 @@ public class CUI_Tick_Inteface {
             ui.interface_print("Help for options ");
             ui.interface_print("    ( manages main functionalities of the Tick program ) ");
             ui.interface_print("    More info in the options ");
+        }
+        // help share
+        else if ( addons.size() == 2 && addons.contains("share")){
+            ui.interface_print("Help for share ");
+            ui.interface_print("    ( without parameters show share )");
+            ui.interface_print("    -his ( shows history of shares ) ");
+            ui.interface_print("    -load ( loads shared ticks )");
+            ui.interface_print("    -check ( checks if there is a new tick to add ) ");
+            ui.interface_print("share tick /tick_id/ ");
+            ui.interface_print("    ( share tick to the other user )");
+            ui.interface_print("                                         /eg. share tick 1/");
         }
         // help clean
         else if ( addons.size() == 2 && addons.contains("clean")){
@@ -681,6 +697,9 @@ public class CUI_Tick_Inteface {
     }
     
     void show_arraylist(ArrayList<String> to_show){
+        if ( to_show == null){
+            ui.interface_print("Data : null");
+        }
         if (to_show.size() == 1){
             ui.interface_print("Empty");
         }
@@ -1495,7 +1514,7 @@ public class CUI_Tick_Inteface {
                 ui.interface_print("Failed to add list");
             }
         }
-        // lists delete /list_id
+        // lists delete /list_id/
         else if (addons.size() == 3 && addons.contains("delete") && ui.check_existance_int(addons) != -1){
             if ( database.check_if_record_exists(ui.last_input, "list") ){
                 if ( dl.delete_list(ui.last_input) ){
@@ -1579,12 +1598,11 @@ public class CUI_Tick_Inteface {
                 ui.interface_print("Wrong list id");
             }
         }
-        // lists det
+        // lists det /list_id/
         else if (addons.size() == 3 && addons.contains("det") && ui.check_existance_int(addons) != -1){
             dv = new Database_Viewer(database,database.logged,"list view");
             ui.interface_print("Detailed view of lists: ");
             show_arraylist(dv.make_view());
-            
         }
         // lists mail /list_id/
         else if (addons.size() == 3 && addons.contains("mail") && ui.check_existance_int(addons) != -1){
@@ -1617,7 +1635,6 @@ public class CUI_Tick_Inteface {
      * Function for adding share functionality
      */
     void CUI_FUN_share(List<String> addons) throws SQLException{
-        
         
         // share
         if ( addons.size() == 1){

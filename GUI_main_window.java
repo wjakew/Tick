@@ -5,9 +5,16 @@ all rights reserved
  */
 package tick;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.mail.MessagingException;
 
 /**
  *
@@ -19,8 +26,12 @@ public class GUI_main_window extends javax.swing.JFrame {
     public Database database;
     GUI_Window_Manager window_manager;
     public int actual_panel_index;     // index of a tabbed panel
-    public int actual_choosen_element_index; // index of an element in list
+    public int TICK_list_selectedvalue; // index of an element in list
+    public int LIST_listlist_selectedvalue;
+    public int LIST_listtick_selectedvalue;
+    public int LIST_listitems_selectedvalue;
     public String actual_choosen_element_string;
+    UI_Interface ui;
 
     /**
      * Creates new form GUI_main_window
@@ -28,8 +39,11 @@ public class GUI_main_window extends javax.swing.JFrame {
     public GUI_main_window(Database database) throws SQLException {
         this.database = database;
         window_manager = new GUI_Window_Manager(this);
-        actual_choosen_element_index = -1;
+        TICK_list_selectedvalue = -1;
+        LIST_listlist_selectedvalue = -1;
+        LIST_listitems_selectedvalue = -1;
         actual_panel_index = 0;
+        ui = new UI_Interface();
         
         initComponents();
         
@@ -62,12 +76,28 @@ public class GUI_main_window extends javax.swing.JFrame {
         TICK_button_toclipboard = new javax.swing.JButton();
         TICK_button_markdone = new javax.swing.JButton();
         TICK_button_unarchive = new javax.swing.JButton();
-        TICK_button_link = new javax.swing.JButton();
         TICK_button_delete = new javax.swing.JButton();
         list_panel = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        LIST_listlist = new javax.swing.JList<>();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        LIST_listitems = new javax.swing.JList<>();
+        LIST_label_info1 = new javax.swing.JLabel();
+        LIST_label_info2 = new javax.swing.JLabel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        LIST_listtick = new javax.swing.JList<>();
+        LIST_button_addticktolist = new javax.swing.JButton();
+        LIST_button_edit = new javax.swing.JButton();
+        LIST_button_copycontent = new javax.swing.JButton();
+        LIST_button_deletelist = new javax.swing.JButton();
+        LIST_button_addnewlist = new javax.swing.JButton();
+        LIST_button_deleteticklist = new javax.swing.JButton();
+        LIST_button_sendasemail = new javax.swing.JButton();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        LIST_textarea_listdet = new javax.swing.JTextArea();
+        LIST_textfield_listname = new javax.swing.JTextField();
         scenes_panel = new javax.swing.JPanel();
         Tick_LABEL_tick_version = new javax.swing.JLabel();
-        TICK_button_reload = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -143,8 +173,6 @@ public class GUI_main_window extends javax.swing.JFrame {
 
         TICK_button_unarchive.setText("Unarchive");
 
-        TICK_button_link.setText("Link");
-
         TICK_button_delete.setBackground(new java.awt.Color(255, 0, 51));
         TICK_button_delete.setText("Delete");
         TICK_button_delete.addActionListener(new java.awt.event.ActionListener() {
@@ -166,16 +194,14 @@ public class GUI_main_window extends javax.swing.JFrame {
                 .addGap(59, 59, 59)
                 .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
-                                .addComponent(TICK_button_edittick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(TICK_button_sharetick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(TICK_button_addnewtick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(TICK_button_toclipboard, javax.swing.GroupLayout.Alignment.TRAILING))
-                            .addComponent(TICK_button_unarchive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(TICK_button_link, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(TICK_button_delete))
+                        .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+                            .addComponent(TICK_button_edittick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(TICK_button_sharetick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(TICK_button_addnewtick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(TICK_button_toclipboard, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addComponent(TICK_button_unarchive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(TICK_button_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         tick_panelLayout.setVerticalGroup(
@@ -202,23 +228,171 @@ public class GUI_main_window extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(TICK_button_unarchive)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(TICK_button_link)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(TICK_button_delete)))
                 .addContainerGap(32, Short.MAX_VALUE))
         );
 
         tabbed_panel.addTab("Tick", tick_panel);
 
+        LIST_listlist.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        LIST_listlist.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                LIST_listlistMouseClicked(evt);
+            }
+        });
+        jScrollPane3.setViewportView(LIST_listlist);
+
+        LIST_listitems.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        LIST_listitems.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                LIST_listitemsMouseClicked(evt);
+            }
+        });
+        jScrollPane4.setViewportView(LIST_listitems);
+
+        LIST_label_info1.setText("Lists");
+
+        LIST_label_info2.setText("List items");
+
+        LIST_listtick.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        LIST_listtick.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                LIST_listtickMouseClicked(evt);
+            }
+        });
+        jScrollPane5.setViewportView(LIST_listtick);
+
+        LIST_button_addticktolist.setText("^");
+        LIST_button_addticktolist.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LIST_button_addticktolistActionPerformed(evt);
+            }
+        });
+
+        LIST_button_edit.setText("Edit");
+        LIST_button_edit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LIST_button_editActionPerformed(evt);
+            }
+        });
+
+        LIST_button_copycontent.setText("Copy content");
+        LIST_button_copycontent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LIST_button_copycontentActionPerformed(evt);
+            }
+        });
+
+        LIST_button_deletelist.setText("Delete List");
+        LIST_button_deletelist.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LIST_button_deletelistActionPerformed(evt);
+            }
+        });
+
+        LIST_button_addnewlist.setText("Add new list");
+        LIST_button_addnewlist.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LIST_button_addnewlistActionPerformed(evt);
+            }
+        });
+
+        LIST_button_deleteticklist.setText("X");
+        LIST_button_deleteticklist.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LIST_button_deleteticklistActionPerformed(evt);
+            }
+        });
+
+        LIST_button_sendasemail.setText("Send as e-mail");
+        LIST_button_sendasemail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LIST_button_sendasemailActionPerformed(evt);
+            }
+        });
+
+        LIST_textarea_listdet.setColumns(20);
+        LIST_textarea_listdet.setRows(5);
+        jScrollPane6.setViewportView(LIST_textarea_listdet);
+
+        LIST_textfield_listname.setText("Enter the name");
+
         javax.swing.GroupLayout list_panelLayout = new javax.swing.GroupLayout(list_panel);
         list_panel.setLayout(list_panelLayout);
         list_panelLayout.setHorizontalGroup(
             list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 762, Short.MAX_VALUE)
+            .addGroup(list_panelLayout.createSequentialGroup()
+                .addGap(30, 30, 30)
+                .addGroup(list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane3)
+                    .addComponent(LIST_label_info1)
+                    .addComponent(LIST_button_addnewlist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(LIST_button_copycontent, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(LIST_button_sendasemail, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
+                    .addComponent(LIST_textfield_listname))
+                .addGap(18, 18, 18)
+                .addGroup(list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(LIST_label_info2)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, list_panelLayout.createSequentialGroup()
+                        .addComponent(LIST_button_addticktolist, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(LIST_button_deleteticklist, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(LIST_button_deletelist, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(LIST_button_edit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE))
+                .addContainerGap())
         );
         list_panelLayout.setVerticalGroup(
             list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 584, Short.MAX_VALUE)
+            .addGroup(list_panelLayout.createSequentialGroup()
+                .addGap(37, 37, 37)
+                .addGroup(list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(LIST_label_info1)
+                    .addComponent(LIST_label_info2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(list_panelLayout.createSequentialGroup()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(LIST_textfield_listname, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(LIST_button_addnewlist)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(LIST_button_copycontent)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(LIST_button_sendasemail))
+                    .addGroup(list_panelLayout.createSequentialGroup()
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(list_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(LIST_button_addticktolist)
+                            .addComponent(LIST_button_deleteticklist))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(list_panelLayout.createSequentialGroup()
+                        .addComponent(LIST_button_edit)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(LIST_button_deletelist)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane6)))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         tabbed_panel.addTab("List", list_panel);
@@ -238,13 +412,6 @@ public class GUI_main_window extends javax.swing.JFrame {
 
         Tick_LABEL_tick_version.setText("Tick version 1.0.0B11");
 
-        TICK_button_reload.setText("R");
-        TICK_button_reload.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TICK_button_reloadActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -254,8 +421,7 @@ public class GUI_main_window extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tabbed_panel)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(TICK_button_reload)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(Tick_LABEL_tick_version)))
                 .addContainerGap())
         );
@@ -265,9 +431,7 @@ public class GUI_main_window extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(tabbed_panel, javax.swing.GroupLayout.PREFERRED_SIZE, 610, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(TICK_button_reload, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(Tick_LABEL_tick_version, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(Tick_LABEL_tick_version, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -293,8 +457,15 @@ public class GUI_main_window extends javax.swing.JFrame {
                 break;
 
             case 1:
-                System.out.println("Lists");
+            {
+                try {
+                    window_manager.reload_default_scene_list();
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
                 break;
+
             case 2:
                 System.out.println("Scenes");
                 break;
@@ -309,7 +480,7 @@ public class GUI_main_window extends javax.swing.JFrame {
         actual_choosen_element_string = TICK_list_ticklist.getSelectedValue();
         String[] parts = actual_choosen_element_string.split(":");
         //System.out.println(parts[0]);
-        actual_choosen_element_index = Integer.parseInt(parts[0]);
+        TICK_list_selectedvalue = Integer.parseInt(parts[0]);
         try {
             window_manager.tick_list_clicked();
         } catch (SQLException ex) {
@@ -364,7 +535,7 @@ public class GUI_main_window extends javax.swing.JFrame {
 
     private void TICK_button_toclipboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_toclipboardActionPerformed
         try {
-            if ( window_manager.button_action_toclipboard(actual_choosen_element_index)){
+            if ( window_manager.button_action_toclipboard(TICK_list_selectedvalue)){
                 TICK_button_toclipboard.setText("Copied!");
             }
             else{
@@ -377,38 +548,245 @@ public class GUI_main_window extends javax.swing.JFrame {
 
     private void TICK_button_edittickActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_edittickActionPerformed
         try {
-            window_manager.buttonaction_edittick(actual_choosen_element_index);
+            window_manager.buttonaction_edittick(TICK_list_selectedvalue);
         } catch (SQLException ex) {
             Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_TICK_button_edittickActionPerformed
 
-    private void TICK_button_reloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_reloadActionPerformed
-        try {
-            window_manager.reload_default_scene_tick();
-        } catch (SQLException ex) {
-            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_TICK_button_reloadActionPerformed
-
     private void TICK_button_sharetickActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TICK_button_sharetickActionPerformed
         try {
-            new GUI_share_window(this,true,database,actual_choosen_element_index);
+            new GUI_share_window(this,true,database,TICK_list_selectedvalue);
         } catch (SQLException ex) {
             Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_TICK_button_sharetickActionPerformed
 
+    private void LIST_button_addnewlistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LIST_button_addnewlistActionPerformed
+        if ( LIST_button_addnewlist.getText().equals("Add new list")){
+            // open prompt to enter the name
+            LIST_textfield_listname.setVisible(true);
+            LIST_button_addnewlist.setText("Confirm");
+        }
+        else{
+            // add new list to database and reload view
+            if ( !LIST_textfield_listname.getText().equals("Enter the name")){
+                // name of the list is correct
+                Database_List dl = new Database_List(database);
+                Tick_List tl = new Tick_List();
+                tl.list_name = LIST_textfield_listname.getText();
+                tl.owner_id = database.logged.owner_id;
+                tl.list_date = new Date().toString();
+                tl.wall_updater();
+                try {
+                    if ( dl.add_list(tl) ){
+                        window_manager.reload_default_scene_list();
+                    }
+                    else{
+                        LIST_textfield_listname.setText("Failed to add");
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_LIST_button_addnewlistActionPerformed
+
+    private void LIST_listlistMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LIST_listlistMouseClicked
+        LIST_listlist_selectedvalue = Integer.parseInt(LIST_listlist.getSelectedValue().split(":")[0]);
+        LIST_button_sendasemail.setText("Send as e-mail");
+        LIST_button_copycontent.setText("Copy content");
+        
+        if ( LIST_listlist_selectedvalue != -1 ){
+            Database_List dl = new Database_List(database);
+            try {
+                Tick_List tl = dl.get_list(LIST_listlist_selectedvalue);
+                
+                if ( tl != null ){
+                    ArrayList<String> data_to_show  = dl.load_tick_data(tl.understand_id());
+                    window_manager.load_list(LIST_listitems, data_to_show);
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        LIST_button_copycontent.setEnabled(true);
+        LIST_button_deletelist.setEnabled(true);
+        LIST_button_edit.setEnabled(true);
+        LIST_button_sendasemail.setEnabled(true);
+        Database_Viewer dv = new Database_Viewer(database,database.logged,"list view");
+        try {
+            window_manager.load_textarea(dv.make_view(), LIST_textarea_listdet);
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_LIST_listlistMouseClicked
+
+    private void LIST_button_copycontentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LIST_button_copycontentActionPerformed
+        if ( LIST_listlist_selectedvalue != -1 ){
+            Database_List dl = new Database_List(database);
+            try {
+                Tick_List tl = dl.get_list(LIST_listlist_selectedvalue);
+                String content = ui.convert_array(tl.get_all_info(database));
+                StringSelection stringSelection = new StringSelection(content);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, null);
+                LIST_button_copycontent.setText("Copied to clipboard");
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+    }//GEN-LAST:event_LIST_button_copycontentActionPerformed
+
+    private void LIST_button_sendasemailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LIST_button_sendasemailActionPerformed
+        if ( LIST_button_sendasemail.getText().equals("Send as e-mail")){
+            LIST_textfield_listname.setVisible(true);
+            LIST_textfield_listname.setText("Enter e-mail address");
+            LIST_button_sendasemail.setText("Confirm sending");
+        }
+        else{
+            if ( !LIST_textfield_listname.getText().equals("Enter e-mail address") && LIST_textfield_listname.getText().contains("@") ){
+                Database_Viewer dv = new Database_Viewer(database,database.logged,"list view");
+                
+                MailSender ms;
+                try {
+                    ms = new MailSender("List of things to do!",ui.convert_array(dv.make_view()),LIST_textfield_listname.getText());
+                    ms.run();
+                    LIST_button_sendasemail.setText("Sent");
+                    LIST_textfield_listname.setVisible(false);
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (MessagingException ex) {
+                    Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        
+    }//GEN-LAST:event_LIST_button_sendasemailActionPerformed
+
+    private void LIST_button_deletelistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LIST_button_deletelistActionPerformed
+        if ( LIST_button_deletelist.getText().equals("Delete")){
+            if(LIST_listtick_selectedvalue != -1){
+                LIST_button_deletelist.setText("Confirm");
+            }
+        }
+        else{
+            Database_List dl = new Database_List(database);
+            
+            try {
+                if ( dl.delete_list(LIST_listtick_selectedvalue) ){
+                    window_manager.reload_default_scene_list();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+    }//GEN-LAST:event_LIST_button_deletelistActionPerformed
+
+    private void LIST_button_editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LIST_button_editActionPerformed
+        if ( LIST_button_edit.getText().equals("Edit")){
+            LIST_button_addnewlist.setEnabled(false);
+            LIST_button_copycontent.setEnabled(false);
+            LIST_button_deletelist.setEnabled(false);
+            LIST_button_sendasemail.setEnabled(false);
+            LIST_listlist.setEnabled(false);
+            LIST_button_deleteticklist.setEnabled(true);
+            LIST_button_addticktolist.setEnabled(true);
+            LIST_button_edit.setText("Done");
+        }
+        else{
+            try {
+                window_manager.reload_default_scene_list();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_LIST_button_editActionPerformed
+
+    private void LIST_button_addticktolistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LIST_button_addticktolistActionPerformed
+        if ( LIST_listtick_selectedvalue != -1){
+            Database_List dl = new Database_List(database);
+            int tick_index_add = LIST_listtick_selectedvalue;
+            Tick_List tl;
+            try {
+                tl = dl.get_list(LIST_listlist_selectedvalue);
+                try {
+                    if ( !dl.check_tick_in_list(tick_index_add, LIST_listlist_selectedvalue)){
+                        if ( dl.add_tick_to_list(tick_index_add, LIST_listlist_selectedvalue)){
+                            tl = dl.get_list(LIST_listlist_selectedvalue);  //update object
+                            ArrayList<String> data_to_show  = dl.load_tick_data(tl.understand_id());
+                            window_manager.load_list(LIST_listitems, data_to_show);
+                        }
+                    } 
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+        }
+    }//GEN-LAST:event_LIST_button_addticktolistActionPerformed
+
+    private void LIST_listitemsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LIST_listitemsMouseClicked
+        LIST_listitems_selectedvalue = Integer.parseInt(LIST_listitems.getSelectedValue().toString().split(":")[0]);
+    }//GEN-LAST:event_LIST_listitemsMouseClicked
+
+    private void LIST_listtickMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LIST_listtickMouseClicked
+        LIST_listtick_selectedvalue = Integer.parseInt(LIST_listtick.getSelectedValue().toString().split(":")[0]);
+    }//GEN-LAST:event_LIST_listtickMouseClicked
+
+    private void LIST_button_deleteticklistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LIST_button_deleteticklistActionPerformed
+        if ( LIST_listitems_selectedvalue != -1 ){
+            Database_List dl = new Database_List(database);
+            int tick_index_add = LIST_listitems_selectedvalue;
+            Tick_List tl;
+            try {
+                tl = dl.get_list(LIST_listlist_selectedvalue);
+                try {
+                    if ( dl.check_tick_in_list(tick_index_add, LIST_listlist_selectedvalue)){
+                        if ( dl.delete_tick_from_list(tick_index_add, LIST_listlist_selectedvalue)){
+                            tl = dl.get_list(LIST_listlist_selectedvalue);  //update object
+                            ArrayList<String> data_to_show  = dl.load_tick_data(tl.understand_id());
+                            window_manager.load_list(LIST_listitems, data_to_show);
+                        }
+                    } 
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_LIST_button_deleteticklistActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JButton LIST_button_addnewlist;
+    public javax.swing.JButton LIST_button_addticktolist;
+    public javax.swing.JButton LIST_button_copycontent;
+    public javax.swing.JButton LIST_button_deletelist;
+    public javax.swing.JButton LIST_button_deleteticklist;
+    public javax.swing.JButton LIST_button_edit;
+    public javax.swing.JButton LIST_button_sendasemail;
+    private javax.swing.JLabel LIST_label_info1;
+    private javax.swing.JLabel LIST_label_info2;
+    public javax.swing.JList<String> LIST_listitems;
+    public javax.swing.JList<String> LIST_listlist;
+    public javax.swing.JList<String> LIST_listtick;
+    public javax.swing.JTextArea LIST_textarea_listdet;
+    public javax.swing.JTextField LIST_textfield_listname;
     public javax.swing.JButton TICK_button_active_ticks;
     public javax.swing.JButton TICK_button_addnewtick;
     public javax.swing.JButton TICK_button_delete;
     public javax.swing.JButton TICK_button_edittick;
-    public javax.swing.JButton TICK_button_link;
     public javax.swing.JButton TICK_button_markdone;
-    private javax.swing.JButton TICK_button_reload;
     public javax.swing.JButton TICK_button_sharetick;
     private javax.swing.JButton TICK_button_toclipboard;
     public javax.swing.JButton TICK_button_unarchive;
@@ -417,6 +795,10 @@ public class GUI_main_window extends javax.swing.JFrame {
     private javax.swing.JLabel Tick_LABEL_tick_version;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JPanel list_panel;
     private javax.swing.JPanel scenes_panel;
     private javax.swing.JTabbedPane tabbed_panel;

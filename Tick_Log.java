@@ -58,6 +58,10 @@ public class Tick_Log {
         String str = new Date().toString();
         String time = str.substring(11,19);
         String to_add = time + " : " + header + " ----> " + text+"\n";
+        // if for showing errors on the screen
+        if ( to_add.contains("E!!!")){
+            System.out.println(to_add);
+        }
         log_lines.add(to_add);
     }
     /**

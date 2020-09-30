@@ -8,6 +8,7 @@ package tick;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.sql.ResultSet;
 
 /**
  *Object for storing main data 
@@ -99,6 +100,23 @@ public class Tick_Tick extends Tick_Element{
             super.put_elements(wall_updater());
             internal_fail = true;
         }
+    }
+    
+    // constructor with resultset
+    Tick_Tick(ResultSet rs) throws SQLException{
+        super("Tick_Tick");
+        tick_id = rs.getInt("tick_id");
+        owner_id = rs.getInt("owner_id");
+        place_id = rs.getInt("place_id");
+        category_id = rs.getInt("category_id");
+        note_id = rs.getInt("note_id");
+        hashtag_table_id = rs.getInt("hashtag_table_id");
+        tick_done_id = rs.getInt("tick_done_id");
+        tick_done_start = rs.getString("tick_done_start");
+        tick_done_end = "";
+        tick_name = rs.getString("tick_name");
+        tick_priority = rs.getInt("tick_priority");
+        super.put_elements(wall_updater());       
     }
     
     /**

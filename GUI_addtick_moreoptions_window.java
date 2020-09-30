@@ -227,21 +227,33 @@ public class GUI_addtick_moreoptions_window extends javax.swing.JDialog {
             tick_to_extend.category_id = 1;
         }
         else{
-            tick_to_extend.category_id = combobox_category.getSelectedIndex()+1;
+            try { 
+                tick_to_extend.category_id = database.get_category_id_byname(combobox_category.getSelectedItem().toString());
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_addtick_moreoptions_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         // updating place
         if ( combobox_place.getSelectedItem().toString().equals("Manage...")){
             tick_to_extend.place_id = 1;
         }
         else{
-            tick_to_extend.place_id = combobox_place.getSelectedIndex()+1;
+            try {
+                tick_to_extend.place_id = database.get_place_id_byname(combobox_place.getSelectedItem().toString());
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_addtick_moreoptions_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         // updating hashtagtable
         if ( combobox_hashtagtable.getSelectedItem().toString().equals("Manage...")){
             tick_to_extend.hashtag_table_id = 1;
         }
         else{
-            tick_to_extend.hashtag_table_id = combobox_hashtagtable.getSelectedIndex()+1;
+            try {
+                tick_to_extend.hashtag_table_id = database.get_hashtagtable_id_byname(combobox_hashtagtable.getSelectedItem().toString());
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_addtick_moreoptions_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         // updating priority
         tick_to_extend.tick_priority = Integer.parseInt(combobox_priority.getSelectedItem().toString());
