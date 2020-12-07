@@ -22,7 +22,7 @@ import javax.mail.MessagingException;
  */
 public class GUI_main_window extends javax.swing.JFrame {
     
-    final String GUI_version = "v0.0.5";
+    final String GUI_version = "v0.0.9";
     public Database database;
     GUI_Window_Manager window_manager;
     public int actual_panel_index;     // index of a tabbed panel
@@ -30,6 +30,8 @@ public class GUI_main_window extends javax.swing.JFrame {
     public int LIST_listlist_selectedvalue;
     public int LIST_listtick_selectedvalue;
     public int LIST_listitems_selectedvalue;
+    public int SCENES_list_selectedvalue;
+    public int SCENES_listtick_selectedvalue;
     public String actual_choosen_element_string;
     UI_Interface ui;
 
@@ -42,6 +44,7 @@ public class GUI_main_window extends javax.swing.JFrame {
         TICK_list_selectedvalue = -1;
         LIST_listlist_selectedvalue = -1;
         LIST_listitems_selectedvalue = -1;
+        SCENES_list_selectedvalue = -1;
         actual_panel_index = 0;
         ui = new UI_Interface();
         
@@ -77,6 +80,8 @@ public class GUI_main_window extends javax.swing.JFrame {
         TICK_button_markdone = new javax.swing.JButton();
         TICK_button_unarchive = new javax.swing.JButton();
         TICK_button_delete = new javax.swing.JButton();
+        TICK_combobox_filter = new javax.swing.JComboBox<>();
+        jLabel1 = new javax.swing.JLabel();
         list_panel = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         LIST_listlist = new javax.swing.JList<>();
@@ -97,7 +102,20 @@ public class GUI_main_window extends javax.swing.JFrame {
         LIST_textarea_listdet = new javax.swing.JTextArea();
         LIST_textfield_listname = new javax.swing.JTextField();
         scenes_panel = new javax.swing.JPanel();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        SCENES_listscenes = new javax.swing.JList<>();
+        SCENES_label_info1 = new javax.swing.JLabel();
+        SCENES_button_createnewscene = new javax.swing.JButton();
+        SCENES_button_editscene = new javax.swing.JButton();
+        SCENES_label_info2 = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        SCENES_textarea_scenedata = new javax.swing.JTextArea();
+        SCENES_label_info3 = new javax.swing.JLabel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        SCENES_listtick = new javax.swing.JList<>();
+        SCENES_button_deletescene = new javax.swing.JButton();
         Tick_LABEL_tick_version = new javax.swing.JLabel();
+        button_options = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -181,6 +199,10 @@ public class GUI_main_window extends javax.swing.JFrame {
             }
         });
 
+        TICK_combobox_filter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel1.setText("Filter:");
+
         javax.swing.GroupLayout tick_panelLayout = new javax.swing.GroupLayout(tick_panel);
         tick_panel.setLayout(tick_panelLayout);
         tick_panelLayout.setHorizontalGroup(
@@ -192,16 +214,22 @@ public class GUI_main_window extends javax.swing.JFrame {
                     .addComponent(TICK_button_active_ticks, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))
                 .addGap(59, 59, 59)
-                .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
-                            .addComponent(TICK_button_edittick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(TICK_button_sharetick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(TICK_button_addnewtick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(TICK_button_toclipboard, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addComponent(TICK_button_unarchive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(TICK_button_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+                                .addComponent(TICK_button_edittick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(TICK_button_sharetick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(TICK_button_addnewtick, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(TICK_button_unarchive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(TICK_button_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(tick_panelLayout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(TICK_combobox_filter, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(65, 65, 65)
+                        .addComponent(TICK_button_toclipboard)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         tick_panelLayout.setVerticalGroup(
@@ -210,7 +238,9 @@ public class GUI_main_window extends javax.swing.JFrame {
                 .addGap(12, 12, 12)
                 .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(TICK_button_active_ticks)
-                    .addComponent(TICK_button_toclipboard))
+                    .addComponent(TICK_button_toclipboard)
+                    .addComponent(TICK_combobox_filter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tick_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tick_panelLayout.createSequentialGroup()
@@ -229,7 +259,7 @@ public class GUI_main_window extends javax.swing.JFrame {
                         .addComponent(TICK_button_unarchive)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(TICK_button_delete)))
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
 
         tabbed_panel.addTab("Tick", tick_panel);
@@ -397,20 +427,109 @@ public class GUI_main_window extends javax.swing.JFrame {
 
         tabbed_panel.addTab("List", list_panel);
 
+        SCENES_listscenes.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        SCENES_listscenes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                SCENES_listscenesMouseClicked(evt);
+            }
+        });
+        jScrollPane7.setViewportView(SCENES_listscenes);
+
+        SCENES_label_info1.setText("Scenes");
+
+        SCENES_button_createnewscene.setText("Create new scene");
+        SCENES_button_createnewscene.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SCENES_button_createnewsceneActionPerformed(evt);
+            }
+        });
+
+        SCENES_button_editscene.setText("Edit scene");
+        SCENES_button_editscene.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SCENES_button_editsceneActionPerformed(evt);
+            }
+        });
+
+        SCENES_label_info2.setText("Scene data:");
+
+        SCENES_textarea_scenedata.setColumns(20);
+        SCENES_textarea_scenedata.setRows(5);
+        jScrollPane8.setViewportView(SCENES_textarea_scenedata);
+
+        SCENES_label_info3.setText("Ticks in scene:");
+
+        SCENES_listtick.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane9.setViewportView(SCENES_listtick);
+
+        SCENES_button_deletescene.setText("Delete scene");
+        SCENES_button_deletescene.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SCENES_button_deletesceneActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout scenes_panelLayout = new javax.swing.GroupLayout(scenes_panel);
         scenes_panel.setLayout(scenes_panelLayout);
         scenes_panelLayout.setHorizontalGroup(
             scenes_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 762, Short.MAX_VALUE)
+            .addGroup(scenes_panelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(scenes_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(SCENES_button_deletescene, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(SCENES_label_info1, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(SCENES_button_createnewscene, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)
+                    .addComponent(SCENES_button_editscene, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(65, 65, 65)
+                .addGroup(scenes_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+                    .addGroup(scenes_panelLayout.createSequentialGroup()
+                        .addGroup(scenes_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(SCENES_label_info2)
+                            .addComponent(SCENES_label_info3))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane9))
+                .addContainerGap())
         );
         scenes_panelLayout.setVerticalGroup(
             scenes_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 584, Short.MAX_VALUE)
+            .addGroup(scenes_panelLayout.createSequentialGroup()
+                .addGap(33, 33, 33)
+                .addComponent(SCENES_label_info1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(scenes_panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(scenes_panelLayout.createSequentialGroup()
+                        .addComponent(SCENES_label_info2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(SCENES_label_info3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane9)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(SCENES_button_createnewscene)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(SCENES_button_editscene)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(SCENES_button_deletescene)
+                .addContainerGap())
         );
 
         tabbed_panel.addTab("Scenes", scenes_panel);
 
-        Tick_LABEL_tick_version.setText("Tick version 1.0.0B11");
+        Tick_LABEL_tick_version.setText("Tick version 1.0.0B13");
+
+        button_options.setText("Options");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -420,8 +539,9 @@ public class GUI_main_window extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tabbed_panel)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(button_options, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(Tick_LABEL_tick_version)))
                 .addContainerGap())
         );
@@ -431,7 +551,9 @@ public class GUI_main_window extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(tabbed_panel, javax.swing.GroupLayout.PREFERRED_SIZE, 610, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Tick_LABEL_tick_version, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Tick_LABEL_tick_version, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(button_options))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -467,8 +589,15 @@ public class GUI_main_window extends javax.swing.JFrame {
                 break;
 
             case 2:
-                System.out.println("Scenes");
+            {
+                try {
+                    window_manager.reload_default_scene_scene();
+                } catch (SQLException ex) {
+                    Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
                 break;
+
             default:
                 break;
         }
@@ -765,6 +894,64 @@ public class GUI_main_window extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_LIST_button_deleteticklistActionPerformed
 
+    private void SCENES_listscenesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SCENES_listscenesMouseClicked
+        SCENES_list_selectedvalue = Integer.parseInt(SCENES_listscenes.getSelectedValue().split(":")[0]);
+        SCENES_button_deletescene.setText("Delete scene");
+        if ( SCENES_list_selectedvalue != -1 ){
+            Database_Scene ds = new Database_Scene(database);
+            try {
+                Tick_Scene ts = ds.get_scene_object(SCENES_list_selectedvalue);
+                SCENES_textarea_scenedata.setText(ui.convert_array(ts.get_lines_to_show()));
+                
+                ArrayList<Tick_Tick> tick_from_scene = ts.return_tick_from_scene(database);
+                ArrayList<String> data_to_send = new ArrayList<>();
+                for(Tick_Tick object : tick_from_scene ){
+                    data_to_send.add(object.simple_show());
+                }
+                
+                window_manager.reload_JList(data_to_send, SCENES_listtick);
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           
+        }
+    }//GEN-LAST:event_SCENES_listscenesMouseClicked
+
+    private void SCENES_button_createnewsceneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SCENES_button_createnewsceneActionPerformed
+        try {
+            new GUI_addscene_window(this,true,database,0);
+            window_manager.reload_default_scene_scene();
+        } catch (SQLException ex) {
+            Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_SCENES_button_createnewsceneActionPerformed
+
+    private void SCENES_button_editsceneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SCENES_button_editsceneActionPerformed
+        if ( SCENES_list_selectedvalue != -1 ){
+            try {
+                new GUI_addscene_window(this,true,database,SCENES_list_selectedvalue);
+                window_manager.reload_default_scene_scene();
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_SCENES_button_editsceneActionPerformed
+
+    private void SCENES_button_deletesceneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SCENES_button_deletesceneActionPerformed
+        if ( SCENES_list_selectedvalue != -1 ){
+            Database_Garbage_Collector dgc = new Database_Garbage_Collector(database);
+            try {
+                if ( dgc.delete_scene(SCENES_list_selectedvalue) ){
+                    window_manager.reload_default_scene_scene();
+                    SCENES_button_deletescene.setText("Scene deleted");
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(GUI_main_window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_SCENES_button_deletesceneActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -782,6 +969,15 @@ public class GUI_main_window extends javax.swing.JFrame {
     public javax.swing.JList<String> LIST_listtick;
     public javax.swing.JTextArea LIST_textarea_listdet;
     public javax.swing.JTextField LIST_textfield_listname;
+    public javax.swing.JButton SCENES_button_createnewscene;
+    private javax.swing.JButton SCENES_button_deletescene;
+    public javax.swing.JButton SCENES_button_editscene;
+    private javax.swing.JLabel SCENES_label_info1;
+    private javax.swing.JLabel SCENES_label_info2;
+    private javax.swing.JLabel SCENES_label_info3;
+    public javax.swing.JList<String> SCENES_listscenes;
+    public javax.swing.JList<String> SCENES_listtick;
+    public javax.swing.JTextArea SCENES_textarea_scenedata;
     public javax.swing.JButton TICK_button_active_ticks;
     public javax.swing.JButton TICK_button_addnewtick;
     public javax.swing.JButton TICK_button_delete;
@@ -790,17 +986,23 @@ public class GUI_main_window extends javax.swing.JFrame {
     public javax.swing.JButton TICK_button_sharetick;
     private javax.swing.JButton TICK_button_toclipboard;
     public javax.swing.JButton TICK_button_unarchive;
+    public javax.swing.JComboBox<String> TICK_combobox_filter;
     public javax.swing.JList<String> TICK_list_ticklist;
     public javax.swing.JTextArea TICK_textarea_tickdetails;
     private javax.swing.JLabel Tick_LABEL_tick_version;
+    private javax.swing.JButton button_options;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JPanel list_panel;
-    private javax.swing.JPanel scenes_panel;
+    public javax.swing.JPanel scenes_panel;
     private javax.swing.JTabbedPane tabbed_panel;
     private javax.swing.JPanel tick_panel;
     // End of variables declaration//GEN-END:variables

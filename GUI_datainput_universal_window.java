@@ -64,14 +64,17 @@ public class GUI_datainput_universal_window extends javax.swing.JDialog {
                     button_optional1.setVisible(false);
                     break;
                 case "hashtag table":
-                    textfield_name.setText("Name of the tag");
-                    textfield_note.setText("Note for the tag");
+                    textfield_name.setText("Name of the hashtag table");
+                    textfield_note.setText("Note for the hashtag table");
+                    textfield_note.setEditable(true);
                     button_optional1.setText("Link tags");
                     button_optional1.setVisible(false);
+                    button_optional2.setVisible(false);
                     break;
                 case "tag":
                     textfield_name.setText("Name of the tag");
                     textfield_note.setText("Note for the tag");
+                    textfield_note.setEditable(true);
                     button_optional1.setVisible(false);
                     button_optional2.setVisible(false);
                     break;
@@ -85,6 +88,7 @@ public class GUI_datainput_universal_window extends javax.swing.JDialog {
                     Tick_Category tc = new Tick_Category(database.return_TB_collection(database.logged, "category", program));
                     textfield_name.setText(tc.category_name);
                     textfield_note.setText(tc.category_note);
+                    textfield_note.setEditable(true);
                     button_optional1.setVisible(false);
                     button_optional2.setVisible(false);
                     break;
@@ -92,21 +96,25 @@ public class GUI_datainput_universal_window extends javax.swing.JDialog {
                     Tick_Place tp = new Tick_Place(database.return_TB_collection(database.logged, "place", program));
                     textfield_name.setText(tp.place_name);
                     textfield_note.setEditable(false);
-                    button_optional1.setVisible(false);
+                    button_optional1.setText("Add address");
+                    button_optional1.setVisible(true);
                     button_optional2.setVisible(false);
                     break;
                 case "hashtag table":
                     Tick_HashtagT th = new Tick_HashtagT(database.return_TB_collection(database.logged, "hashtag table", program));
                     textfield_name.setText(th.hashtag_table_name);
                     textfield_note.setText(th.hashtag_table_note);
+                    textfield_note.setEditable(true);
                     button_optional1.setText("Link tags");
-                    button_optional1.setVisible(false);
+                    button_optional1.setVisible(true);
+                    button_optional2.setVisible(false);
                     break;
                 case "tag":
                     Tick_Tag tt = new Tick_Tag(database.return_TB_collection(database.logged, "tag", program));
                     textfield_name.setText(tt.tag_name);
                     textfield_note.setText(tt.tag_note);
                     button_optional1.setVisible(false);
+                    textfield_note.setEditable(true);
                     button_optional2.setVisible(false);
                     break;
                 default:
@@ -139,10 +147,18 @@ public class GUI_datainput_universal_window extends javax.swing.JDialog {
         if ( mode == 1){
             textfield_name.setEnabled(false);
             textfield_note.setEnabled(false);
-            button_optional1.setVisible(false);
+            if ( this.mode.equals("hashtag table") || this.mode.equals("place") ){
+                button_optional1.setVisible(true);
+            }
             button_optional2.setVisible(false);
             button_add.setEnabled(false);
-            button_add.setText("Done");
+            if ( program != 1){
+                button_add.setText("Updated");
+                button_optional1.setEnabled(true);
+            }
+            else{
+                button_add.setText("Done");
+            }
         }
         else if (mode == 2){
             textfield_name.setEnabled(false);
@@ -222,10 +238,72 @@ public class GUI_datainput_universal_window extends javax.swing.JDialog {
         }
         // edit data
         else{
-            
-        }
-        
-        
+            Database_Object_Updater dou = new Database_Object_Updater(database);
+            switch(mode){
+                case "category":
+                    Tick_Category tc = new Tick_Category();
+                    tc.category_id = program;
+                    tc.category_name = textfield_name.getText();
+                    tc.category_note = textfield_note.getText();
+                    tc.owner_id = database.logged.owner_id;
+                    tc.wall_updater();
+                    
+                    if ( dou.update_record(tc.wall_updater(), mode)){
+                        close_window_activity(1);
+                    }
+                    else{
+                        close_window_activity(2);
+                    }
+                    
+                    break;
+                
+                case "place":
+                    Tick_Place tp = new Tick_Place();
+                    tp.place_id = program;
+                    tp.place_name = textfield_name.getText();
+                    tp.owner_id = database.logged.owner_id;
+                    tp.wall_updater();
+                    if ( dou.update_record(tp.wall_updater(), mode)){
+                        close_window_activity(1);
+                    }
+                    else{
+                        close_window_activity(2);
+                    }
+                    break;
+                case "hashtag table":
+                    Tick_HashtagT th = new Tick_HashtagT();
+                    th.hashtag_table_id = program;
+                    th.hashtag_table_name = textfield_name.getText();
+                    th.hashtag_table_note = textfield_note.getText();
+                    th.owner_id = database.logged.owner_id;
+                    th.wall_updater();
+                    if ( dou.update_record(th.wall_updater(), mode)){
+                        close_window_activity(1);
+                    }
+                    else{
+                        close_window_activity(2);
+                    }
+                    
+                    break;
+                case "tag":
+                    Tick_Tag tt = new Tick_Tag();
+                    tt.tag_id = program;
+                    tt.tag_name = textfield_name.getText();
+                    tt.tag_note = textfield_note.getText();
+                    tt.owner_id = database.logged.owner_id;
+                    tt.wall_updater();
+                    if ( dou.update_record(tt.wall_updater(), mode)){
+                        close_window_activity(1);
+                    }
+                    else{
+                        close_window_activity(2);
+                    }
+                    
+                    break;
+                default:
+                    break;
+            }
+        } 
     }
 
     /**
@@ -253,6 +331,11 @@ public class GUI_datainput_universal_window extends javax.swing.JDialog {
         jScrollPane1.setViewportView(textfield_note);
 
         button_optional1.setText("jButton1");
+        button_optional1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button_optional1ActionPerformed(evt);
+            }
+        });
 
         button_add.setText("Add");
         button_add.addActionListener(new java.awt.event.ActionListener() {
@@ -307,6 +390,40 @@ public class GUI_datainput_universal_window extends javax.swing.JDialog {
             }
         }
     }//GEN-LAST:event_button_addActionPerformed
+
+    private void button_optional1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_optional1ActionPerformed
+        switch(mode){
+            case "hashtag table": 
+                if ( program == 1 ){
+                    int index = 0;
+                    try {
+                        index = database.get_hashtagtable_id_byname(textfield_name.getText());
+                    } catch (SQLException ex) {
+                        Logger.getLogger(GUI_datainput_universal_window.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    try {
+                        new GUI_addtags_window(this,true,database,index);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(GUI_datainput_universal_window.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                else{
+                    try {
+                        new GUI_addtags_window(this,true,database,program);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(GUI_datainput_universal_window.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                break;
+            case "place":
+                if ( program == 1 ){
+                    
+                }
+                break;
+            default:
+                break;
+        }
+    }//GEN-LAST:event_button_optional1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton button_add;

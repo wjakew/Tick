@@ -801,7 +801,7 @@ public class CUI_Tick_Inteface {
             }
         }
         // hshtag    /tag_id/ /hashtag_table_id/
-        else if ( addons.size() == 4 && addons.contains("taghsh")){
+        else if ( addons.size() == 4 && addons.contains("hshtag")){
             if ( database.check_if_record_exists(ui.numbers.get(0), "tag") 
                     && database.check_if_record_exists(ui.numbers.get(1), "hashtag table")){
                 int tag_id = ui.numbers.get(0);

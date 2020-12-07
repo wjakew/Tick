@@ -5,7 +5,10 @@ all rights reserved
  */
 package tick;
 
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *Object for storing addresses
@@ -57,6 +60,19 @@ public class Tick_Address extends Tick_Element{
         super.put_elements(wall_updater());
     }
     
+    // constructor with ResultSet implementation
+    Tick_Address(ResultSet to_add) throws SQLException{
+        super("Tick_Address");
+        address_id = to_add.getInt("address_id");
+        address_city = to_add.getString("address_city");
+        address_street = to_add.getString("address_street");
+        address_house_number = to_add.getInt("address_house_number");
+        address_flat_number = to_add.getInt("address_flat_number");
+        address_postal = to_add.getString("address_postal");
+        address_country = to_add.getString("address_country");
+        super.put_elements(wall_updater());
+    }
+    
     /**
      * Tick_Address.wall_updater()
      * @return ArrayList
@@ -71,6 +87,7 @@ public class Tick_Address extends Tick_Element{
         to_ret.add(new Tick_Brick(address_flat_number));
         to_ret.add(new Tick_Brick(address_postal));
         to_ret.add(new Tick_Brick(address_country));
+        super.put_elements(to_ret);
         return to_ret;
     }
     /**
@@ -112,5 +129,30 @@ public class Tick_Address extends Tick_Element{
         to_ret.add(address_postal+" "+address_city);
         to_ret.add(address_country);
         return to_ret;
+    }
+    
+    /**
+     * Tick_Address.get_query(Database database)
+     * @param database
+     * @return PreparedStatment
+     * @throws SQLException 
+     */
+    PreparedStatement get_query(Database database) throws SQLException{
+        String query = "INSERT INTO ADDRESS\n" +
+                       "(address_city,address_street,address_house_number,address_flat_number,address_postal,address_country)\n" +
+                       "VALUES\n" +
+                       "(?,?,?,?,?,?);";
+        
+        
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setString(1,address_city);
+        ppst.setString(2,address_street);
+        ppst.setInt(3, address_house_number);
+        ppst.setInt(4,address_flat_number);
+        ppst.setString(6,address_postal);
+        ppst.setString(7,address_country);
+    
+        return ppst;
     }
 }

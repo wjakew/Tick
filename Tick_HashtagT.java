@@ -8,6 +8,7 @@ package tick;
 import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
 
 
 /**
@@ -87,7 +88,7 @@ public class Tick_HashtagT extends Tick_Element{
         super.put_elements(wall_updater());
     }
     /**
-     * Tick_Address.get_lines_to_show()
+     * Tick_Hashtag.get_lines_to_show()
      * @return ArrayList
      * Returns lines of object content
      */
@@ -103,6 +104,33 @@ public class Tick_HashtagT extends Tick_Element{
         to_ret.add("Hashtag Table Name: "+hashtag_table_name);
         to_ret.add("Hashtag Table Note:\n"+hashtag_table_note);
         return to_ret;
+    }
+    
+    /**
+     * Tick_Hashtag.get_all_tags(Database database)
+     * @param database
+     * @return ArrayList
+     * @throws SQLException
+     * Function for getting all tags from current hashtag table
+     */
+    ArrayList<Tick_Tag> get_all_tags(Database database) throws SQLException{
+        String query = "SELECT * FROM TAG where hashtag_table_id = ?";
+        ArrayList<Tick_Tag> data_toRet = new ArrayList<>();
+        
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setInt(1,hashtag_table_id);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            while(rs.next()){
+                data_toRet.add(new Tick_Tag(rs));
+            }
+        }catch(SQLException e){
+            return null;
+        }
+        return data_toRet;
     }
     
     /**

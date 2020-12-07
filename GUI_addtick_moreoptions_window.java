@@ -139,8 +139,8 @@ public class GUI_addtick_moreoptions_window extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addComponent(textfield_tickname, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addComponent(textfield_tickname, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -277,7 +277,7 @@ public class GUI_addtick_moreoptions_window extends javax.swing.JDialog {
      * hashtag - returns name of elements in HASHTAG_TABLE table
      */
     DefaultComboBoxModel update_combobox(String mode) throws SQLException{
-        ArrayList<String> data_tofill = database.get_element_name(mode);
+        ArrayList<String> data_tofill = database.get_element_name(mode,0);
         return new DefaultComboBoxModel(data_tofill.toArray());
     }
     

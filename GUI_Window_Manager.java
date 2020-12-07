@@ -8,18 +8,21 @@ package tick;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JTextArea;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *Object for managing windows in the program
  * @author jakubwawak
  */
 public class GUI_Window_Manager {
-    final String version = "v.0.0.3";
+    final String version = "v.0.0.4";
     
     GUI_main_window window;
     DefaultListModel model_obj; // jList model object
@@ -27,6 +30,19 @@ public class GUI_Window_Manager {
     
     GUI_Window_Manager(GUI_main_window window){
         this.window = window;
+        
+    }
+    
+    /**
+     * Function for reloading filters in Tick card
+     */
+    void reload_filters_combobox() throws SQLException{
+        DefaultComboBoxModel dcm = new DefaultComboBoxModel();
+        
+        dcm.addAll(window.database.get_all_elements());
+        
+        window.TICK_combobox_filter.setModel(dcm);
+        log("Model for ComboBox filters updated");
         
     }
     //----------------------- functions for reloading components
@@ -45,6 +61,27 @@ public class GUI_Window_Manager {
         
         window.LIST_listlist.setModel(model_obj);
         log("Model for List list updated");
+    }
+    
+    void reload_SCENElisttick(int scene_id) throws SQLException{
+        //todo
+        
+    }
+    
+    /**
+     * Function for reloading scenes
+     * @throws SQLException 
+     */
+    void reload_listscenes() throws SQLException{
+        Database_Scene ds = new Database_Scene(window.database);
+        ArrayList<String> data_to_show = ds.get_glances();
+        model_obj = new DefaultListModel();
+        
+        for(String element : data_to_show){
+            model_obj.addElement(element);
+        }
+        window.SCENES_listscenes.setModel(model_obj);
+        
     }
     
     /**
@@ -94,6 +131,21 @@ public class GUI_Window_Manager {
         
         to_update.setModel(model_obj);
         log("Model for Tick list updated");
+    }
+    /**
+     * Function for reloading data in jList ( any jList )
+     * @param data
+     * @param object 
+     */
+    void reload_JList(ArrayList<String> data,JList object){
+        DefaultListModel dlm = new DefaultListModel();
+        
+        for(String line : data){
+            dlm.addElement(line);
+        }
+        
+        object.setModel(dlm);
+        
     }
     /**
      * Function fro reloading blank data to components
@@ -170,7 +222,19 @@ public class GUI_Window_Manager {
 
     //----------------------------- functions for reloading window views
     /**
-     * Functionf for reloading to default scene (LIST)
+     * Function for reloading to defalut scene (SCENE)
+     * @throws SQLException 
+     */
+    void reload_default_scene_scene() throws SQLException{
+        reload_listscenes();
+        window.SCENES_list_selectedvalue = -1;
+        window.SCENES_listtick_selectedvalue = -1;
+        window.SCENES_textarea_scenedata.setText("");
+        reload_blank(window.SCENES_listtick);
+        
+    }
+    /**
+     * Function of for reloading to default scene (LIST)
      * @throws SQLException 
      */
     void reload_default_scene_list() throws SQLException{
@@ -208,6 +272,7 @@ public class GUI_Window_Manager {
      */
     void reload_default_scene_tick() throws SQLException{
         reload_ticklist(0,window.TICK_list_ticklist);
+        reload_filters_combobox();
         window.TICK_button_delete.setText("Delete");
         window.TICK_button_delete.setEnabled(false);
         window.TICK_button_active_ticks.setText("Active Ticks");
@@ -304,6 +369,28 @@ public class GUI_Window_Manager {
             }
             
         }
+    }
+    /**
+     * Function gets models for comboboxes
+     * @param mode
+     * @return DefaultComboBoxModel
+     * modes:
+     * category - returns name of elements in CATEGORY table
+     * place - returns name of elements in PLACE table
+     * hashtag table - returns name of elements in HASHTAG_TABLE table
+     */
+    DefaultComboBoxModel get_defaultcomboboxmodel(String mode,int option) throws SQLException{
+        return new DefaultComboBoxModel(window.database.get_element_name(mode,option).toArray());
+    }
+    
+    /**
+     * Function for updating comboboxes
+     * @param object_to_add
+     * @param data 
+     */
+    void update_combobox(JComboBox object_to_add, ArrayList<String> data){
+        DefaultComboBoxModel dlm = new DefaultComboBoxModel(data.toArray());
+        object_to_add.setModel(dlm);
     }
     
     /**

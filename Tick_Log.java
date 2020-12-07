@@ -19,6 +19,9 @@ public class Tick_Log {
     
     final String version = "v1.0.3";
     
+    // set to 0 when deploying
+    int debug = 1;
+    
     ArrayList<String> log_lines;
     String LOG_SRC = "LOG_TICKPROGRAM_";
     Date actual_date;
@@ -59,7 +62,7 @@ public class Tick_Log {
         String time = str.substring(11,19);
         String to_add = time + " : " + header + " ----> " + text+"\n";
         // if for showing errors on the screen
-        if ( to_add.contains("E!!!")){
+        if ( to_add.contains("E!!!") || debug == 1){
             System.out.println(to_add);
         }
         log_lines.add(to_add);
@@ -97,6 +100,4 @@ public class Tick_Log {
         }
         writer.close();
     }
-    
-    
 }

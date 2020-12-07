@@ -22,6 +22,15 @@ public class Tick_Brick {
     int data_int;
     String data_string;
     ArrayList<String> data_array;
+    
+    /**
+     * category
+     * modes:
+     * 1 - int
+     * 2 - string
+     * 3 - array
+     * -1 - error
+     */
     int category;
     
     Tick_Brick(){

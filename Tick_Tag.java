@@ -6,6 +6,8 @@ all rights reserved
 package tick;
 
 import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *Object for storing tags from database
@@ -44,6 +46,16 @@ public class Tick_Tag extends Tick_Element{
         
     }
     
+    Tick_Tag(ResultSet to_add) throws SQLException{
+        super("Tick_Tag");
+        tag_id = to_add.getInt("tag_id");
+        owner_id = to_add.getInt("owner_id");
+        hashtag_table_id = to_add.getInt("hashtag_table_id");
+        tag_name = to_add.getString("tag_name");
+        tag_note = to_add.getString("tag_note");
+        super.put_elements(wall_updater());
+    }
+    
     // one argument constructor
     Tick_Tag(ArrayList<Tick_Brick> to_add){
         super("Tick_Tag");
@@ -72,6 +84,14 @@ public class Tick_Tag extends Tick_Element{
         super.put_elements(to_ret);
          
         return to_ret;
+    }
+    
+    /**
+     * Function for getting glance
+     * @return String
+     */
+    String get_glance(){
+        return Integer.toString(tag_id)+ " : "+tag_name;
     }
     
     /**

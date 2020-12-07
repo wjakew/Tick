@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class Database {
     
-    final String version = "v1.0.4";
+    final String version = "v1.0.6";
     
     final String HEADER = "DATABASE ("+version+")";
     
@@ -66,9 +66,9 @@ public class Database {
         PreparedStatement ppst = con.prepareStatement(query);
         
         try{
-            ResultSet rs = ppst.executeQuery();
-            if ( rs.next() ){
-                return rs.getString("gi_version");
+            ResultSet rs_dv = ppst.executeQuery();
+            if ( rs_dv.next() ){
+                return rs_dv.getString("gi_version");
             }
             return null;
         
@@ -88,9 +88,9 @@ public class Database {
         PreparedStatement ppst = con.prepareStatement(query);
         
         try{
-            ResultSet rs = ppst.executeQuery();
-            if ( rs.next() ){
-                return rs.getString("gi_build_id");
+            ResultSet rs_h = ppst.executeQuery();
+            if ( rs_h.next() ){
+                return rs_h.getString("gi_build_id");
             }
             return null;
         
@@ -110,40 +110,44 @@ public class Database {
      */
     boolean check_if_record_exists(int id,String mode) throws SQLException{
         String query = "";
-        if (mode.equals("address")){
-            query = "SELECT * FROM ADDRESS where address_id = ?;";
-        }
-        else if (mode.equals("category")){
-            query = "SELECT * FROM CATEGORY where category_id = ?;";
-        }
-        else if (mode.equals("hashtag table")){
-            query = "SELECT * FROM HASHTAG_TABLE where hashtag_table_id = ?;";
-        }
-        else if (mode.equals("note")){
-            query = "SELECT * FROM NOTE where note_id = ?;";
-        }
-        else if (mode.equals("place")){
-            query = "SELECT * FROM PLACE where place_id = ?;";
-        }
-        else if (mode.equals("tag")){
-            query = "SELECT * FROM TAG where tag_id = ?;";
-        }
-        else if (mode.equals("tick")){
-            query = "SELECT * FROM TICK where tick_id = ?;";
-        }
-        else if (mode.equals("tick_done")){
-            query = "SELECT * FROM TICK_DONE where tick_done_id = ?;";
-        }
-        else if (mode.equals("scene")){
-            query = "SELECT * FROM SCENE where scene_id =?;";
-        }
-        else if (mode.equals("list")){
-            query = "SELECT * FROM LISTS where list_id =?;";
+        switch (mode) {
+            case "address":
+                query = "SELECT * FROM ADDRESS where address_id = ?;";
+                break;
+            case "category":
+                query = "SELECT * FROM CATEGORY where category_id = ?;";
+                break;
+            case "hashtag table":
+                query = "SELECT * FROM HASHTAG_TABLE where hashtag_table_id = ?;";
+                break;
+            case "note":
+                query = "SELECT * FROM NOTE where note_id = ?;";
+                break;
+            case "place":
+                query = "SELECT * FROM PLACE where place_id = ?;";
+                break;
+            case "tag":
+                query = "SELECT * FROM TAG where tag_id = ?;";
+                break;
+            case "tick":
+                query = "SELECT * FROM TICK where tick_id = ?;";
+                break;
+            case "tick_done":
+                query = "SELECT * FROM TICK_DONE where tick_done_id = ?;";
+                break;
+            case "scene":
+                query = "SELECT * FROM SCENE where scene_id =?;";
+                break;
+            case "list":
+                query = "SELECT * FROM LISTS where list_id =?;";
+                break;
+            default:
+                break;
         }
         PreparedStatement ppst = con.prepareStatement(query);
         ppst.setInt(1, id);
-        ResultSet rs = ppst.executeQuery();
-        return rs.next();
+        ResultSet rs_re = ppst.executeQuery();
+        return rs_re.next();
     }
     /**
      * Database.get_debug_info(int owner_id)
@@ -157,13 +161,70 @@ public class Database {
         this.log.add("Getting debug info from database", HEADER);
         PreparedStatement ppst = con.prepareStatement(query);
         ppst.setInt(1, user.owner_id);
-        ResultSet rs = ppst.executeQuery();
+        ResultSet rs_di = ppst.executeQuery();
         
-        if ( rs.next() ){
-            return rs.getInt("debug");
+        if ( rs_di.next() ){
+            return rs_di.getInt("debug");
         }
         return -1;
     }
+    
+    /**
+     * Database.get_all_elements()
+     * @return ArrayList
+     * Function for getting all elements like place category hashtagtable or tag from table
+     */
+    ArrayList<String> get_all_elements() throws SQLException{
+        ArrayList<String> data_toRet = new ArrayList<>();
+        this.log.add("Getting elements from database...",HEADER);
+        String data;
+        String [] names = {"PLACE","CATEGORY","HASHTAG_TABLE"};
+        
+        for(String name : names){
+            data = name;
+            
+            this.log.add("name: "+data,HEADER);
+            
+            
+            String query = "SELECT * from "+ data + " where owner_id = ?;";
+            
+            PreparedStatement ppst = con.prepareStatement(query);
+            
+            ppst.setInt(1,logged.owner_id);
+            
+            this.log.add("QUERY: "+ppst.toString(),HEADER);
+            
+            try{
+                
+                ResultSet rs_gaea = ppst.executeQuery();
+                
+                while ( rs_gaea.next() ){
+                    
+                    switch (name) {
+                        case "PLACE":
+                            data_toRet.add("P "+rs_gaea.getString("place_name"));
+                            break;
+                        case "CATEGORY":
+                            data_toRet.add("C "+rs_gaea.getString("category_name"));
+                            break;
+                        case "HASHTAG_TABLE":
+                            data_toRet.add("H "+rs_gaea.getString("hashtag_table_name"));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                
+            }catch(SQLException e){
+                this.log.add("Failed to get all elements ("+e.toString()+")",HEADER);
+                return null;
+            }
+        }
+        
+        return data_toRet;
+        
+    }
+    
     /**
      * Database.array_has_it(int array[],int a)
      * @param array
@@ -244,10 +305,10 @@ public class Database {
         String query = " SELECT owner_id from OWN WHERE owner_login = ?;";
         PreparedStatement ppst = con.prepareStatement(query);
         ppst.setString(1, owner_login);
-        ResultSet rs = ppst.executeQuery();
+        ResultSet rs_roi = ppst.executeQuery();
         
-        if ( rs.next() ){
-            return rs.getInt("owner_id");
+        if ( rs_roi.next() ){
+            return rs_roi.getInt("owner_id");
         }
         
         return -1;
@@ -266,10 +327,10 @@ public class Database {
         ppst.setInt(1, owner_id);
         
         try{
-            ResultSet rs = ppst.executeQuery();
+            ResultSet rs_ron = ppst.executeQuery();
             log.add("RET NAME: QUERY "+ ppst.toString(),HEADER);
-            if ( rs.next() ){
-            return rs.getString("owner_login");
+            if ( rs_ron.next() ){
+            return rs_ron.getString("owner_login");
             }
             else{
                 return null;
@@ -294,9 +355,9 @@ public class Database {
         ppst.setInt(1, tick_id);
         
         try{
-            ResultSet rs = ppst.executeQuery();
-            if ( rs.next()){
-                return rs.getString("tick_name");
+            ResultSet rs_rtn = ppst.executeQuery();
+            if ( rs_rtn.next()){
+                return rs_rtn.getString("tick_name");
             }
             return null;
             
@@ -315,9 +376,9 @@ public class Database {
         String query = "select address_id from ADDRESS ORDER BY id DESC LIMIT 1;";
         PreparedStatement ppst = con.prepareStatement(query);
         try{
-            ResultSet rs = ppst.executeQuery();
-            if ( rs.next() ){
-                return rs.getInt("address_id");
+            ResultSet rs_lai = ppst.executeQuery();
+            if ( rs_lai.next() ){
+                return rs_lai.getInt("address_id");
             }
             return -1;
         }catch(SQLException e){
@@ -335,17 +396,16 @@ public class Database {
      * Function gets category id by given name
      */
     int get_category_id_byname(String category_name) throws SQLException{
-        String query = "SELECT * FROM CATEGORY WHERE category_name = ? and owner_id = ?";
+        String query = "SELECT * FROM CATEGORY WHERE category_name = ?";
         PreparedStatement ppst = con.prepareStatement(query);
         
         ppst.setString(1,category_name);
-        ppst.setInt(2,this.logged.owner_id);
         
         try{
-            ResultSet rs  = ppst.executeQuery();
+            ResultSet rs_gcib  = ppst.executeQuery();
             
-            if ( rs.next() ){
-                return rs.getInt("category_id");
+            if ( rs_gcib.next() ){
+                return rs_gcib.getInt("category_id");
             }
             return -1;
         }catch(SQLException e){
@@ -353,18 +413,24 @@ public class Database {
             return -2;
         }  
     }
+    /**
+     * Database.get_place_id_byname(String place_name)
+     * @param place_name
+     * @return Integer
+     * @throws SQLException 
+     * Function gets place id by name
+     */
     int get_place_id_byname(String place_name) throws SQLException{
-        String query = "SELECT * FROM PLACE where place_name = ? and owner_id = ?;";
+        String query = "SELECT * FROM PLACE where place_name = ?;";
         PreparedStatement ppst = con.prepareStatement(query);
         
         ppst.setString(1,place_name);
-        ppst.setInt(2,this.logged.owner_id);
         
         try{
-            ResultSet rs = ppst.executeQuery();
+            ResultSet rs_gpib = ppst.executeQuery();
             
-            if ( rs.next() ){
-                return rs.getInt("place_id");
+            if ( rs_gpib.next() ){
+                return rs_gpib.getInt("place_id");
             }
             return -1;
         }catch(SQLException e){
@@ -372,26 +438,81 @@ public class Database {
             return -2;
         }
     }
+    /**
+     * Database.get_hashtagtable_id_byname(String hashtagtable_name)
+     * @param hashtagtable_name
+     * @return Integer
+     * @throws SQLException
+     * Function for getting hashtagtable by name
+     */
     int get_hashtagtable_id_byname(String hashtagtable_name) throws SQLException{
-        String query = "SELECT * from HASHTAG_TABLE where hashtag_table_name = ? and owner_id = ?;";
+        String query = "SELECT * from HASHTAG_TABLE where hashtag_table_name = ?;";
         PreparedStatement ppst = con.prepareStatement(query);
         
         ppst.setString(1,hashtagtable_name);
-        ppst.setInt(2,this.logged.owner_id);
+        
+        try{
+            ResultSet rs_h = ppst.executeQuery();
+            
+            if ( rs_h.next() ){
+                return rs_h.getInt("hashtag_table_id");
+            }
+            return -1;
+        }catch(SQLException e){
+            log.add("Failed to get hashtag table id by name ("+e.toString()+")",HEADER+" E!!!");
+            return -2;
+        }
+    }
+    
+    /**
+     * Database.get_hashtagtable_obj_byid(int hashtag_table_id)
+     * @param hashtag_table_id
+     * @return Tick_HashtagT
+     * Function gets hashtag table object by given id
+     */
+    Tick_HashtagT get_hashtagtable_obj_byid(int hashtag_table_id) throws SQLException{
+        String query = "SELECT * FROM HASHTAG_TABLE where hashtag_table_id = ?;";
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1, hashtag_table_id);
+        try{
+            ResultSet rs_hob = ppst.executeQuery();
+            if ( rs_hob.next() ){
+                return new Tick_HashtagT(rs_hob);
+            }
+            log.add("Failed to get hashtag table by id ( resultset empty ) ",HEADER+" E!!!");
+            return null;
+            
+        }catch(SQLException e){
+            log.add("Failed to get hashtag table by id ("+e.toString()+")",HEADER+" E!!!");
+            return null;
+        }
+    }
+    
+    /**
+     * Database.get_tag_obj_byid(int tag_id)
+     * @param tag_id
+     * @return
+     * @throws SQLException 
+     */
+    Tick_Tag get_tag_obj_byid(int tag_id) throws SQLException{
+        String query = "SELECT * FROM TAG WHERE tag_id = ?;";
+        
+        PreparedStatement ppst = con.prepareStatement(query);
+        ppst.setInt(1,tag_id);
         
         try{
             ResultSet rs = ppst.executeQuery();
             
             if ( rs.next() ){
-                return rs.getInt("hashtag_table_id");
+                return new Tick_Tag(rs);
             }
-            return -1;
+            log.add("Tick_Tag with tag_id: "+Integer.toString(tag_id)+" not found",HEADER);
+            return null;
         }catch(SQLException e){
-            log.add("Failed to get hashtag table id by name ("+e.toString()+")",HEADER);
-            return -2;
+            log.add("Failed to get tag by id ("+e.toString()+")",HEADER+" E!!!");
+            return null;
         }
     }
-    
     /**
      * Database.get_last_id(String table_name)
      * @param table_name
@@ -409,13 +530,13 @@ public class Database {
         ppst.setInt(1,logged.owner_id);
         
         try{
-            ResultSet rs = ppst.executeQuery();
+            ResultSet rs_gli = ppst.executeQuery();
             
-            while ( rs.next() ){
+            while ( rs_gli.next() ){
                 if ( table_name.equals("LISTS")){
                     field = "list_id";
                 }
-                index = rs.getInt(field);
+                index = rs_gli.getInt(field);
             }
         }catch(SQLException e){
             log.add("Failed to get last_id ("+e.toString()+")",HEADER+"E!!!");
@@ -431,8 +552,11 @@ public class Database {
      * category - returns name of elements in CATEGORY table
      * place - returns name of elements in PLACE table
      * hashtag table - returns name of elements in HASHTAG_TABLE table
+     * options:
+     * 1 - adding "None" and "Manage..." to list ( for objects used in GUI )
+     * 0 - not adding anything more than names of elements
      */
-    ArrayList<String> get_element_name(String mode) throws SQLException{
+    ArrayList<String> get_element_name(String mode,int option) throws SQLException{
         ArrayList<String> data_toRet = new ArrayList<>();
         String query = "",element_name = "";
         String addon = "Manage...";
@@ -455,19 +579,47 @@ public class Database {
         PreparedStatement ppst = con.prepareStatement(query);
         //ppst.setInt(1,logged.owner_id);
         try{
-            ResultSet rs  = ppst.executeQuery();
+            ResultSet rs_gen  = ppst.executeQuery();
             
-            while ( rs.next() ){
-                data_toRet.add(rs.getString(element_name));
+            while ( rs_gen.next() ){
+                data_toRet.add(rs_gen.getString(element_name));
             }
             
-            if ( data_toRet.size() == 0 ){
+            if ( data_toRet.isEmpty() ){
                 data_toRet.add("-");
             }
-            data_toRet.add(addon);
+            
+            // adding options to not adding element
+            if ( option == 1){
+                data_toRet.add("None");
+                data_toRet.add(addon);
+            }
+            
         }catch(SQLException e){
             log.add("Failed to load element names...",HEADER + " E!!!");
             return null;
+        }
+        return data_toRet;
+    }
+    
+    /**
+     * Database.get_all_tags()
+     * @return ArrayList
+     * @throws SQLException
+     * Function for getting all tags from database
+     */
+    ArrayList<Tick_Tag> get_all_tags() throws SQLException{
+        ArrayList<Tick_Tag> data_toRet = new ArrayList<>();
+        ArrayList<Integer> ids = get_all_id("tag");
+        String query = "SELECT * from tag where tag_id = ?";
+        PreparedStatement ppst = con.prepareStatement(query);
+        for(int id : ids){
+            ppst.setInt(1, id);
+            ResultSet rs_gat = ppst.executeQuery();
+            
+            if ( rs_gat.next() ){
+                data_toRet.add(new Tick_Tag(rs_gat));
+            }
         }
         return data_toRet;
     }
@@ -479,43 +631,47 @@ public class Database {
      * @throws SQLException
      * Function for getting all ids from table
      */
-    int[] get_all_id(String mode) throws SQLException{
-        int[] ids = {};
+    ArrayList<Integer> get_all_id(String mode) throws SQLException{
+        ArrayList<Integer> ids = new ArrayList<>();
         String query = "";
-        if (mode.equals("address")){
-            query = "SELECT * FROM ADDRESS;";
-        }
-        else if (mode.equals("category")){
-            query = "SELECT * FROM CATEGORY where owner_id = ?;";
-        }
-        else if (mode.equals("hashtag table")){
-            query = "SELECT * FROM HASHTAG_TABLE where owner_id = ?;";
-        }
-        else if (mode.equals("note")){
-            query = "SELECT * FROM NOTE where owner_id = ?;";
-        }
-        else if (mode.equals("place")){
-            query = "SELECT * FROM PLACE where owner_id = ?;";
-        }
-        else if (mode.equals("tag")){
-            query = "SELECT * FROM TAG where owner_id = ?;";
-        }
-        else if (mode.equals("list")){
-            query = "SELECT * FROM LISTS where owner_id = ?";
+        switch (mode) {
+            case "address":
+                query = "SELECT * FROM ADDRESS;";
+                break;
+            case "category":
+                query = "SELECT * FROM CATEGORY where owner_id = ?;";
+                break;
+            case "hashtag table":
+                query = "SELECT * FROM HASHTAG_TABLE where owner_id = ?;";
+                break;
+            case "note":
+                query = "SELECT * FROM NOTE where owner_id = ?;";
+                break;
+            case "place":
+                query = "SELECT * FROM PLACE where owner_id = ?;";
+                break;
+            case "tag":
+                query = "SELECT * FROM TAG where owner_id = ?;";
+                break;
+            case "list":
+                query = "SELECT * FROM LISTS where owner_id = ?";
+                break;
+            default:
+                break;
         }
         PreparedStatement ppst = con.prepareStatement(query);
         if ( !mode.equals("address") ){
             ppst.setInt(1,logged.owner_id);
         }
-        int i = 0;
         try{
-            ResultSet rs = ppst.executeQuery();
+            ResultSet rs_gai = ppst.executeQuery();
             
-            while(rs.next()){
-                ids[i] = rs.getInt("mode"+"_id");
+            while(rs_gai.next()){
+
+                ids.add(rs_gai.getInt(mode+"_id"));
             }
         }catch(SQLException e){
-            log.add("Failed to get all ids from table ("+e.toString(),HEADER);
+            log.add("Failed to get all ids from table ("+e.toString()+")",HEADER);
             return null;
         }
         return ids;
@@ -560,23 +716,27 @@ public class Database {
      */
     ResultSet return_resultset(String mode,Tick_User logged_user) throws SQLException{
         String query = "";
-        if (mode.equals("address")){
-            query = "SELECT * FROM ADDRESS;";
-        }
-        else if (mode.equals("category")){
-            query = "SELECT * FROM CATEGORY where owner_id = ?;";
-        }
-        else if (mode.equals("hashtag table")){
-            query = "SELECT * FROM HASHTAG_TABLE where owner_id = ?;";
-        }
-        else if (mode.equals("note")){
-            query = "SELECT * FROM NOTE where owner_id = ?;";
-        }
-        else if (mode.equals("place")){
-            query = "SELECT * FROM PLACE where owner_id = ?;";
-        }
-        else if (mode.equals("tag")){
-            query = "SELECT * FROM TAG where owner_id = ?;";
+        switch (mode) {
+            case "address":
+                query = "SELECT * FROM ADDRESS;";
+                break;
+            case "category":
+                query = "SELECT * FROM CATEGORY where owner_id = ?;";
+                break;
+            case "hashtag table":
+                query = "SELECT * FROM HASHTAG_TABLE where owner_id = ?;";
+                break;
+            case "note":
+                query = "SELECT * FROM NOTE where owner_id = ?;";
+                break;
+            case "place":
+                query = "SELECT * FROM PLACE where owner_id = ?;";
+                break;
+            case "tag":
+                query = "SELECT * FROM TAG where owner_id = ?;";
+                break;
+            default:
+                break;
         }
         PreparedStatement ppst = con.prepareStatement(query);
         if ( !mode.equals("address") ){
@@ -590,7 +750,7 @@ public class Database {
         }
     }
     /**
-     * Database.prepare_tick_brick(ResultSet rs,String mode)
+     * Database.prepare_tick_brick(ResultSet rs_ul,String mode)
      * @param rs
      * @param mode
      * @return ArrayList
@@ -603,98 +763,98 @@ public class Database {
         ArrayList<Tick_Brick> to_ret = new ArrayList<>();  // tick_brick to ret
         
         int index[] = {};                // array of int indexes
-        
-        if (mode.equals("address")){
-            /**
-             *  address_id INT AUTO_INCREMENT PRIMARY KEY,
-                address_city VARCHAR(30),
-                address_street VARCHAR (30),
-                address_house_number INT,
-                address_flat_number INT,
-                address_postal VARCHAR(15),
-                address_country VARCHAR(30)
-             */
-            index = new int[] {1,4,5};
-            
-        }
-        else if (mode.equals("category")){
-            /**
-             *  category_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                category_name VARCHAR(45),
-                category_note VARCHAR(100),
-             */
-            index = new int[] {1,2};
-            
-        }
-        else if (mode.equals("hashtag table")){
-            /**
-             *  hashtag_table_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                hashtag_table_name VARCHAR(45),
-                hashtag_table_note VARCHAR(100),
-                * 
-             */
-            index = new int[] {1,2};
-        }
-        else if (mode.equals("note")){
-            /**
-             *  note_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                note_content VARCHAR(100),
-                setting1 VARCHAR(40),
-                setting2 VARCHAR(40),
-                setting3 VARCHAR(40),
-             */
-            index = new int[] {1,2};
-        }
-        else if (mode.equals("place")){
-            /**
-             *  place_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                place_name VARCHAR(30),
-                address_id INT,
-             */
-            index = new int[] {1,2,4};
-            
-        }
-        else if (mode.equals("tag")){
-            /**
-             *  tag_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                hashtag_table_id INT,
-                tag_name VARCHAR(45),
-                tag_note VARCHAR(100),
-             */
-            index = new int[] {1,2,3};
-        }
-        else if (mode.equals("tick")){
-            /**
-             *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                place_id INT,
-                category_id INT,
-                note_id INT,
-                hashtag_table_id INT,
-                tick_done_id INT,
-                tick_done_start VARCHAR(60),
-                tick_date_end VARCHAR(60),
-                tick_name VARCHAR(60),
-                tick_priority INT
-             */
-            index = new int[] {1,2,3,4,5,6,7,11};
-        }
-        else if (mode.equals("scene")){
-            /**
-             *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
-                hashtag_table_id INT,
-                place_id INT,
-                owner_id INT,
-                category_id INT,
-                scene_name VARCHAR(30),
-                scene_note VARCHAR(100),
-             */
-            index = new int[] {1,2,3,4,5};
+        switch (mode) {
+            case "address":
+                /**
+                 *  address_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * address_city VARCHAR(30),
+                 * address_street VARCHAR (30),
+                 * address_house_number INT,
+                 * address_flat_number INT,
+                 * address_postal VARCHAR(15),
+                 * address_country VARCHAR(30)
+                 */
+                index = new int[] {1,4,5};
+                break;
+            case "category":
+                /**
+                 *  category_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * category_name VARCHAR(45),
+                 * category_note VARCHAR(100),
+                 */
+                index = new int[] {1,2};
+                break;
+            case "hashtag table":
+                /**
+                 *  hashtag_table_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * hashtag_table_name VARCHAR(45),
+                 * hashtag_table_note VARCHAR(100),
+                 *
+                 */
+                index = new int[] {1,2};
+                break;
+            case "note":
+                /**
+                 *  note_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * note_content VARCHAR(100),
+                 * setting1 VARCHAR(40),
+                 * setting2 VARCHAR(40),
+                 * setting3 VARCHAR(40),
+                 */
+                index = new int[] {1,2};
+                break;
+            case "place":
+                /**
+                 *  place_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * place_name VARCHAR(30),
+                 * address_id INT,
+                 */
+                index = new int[] {1,2,4};
+                break;
+            case "tag":
+                /**
+                 *  tag_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * hashtag_table_id INT,
+                 * tag_name VARCHAR(45),
+                 * tag_note VARCHAR(100),
+                 */
+                index = new int[] {1,2,3};
+                break;
+            case "tick":
+                /**
+                 *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * place_id INT,
+                 * category_id INT,
+                 * note_id INT,
+                 * hashtag_table_id INT,
+                 * tick_done_id INT,
+                 * tick_done_start VARCHAR(60),
+                 * tick_date_end VARCHAR(60),
+                 * tick_name VARCHAR(60),
+                 * tick_priority INT
+                 */
+                index = new int[] {1,2,3,4,5,6,7,11};
+                break;
+            case "scene":
+                /**
+                 *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * hashtag_table_id INT,
+                 * place_id INT,
+                 * owner_id INT,
+                 * category_id INT,
+                 * scene_name VARCHAR(30),
+                 * scene_note VARCHAR(100),
+                 */
+                index = new int[] {1,2,3,4,5};
+                break;
+            default:
+                break;
         }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
@@ -733,107 +893,107 @@ public class Database {
         ArrayList<Tick_Brick> to_ret = new ArrayList<>();  // tick_brick to ret
         
         int index[] = {};                // array of int indexes
-        
-        if (mode.equals("address")){
-            /**
-             *  address_id INT AUTO_INCREMENT PRIMARY KEY,
-                address_city VARCHAR(30),
-                address_street VARCHAR (30),
-                address_house_number INT,
-                address_flat_number INT,
-                address_postal VARCHAR(15),
-                address_country VARCHAR(30)
-             */
-            index = new int[] {1,4,5};
-            
-        }
-        else if (mode.equals("category")){
-            /**
-             *  category_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                category_name VARCHAR(45),
-                category_note VARCHAR(100),
-             */
-            index = new int[] {1,2};
-            
-        }
-        else if (mode.equals("hashtag table")){
-            /**
-             *  hashtag_table_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                hashtag_table_name VARCHAR(45),
-                hashtag_table_note VARCHAR(100),
-                * 
-             */
-            index = new int[] {1,2};
-        }
-        else if (mode.equals("note")){
-            /**
-             *  note_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                note_content VARCHAR(100),
-                setting1 VARCHAR(40),
-                setting2 VARCHAR(40),
-                setting3 VARCHAR(40),
-             */
-            index = new int[] {1,2};
-        }
-        else if (mode.equals("place")){
-            /**
-             *  place_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                place_name VARCHAR(30),
-                address_id INT,
-             */
-            index = new int[] {1,2,4};
-            
-        }
-        else if (mode.equals("tag")){
-            /**
-             *  tag_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                hashtag_table_id INT,
-                tag_name VARCHAR(45),
-                tag_note VARCHAR(100),
-             */
-            index = new int[] {1,2,3};
-        }
-        else if (mode.equals("tick")){
-            /**
-             *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                place_id INT,
-                category_id INT,
-                note_id INT,
-                hashtag_table_id INT,
-                tick_done_id INT,
-                tick_done_start VARCHAR(60),
-                tick_date_end VARCHAR(60),
-                tick_name VARCHAR(60),
-             */
-            index = new int[] {1,2,3,4,5,6,7};
-        }
-        else if (mode.equals("scene")){
-            /**
-             *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
-                hashtag_table_id INT,
-                place_id INT,
-                owner_id INT,
-                category_id INT,
-                scene_name VARCHAR(30),
-                scene_note VARCHAR(100),
-             */
-            index = new int[] {1,2,3,4,5};
-        }
-        else if (mode.equals("list")){
-            /**
-             *  list_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                tick_list_id VARCHAR(100),
-                list_name VARCHAR(50),
-                list_date VARCHAR(50),
-             */
-            index = new int[] {1,2};
+        switch (mode) {
+            case "address":
+                /**
+                 *  address_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * address_city VARCHAR(30),
+                 * address_street VARCHAR (30),
+                 * address_house_number INT,
+                 * address_flat_number INT,
+                 * address_postal VARCHAR(15),
+                 * address_country VARCHAR(30)
+                 */
+                index = new int[] {1,4,5};
+                break;
+            case "category":
+                /**
+                 *  category_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * category_name VARCHAR(45),
+                 * category_note VARCHAR(100),
+                 */
+                index = new int[] {1,2};
+                break;
+            case "hashtag table":
+                /**
+                 *  hashtag_table_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * hashtag_table_name VARCHAR(45),
+                 * hashtag_table_note VARCHAR(100),
+                 *
+                 */
+                index = new int[] {1,2};
+                break;
+            case "note":
+                /**
+                 *  note_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * note_content VARCHAR(100),
+                 * setting1 VARCHAR(40),
+                 * setting2 VARCHAR(40),
+                 * setting3 VARCHAR(40),
+                 */
+                index = new int[] {1,2};
+                break;
+            case "place":
+                /**
+                 *  place_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * place_name VARCHAR(30),
+                 * address_id INT,
+                 */
+                index = new int[] {1,2,4};
+                break;
+            case "tag":
+                /**
+                 *  tag_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * hashtag_table_id INT,
+                 * tag_name VARCHAR(45),
+                 * tag_note VARCHAR(100),
+                 */
+                index = new int[] {1,2,3};
+                break;
+            case "tick":
+                /**
+                 *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * place_id INT,
+                 * category_id INT,
+                 * note_id INT,
+                 * hashtag_table_id INT,
+                 * tick_done_id INT,
+                 * tick_done_start VARCHAR(60),
+                 * tick_date_end VARCHAR(60),
+                 * tick_name VARCHAR(60),
+                 */
+                index = new int[] {1,2,3,4,5,6,7};
+                break;
+            case "scene":
+                /**
+                 *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * hashtag_table_id INT,
+                 * place_id INT,
+                 * owner_id INT,
+                 * category_id INT,
+                 * scene_name VARCHAR(30),
+                 * scene_note VARCHAR(100),
+                 */
+                index = new int[] {1,2,3,4,5};
+                break;
+            case "list":
+                /**
+                 *  list_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * tick_list_id VARCHAR(100),
+                 * list_name VARCHAR(50),
+                 * list_date VARCHAR(50),
+                 */
+                index = new int[] {1,2};
+                break;
+            default:
+                break;
         }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
@@ -867,7 +1027,7 @@ public class Database {
     }
     //----------------------------tick brick functions
     /**
-     * Database.prepare_tick_brick(ResultSet rs)
+     * Database.prepare_tick_brick(ResultSet rs_ul)
      * @param rs
      * @return ArrayList
      * Function returns collection of Tick_Brick
@@ -879,108 +1039,109 @@ public class Database {
         ArrayList<Tick_Brick> to_ret = new ArrayList<>();  // tick_brick to ret
         
         int index[] = {};                // array of int indexes
-        
-        if (mode.equals("address")){
-            /**
-             *  address_id INT AUTO_INCREMENT PRIMARY KEY,
-                address_city VARCHAR(30),
-                address_street VARCHAR (30),
-                address_house_number INT,
-                address_flat_number INT,
-                address_postal VARCHAR(15),
-                address_country VARCHAR(30)
-             */
-            index = new int[] {1,4,5};
-            
-        }
-        else if (mode.equals("category")){
-            /**
-             *  category_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                category_name VARCHAR(45),
-                category_note VARCHAR(100),
-             */
-            index = new int[] {1,2};
-            
-        }
-        else if (mode.equals("hashtag table")){
-            /**
-             *  hashtag_table_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                hashtag_table_name VARCHAR(45),
-                hashtag_table_note VARCHAR(100),
-                * 
-             */
-            index = new int[] {1,2};
-        }
-        else if (mode.equals("note")){
-            /**
-             *  note_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                note_content VARCHAR(100),
-                setting1 VARCHAR(40),
-                setting2 VARCHAR(40),
-                setting3 VARCHAR(40),
-             */
-            index = new int[] {1,2};
-        }
-        else if (mode.equals("place")){
-            /**
-             *  place_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                place_name VARCHAR(30),
-                address_id INT,
-             */
-            index = new int[] {1,2,4};
-            
-        }
-        else if (mode.equals("tag")){
-            /**
-             *  tag_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                hashtag_table_id INT,
-                tag_name VARCHAR(45),
-                tag_note VARCHAR(100),
-             */
-            index = new int[] {1,2,3};
-        }
-        else if (mode.equals("scene")){
-            /**
-             *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
-                hashtag_table_id INT,
-                place_id INT,
-                owner_id INT,
-                category_id INT,
-                scene_name VARCHAR(30),
-                scene_note VARCHAR(100),
-             */
-            index = new int[] {1,2,3,4,5};
-        }
-        else if (mode.equals("tick") || mode.equals("tick_done")){
-            /**
-             *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
-                owner_id INT,
-                place_id INT,
-                category_id INT,
-                note_id INT,
-                hashtag_table_id INT,
-                tick_done_id INT,
-                tick_done_start VARCHAR(60),
-                tick_date_end VARCHAR(60),
-                tick_name VARCHAR(60),
-                tick_priority INT,
-             */
-            index = new int[] {1,2,3,4,5,6,7,11};
-        }
-        else if (mode.equals("lists")){
+        switch (mode) {
+            case "address":
                 /**
-                *  list_id INT AUTO_INCREMENT PRIMARY KEY,
-                   owner_id INT,
-                   tick_list_id VARCHAR(100),
-                   list_name VARCHAR(50),
-                   list_date VARCHAR(50),
-                */
-            index = new int[] {1,2};
+                 *  address_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * address_city VARCHAR(30),
+                 * address_street VARCHAR (30),
+                 * address_house_number INT,
+                 * address_flat_number INT,
+                 * address_postal VARCHAR(15),
+                 * address_country VARCHAR(30)
+                 */
+                index = new int[] {1,4,5};
+                break;
+            case "category":
+                /**
+                 *  category_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * category_name VARCHAR(45),
+                 * category_note VARCHAR(100),
+                 */
+                index = new int[] {1,2};
+                break;
+            case "hashtag table":
+                /**
+                 *  hashtag_table_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * hashtag_table_name VARCHAR(45),
+                 * hashtag_table_note VARCHAR(100),
+                 *
+                 */
+                index = new int[] {1,2};
+                break;
+            case "note":
+                /**
+                 *  note_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * note_content VARCHAR(100),
+                 * setting1 VARCHAR(40),
+                 * setting2 VARCHAR(40),
+                 * setting3 VARCHAR(40),
+                 */
+                index = new int[] {1,2};
+                break;
+            case "place":
+                /**
+                 *  place_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * place_name VARCHAR(30),
+                 * address_id INT,
+                 */
+                index = new int[] {1,2,4};
+                break;
+            case "tag":
+                /**
+                 *  tag_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * hashtag_table_id INT,
+                 * tag_name VARCHAR(45),
+                 * tag_note VARCHAR(100),
+                 */
+                index = new int[] {1,2,3};
+                break;
+            case "scene":
+                /**
+                 *  scene_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * hashtag_table_id INT,
+                 * place_id INT,
+                 * owner_id INT,
+                 * category_id INT,
+                 * scene_name VARCHAR(30),
+                 * scene_note VARCHAR(100),
+                 */
+                index = new int[] {1,2,3,4,5};
+                break;
+            case "tick":
+            case "tick_done":
+                /**
+                 *  tick_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * place_id INT,
+                 * category_id INT,
+                 * note_id INT,
+                 * hashtag_table_id INT,
+                 * tick_done_id INT,
+                 * tick_done_start VARCHAR(60),
+                 * tick_date_end VARCHAR(60),
+                 * tick_name VARCHAR(60),
+                 * tick_priority INT,
+                 */
+                index = new int[] {1,2,3,4,5,6,7,11};
+                break;
+            case "lists":
+                /**
+                 *  list_id INT AUTO_INCREMENT PRIMARY KEY,
+                 * owner_id INT,
+                 * tick_list_id VARCHAR(100),
+                 * list_name VARCHAR(50),
+                 * list_date VARCHAR(50),
+                 */
+                index = new int[] {1,2};
+                break;
+            default:
+                break;
         }
         // coping array to collection
         List<Integer> int_index = Arrays.stream(index).boxed().collect(Collectors.toList());
@@ -1030,32 +1191,36 @@ public class Database {
     ArrayList<Tick_Brick> return_TB_collection(Tick_User logged_user, String mode, int object_id) throws SQLException{
         log.add("Started return_TB_collection function : tick_user, mode and object",HEADER);
         String query = "";
-        if (mode.equals("address")){
-            query = "SELECT * FROM ADDRESS where address_id = ?;";
-        }
-        else if (mode.equals("category")){
-            query = "SELECT * FROM CATEGORY where category_id = ? ;";
-        }
-        else if (mode.equals("hashtag table")){
-            query = "SELECT * FROM HASHTAG_TABLE where hashtag_table_id = ?;";
-        }
-        else if (mode.equals("note")){
-            query = "SELECT * FROM NOTE where note_id = ?;";
-        }
-        else if (mode.equals("place")){
-            query = "SELECT * FROM PLACE where place_id = ?;";
-        }
-        else if (mode.equals("tag")){
-            query = "SELECT * FROM TAG where tag_id = ?;";
-        }
-        else if (mode.equals("scene")){
-            query = "SELECT * FROM SCENE where scene_id = ?;";
-        }
-        else if (mode.equals("tick")){
-            query = "SELECT * FROM TICK where tick_id = ?;";
-        }
-        else if (mode.equals("list")){
-            query = "SELECT * FROM LISTS where list_id =?;";
+        switch (mode) {
+            case "address":
+                query = "SELECT * FROM ADDRESS where address_id = ?;";
+                break;
+            case "category":
+                query = "SELECT * FROM CATEGORY where category_id = ? ;";
+                break;
+            case "hashtag table":
+                query = "SELECT * FROM HASHTAG_TABLE where hashtag_table_id = ?;";
+                break;
+            case "note":
+                query = "SELECT * FROM NOTE where note_id = ?;";
+                break;
+            case "place":
+                query = "SELECT * FROM PLACE where place_id = ?;";
+                break;
+            case "tag":
+                query = "SELECT * FROM TAG where tag_id = ?;";
+                break;
+            case "scene":
+                query = "SELECT * FROM SCENE where scene_id = ?;";
+                break;
+            case "tick":
+                query = "SELECT * FROM TICK where tick_id = ?;";
+                break;
+            case "list":
+                query = "SELECT * FROM LISTS where list_id =?;";
+                break;
+            default:
+                break;
         }
         
         PreparedStatement ppst = con.prepareStatement(query);
@@ -1074,32 +1239,36 @@ public class Database {
     ArrayList<Tick_Brick> return_TB_collection(String mode,int object_id) throws SQLException{
         log.add("Started return_TB_collection function : object and mode",HEADER);
         String query = "";
-        if (mode.equals("address")){
-            query = "SELECT * FROM ADDRESS where address_id = ?;";
-        }
-        else if (mode.equals("category")){
-            query = "SELECT * FROM CATEGORY where category_id = ?;";
-        }
-        else if (mode.equals("hashtag table")){
-            query = "SELECT * FROM HASHTAG_TABLE where and hashtag_table_id = ?;";
-        }
-        else if (mode.equals("note")){
-            query = "SELECT * FROM NOTE where note_id = ?;";
-        }
-        else if (mode.equals("place")){
-            query = "SELECT * FROM PLACE where place_id = ?;";
-        }
-        else if (mode.equals("tag")){
-            query = "SELECT * FROM TAG where tag_id = ?;";
-        }
-        else if (mode.equals("scene")){
-            query = "SELECT * FROM SCENE where scene_id = ?;";
-        }
-        else if (mode.equals("tick")){
-            query = "SELECT * FROM TICK where tick_id = ?;";
-        }
-        else if (mode.equals("list")){
-            query = "SELECT * FROM LISTS where list_id =?;";
+        switch (mode) {
+            case "address":
+                query = "SELECT * FROM ADDRESS where address_id = ?;";
+                break;
+            case "category":
+                query = "SELECT * FROM CATEGORY where category_id = ?;";
+                break;
+            case "hashtag table":
+                query = "SELECT * FROM HASHTAG_TABLE where and hashtag_table_id = ?;";
+                break;
+            case "note":
+                query = "SELECT * FROM NOTE where note_id = ?;";
+                break;
+            case "place":
+                query = "SELECT * FROM PLACE where place_id = ?;";
+                break;
+            case "tag":
+                query = "SELECT * FROM TAG where tag_id = ?;";
+                break;
+            case "scene":
+                query = "SELECT * FROM SCENE where scene_id = ?;";
+                break;
+            case "tick":
+                query = "SELECT * FROM TICK where tick_id = ?;";
+                break;
+            case "list":
+                query = "SELECT * FROM LISTS where list_id =?;";
+                break;
+            default:
+                break;
         }
         
         PreparedStatement ppst = con.prepareStatement(query);
@@ -1132,21 +1301,21 @@ public class Database {
         ppst.setString(1, user_login);
         ppst.setString(2, user_password);
         
-        ResultSet rs = ppst.executeQuery();
+        ResultSet rs_ul = ppst.executeQuery();
         
-        ResultSetMetaData meta   = (ResultSetMetaData) rs.getMetaData();
+        ResultSetMetaData meta   = (ResultSetMetaData) rs_ul.getMetaData();
         int colmax = meta.getColumnCount();
         this.log.add("COLMAX "+Integer.toString(colmax), HEADER);
         int a[] = {1,3,8,9};
         
         ArrayList<Tick_Brick> us_part = new ArrayList<>();
-        if ( rs.next() ){
+        if ( rs_ul.next() ){
             for ( int i = 1 ; i <= colmax; i++){
                 if ( array_has_it(a,i)){
-                    us_part.add(new Tick_Brick(rs.getInt(meta.getColumnName(i))));
+                    us_part.add(new Tick_Brick(rs_ul.getInt(meta.getColumnName(i))));
                 }
                 else{
-                    us_part.add(new Tick_Brick(rs.getString(meta.getColumnName(i))));
+                    us_part.add(new Tick_Brick(rs_ul.getString(meta.getColumnName(i))));
                 }
             }
             this.log.add("Logged user correctly", HEADER);
@@ -1171,12 +1340,7 @@ public class Database {
             ResultSet act_rs = ppst.executeQuery();
             
            if (act_rs.next()){
-               if (act_rs.getInt("debug") == 1){
-                   return true;
-               }
-               else{
-                   return false;
-               }
+                return act_rs.getInt("debug") == 1;
            }
         
         }catch(SQLException e){
@@ -1319,7 +1483,7 @@ public class Database {
             log.add("QUERY: "+ppst.toString(),HEADER);
             ppst.execute();
             return true;
-        }catch (Exception e){
+        }catch (SQLException e){
             log.add("Failed to add address",HEADER);
             log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
             return false;
@@ -1355,7 +1519,7 @@ public class Database {
             log.add("QUERY: "+ppst.toString(),HEADER);
             ppst.execute();
             return true;
-        }catch (Exception e){
+        }catch (SQLException e){
             log.add("Failed to add Hashtag Table",HEADER);
             log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
             return false;
@@ -1391,7 +1555,7 @@ public class Database {
             log.add("QUERY: "+ppst.toString(),HEADER);
             ppst.execute();
             return true;
-        }catch (Exception e){
+        }catch (SQLException e){
             log.add("Failed to add tag",HEADER);
             log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
             return false;
@@ -1426,7 +1590,7 @@ public class Database {
             log.add("QUERY: "+ppst.toString(),HEADER);
             ppst.execute();
             return true;
-        }catch (Exception e){
+        }catch (SQLException e){
             log.add("Failed to add category",HEADER);
             log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
             return false;
@@ -1462,7 +1626,7 @@ public class Database {
             log.add("QUERY: "+ppst.toString(),HEADER);
             ppst.execute();
             return true;
-        }catch (Exception e){
+        }catch (SQLException e){
             log.add("Failed to add note",HEADER);
             log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
             return false;
@@ -1498,7 +1662,7 @@ public class Database {
             log.add("QUERY: "+ppst.toString(),HEADER);
             ppst.execute();
             return true;
-        }catch (Exception e){
+        }catch (SQLException e){
             log.add("Failed to add scene",HEADER);
             log.add("QUERY FAILED: "+e.getMessage(),HEADER+ "E!!");
             return false;

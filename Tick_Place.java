@@ -72,6 +72,7 @@ public class Tick_Place extends Tick_Element{
         ArrayList<Tick_Brick> to_ret = new ArrayList<>();
         
         to_ret.add(new Tick_Brick(place_id));
+        to_ret.add(new Tick_Brick(owner_id));
         to_ret.add(new Tick_Brick(place_name));
         to_ret.add(new Tick_Brick(address_id));
         return to_ret;

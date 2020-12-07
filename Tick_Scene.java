@@ -5,8 +5,9 @@ all rights reserved
  */
 package tick;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *Object for storing and making scenes
@@ -61,6 +62,19 @@ public class Tick_Scene extends Tick_Element{
         scene_note = to_add.get(6).s_get();
         super.put_elements(wall_updater());
     }
+    
+    // constructor with ResultSet object
+    Tick_Scene(ResultSet to_add) throws SQLException{
+        super("Tick_Scene");
+        scene_id = to_add.getInt("scene_id");
+        hashtag_table_id = to_add.getInt("hashtag_table_id");
+        place_id = to_add.getInt("place_id");
+        owner_id = to_add.getInt("owner_id");
+        category_id = to_add.getInt("category_id");
+        scene_name = to_add.getString("scene_name");
+        scene_note = to_add.getString("scene_note");
+        super.put_elements(wall_updater());
+    }
     /**
      * Tick_Scene.wall_updater()
      * @return ArrayList
@@ -75,6 +89,7 @@ public class Tick_Scene extends Tick_Element{
         to_ret.add(new Tick_Brick(category_id));
         to_ret.add(new Tick_Brick(scene_name));
         to_ret.add(new Tick_Brick(scene_note));
+        super.put_elements(to_ret);
         return to_ret;
     }
     /**
@@ -104,6 +119,25 @@ public class Tick_Scene extends Tick_Element{
         }
     }
     
+    /**
+     * Tick_Scene.return_tick_from_scene(Database database)
+     * @param database
+     * @return ArrayList
+     * @throws SQLException
+     * Function for returning Tick objects with given parameters 
+     */
+    ArrayList<Tick_Tick> return_tick_from_scene(Database database) throws SQLException{
+        ArrayList<Tick_Tick> tick_data = new ArrayList<>();
+        Database_Scene ds = new Database_Scene(database);
+        Tick_Scene ts = ds.get_scene_object(scene_id);
+        ResultSet rs = database.return_resultset(ts.query_creator());
+        
+        while( rs.next() ){
+            tick_data.add(new Tick_Tick(rs));
+        }
+        
+        return tick_data;
+    }
     /**
      * Tick_Scene.stop_CUI()
      * @return boolean
@@ -218,5 +252,13 @@ public class Tick_Scene extends Tick_Element{
         query = query + ";";
         
         return query;
-    } 
+    }
+    
+    /**
+     * Function for showing 
+     * @return 
+     */
+    String show_glance(){
+        return Integer.toString(scene_id)+": "+scene_name;
+    }
 }

@@ -38,7 +38,8 @@
                       <Component id="button_delete" min="-2" pref="76" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <Component id="label_canteditdefaults" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="label_deleted" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -59,7 +60,10 @@
                   <Component id="button_delete" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="label_deleted" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="label_deleted" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="label_canteditdefaults" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace pref="12" max="32767" attributes="0"/>
               <Component id="button_add" min="-2" pref="57" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -128,6 +132,11 @@
     <Component class="javax.swing.JLabel" name="label_deleted">
       <Properties>
         <Property name="text" type="java.lang.String" value="Deleted"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="label_canteditdefaults">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="You can&apos;t edit defaults."/>
       </Properties>
     </Component>
   </SubComponents>

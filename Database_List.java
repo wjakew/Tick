@@ -37,7 +37,6 @@ public class Database_List {
         
         ppst.setInt(1, database.logged.owner_id);
         
-        
         try{
             ResultSet rs = ppst.executeQuery();
             
@@ -80,7 +79,7 @@ public class Database_List {
             return null;
         }
     }
-    
+   
     /**
      * Database_List.load_tick_data(ArrayList<Integer>)
      * @param ids
@@ -114,8 +113,7 @@ public class Database_List {
         }
         return data; 
     }
-    
-    
+
     /**
      * Database_List.add_list(Tick_List to_add)
      * @param to_add

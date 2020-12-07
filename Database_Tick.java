@@ -61,6 +61,60 @@ public class Database_Tick {
     }
     
     /**
+     * Database_Tick.filter_by(String mode, int object_id)
+     * @param mode
+     * @param object_id
+     * @return ArrayList
+     * Function for sorting ticks by different objects
+     */
+    ArrayList<Tick_Tick> filter_by(String mode,int object_id) throws SQLException{
+        
+        database.log.add("Filtering tick. mode: "+mode+" object_id ="+Integer.toString(object_id),HEADER);
+        
+        ArrayList<Tick_Tick> data_toRet = new ArrayList<>();
+        
+        String query = "SELECT * FROM ";
+        
+        switch(mode){
+            case "category":
+                query = query + " TICK where category_id = ? and owner_id  = ?;";
+                break;
+            case "place":
+                query = query + " TICK where place_id = ? and  owner_id = ?;";
+                break;
+            case "hashtag table":
+                query = "query" + "TICK where hashtag_table_id = ? and owner_id = ?;";
+                break;
+            default:
+                break;            
+        }
+        
+        PreparedStatement ppst = database.con.prepareStatement(query);
+        
+        ppst.setInt(1, object_id);
+        ppst.setInt(2,database.logged.owner_id);
+        
+        database.log.add("Query for filter: "+ppst.toString(),HEADER);
+        
+        try{
+            ResultSet rs = ppst.executeQuery();
+            
+            while (rs.next()){
+                
+                data_toRet.add(new Tick_Tick(rs));                
+            }
+        }catch(SQLException e){
+            
+            database.log.add("Failed to sort object (mode: "+mode+" ,object_id: "+Integer.toString(object_id)+" | "+e.toString()+")",HEADER+" E!!!");
+            return null;
+        }
+        
+        return data_toRet;
+        
+        
+    }
+    
+    /**
      * Database_Tick.check_if_exists(int tick_id)
      * @param tick_id
      * @return boolean

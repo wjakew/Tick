@@ -11,11 +11,12 @@ import javax.mail.MessagingException;
 
 /**
  *Main program
- * @author jakub
+ * @author jakubwawak
  */
 public class Tick {
 
-    static final String version = "v1.0.0B12";
+    static int debug = 1;
+    static final String version = "v1.0.0B13";
     
     static Tick_Log session_log;
     static Database database;
@@ -26,12 +27,19 @@ public class Tick {
      */
     public static void main(String[] args) throws IOException, SQLException, MessagingException {
         System.out.println("TICK "+version);
-// initialization of the modules
+        // initialization of the modules
         // -- Tick_Log
         session_log = new Tick_Log();
         // -- Database
         database = new Database(session_log);
-        
+        // debug
+        if ( debug == 1){
+            
+            database.user_login("wjakew", "test");
+            
+            new GUI_addtags_window(null,false,database,2);
+            
+        }
         if (database.connected){
             new CUI_Tick_Inteface(database).run();
         }
@@ -39,9 +47,6 @@ public class Tick {
             System.out.println("Failed to connect to the database. Check log file.");
             session_log.add("Failed to connect to the database",  "TICK "+version);
         }
-
         session_log.save();
-        
     }
-    
 }
